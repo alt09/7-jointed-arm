@@ -1,0 +1,53 @@
+# how to run this project
+1. Do pip install -r requirements.txt
+
+## DATA:
+source: https://www.asc-csa.gc.ca/eng/iss/canadarm2/canadarm-canadarm2-canadarm3-comparative-table.asp 
+Length = 8.5m long arm 
+Mass = 1076kg
+Diameter = 23cm
+Composition = carbon fibre composite
+joint rotation = 358°(estimation)
+
+## how I think it is(estimation):
+GATEWAY / BASE
+    │
+    │
+    ▼
+┌───────────────┐
+│ SHOULDER      │
+│ J1 J2 J3      │
+└──────┬────────┘
+       │
+       │ 520 mm shoulder assembly
+       │
+       ▼
+════════════════════════════════════
+       BOOM A
+       3,350 mm
+════════════════════════════════════
+       │
+       ▼
+   ┌─────────┐
+   │ ELBOW   │
+   │   J4    │
+   └────┬────┘
+        │
+        │
+════════════════════════════════════
+       BOOM B
+       3,450 mm
+════════════════════════════════════
+        │
+        ▼
+   ┌───────────────┐
+   │ WRIST         │
+   │ J5 J6 J7      │
+   └──────┬────────┘
+          │
+          │ 300 mm
+          ▼
+     ┌─────────┐
+     │   LEE   │
+     │  HAND   │
+     └─────────┘
