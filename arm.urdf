@@ -5,7 +5,7 @@
 
     <visual> <!-- Base link visual -->
       <geometry>
-        <box size="1 1 .01"/>
+        <box size="1 1 .1"/>
       </geometry>
       <material name="blue">
         <color rgba="0 0 1 1"/>
@@ -14,7 +14,7 @@
     
     <collision> <!-- Base link collision -->
       <geometry>
-        <box size="1 1 .01"/>
+        <box size="1 1 .1"/>
       </geometry>
     </collision>
 
@@ -36,7 +36,7 @@
 
     <visual> <!-- Shoulder link visual -->
       <geometry>
-        <cylinder radius="0.23" length="0.2"/>
+        <box size="0.37427 0.37427 .44090"/>
       </geometry>
       <material name="red">
         <color rgba="1 0 0 1"/>
@@ -45,7 +45,7 @@
 
     <collision> <!-- Shoulder link collision -->
       <geometry>
-        <cylinder radius="0.23" length="0.2"/>
+        <box size="0.37427 0.37427 .44090"/>
       </geometry>
     </collision>
 
@@ -67,16 +67,16 @@
 
     <visual> <!-- Shoulder link visual -->
       <geometry>
-        <cylinder radius="0.23" length="0.2"/>
+        <box size="0.38129 0.36253 0.35895"/>
       </geometry>
-      <material name="red">
-        <color rgba="1 0 0 1"/>
+      <material name="yellow">
+        <color rgba="1 1 0 1"/>
       </material>
     </visual>
 
     <collision> <!-- Shoulder link collision -->
       <geometry>
-        <cylinder radius="0.23" length="0.2"/>
+        <box size="0.38129 0.36253 0.35895"/>
       </geometry>
     </collision>
 
@@ -98,16 +98,16 @@
 
     <visual> <!-- Shoulder link visual -->
       <geometry>
-        <cylinder radius="0.23" length="0.2"/>
+        <box size="0.33712 0.27699 0.38135"/>
       </geometry>
-      <material name="red">
-        <color rgba="1 0 0 1"/>
+      <material name="idk">
+        <color rgba="1 0 1 1"/>
       </material>
     </visual>
 
     <collision> <!-- Shoulder link collision -->
       <geometry>
-        <cylinder radius="0.23" length="0.2"/>
+        <box size="0.33712 0.27699 0.38135"/>
       </geometry>
     </collision>
 
@@ -117,7 +117,8 @@
     </inertial>
 
   </link>
-
+<!-- TODO: add first boom -->
+<!-- TODO: end first boom -->
   <!-- Elbow Link (1 joint) -->
   <joint name="elbow_joint" type="revolute">
     <origin xyz="0 0 0.2" rpy="0 0 0"/>
@@ -130,7 +131,7 @@
 
     <visual> <!-- Elbow link visual -->
       <geometry>
-        <cylinder radius="0.23" length="0.25"/>
+        <cylinder radius="0.01" length="0.01"/>  <!-- inside boom A -->
       </geometry>
       <material name="green">
         <color rgba="0 1 0 1"/>
@@ -139,7 +140,7 @@
 
     <collision> <!-- Elbow link collision -->
       <geometry>
-        <cylinder radius="0.23" length="0.25"/>
+        <cylinder radius="0.01" length="0.01"/> <!-- inside boom A -->
       </geometry>
     </collision>
 
@@ -148,7 +149,8 @@
       <inertia ixx="0.1" ixy="0.0" ixz="0.0" iyy="0.1" iyz="0.0" izz="0.1"/>
     </inertial>
   </link>
-
+<!-- TODO: add second boom -->
+<!-- TODO: finish second boom -->
   <!-- Wrist Link 1 (Pitch) -->
   <joint name="wrist_joint_1" type="revolute">
     <origin xyz="0 0 0.25" rpy="0 0 0"/>
@@ -161,16 +163,16 @@
 
     <visual> <!-- Wrist link visual -->
       <geometry>
-        <cylinder radius="0.23" length="0.15"/>
+        <box size="0.33712 0.27699 0.38135"/>
       </geometry>
-      <material name="yellow">
-        <color rgba="1 1 0 1"/>
+      <material name="idk">
+        <color rgba="1 0 1 1"/>
       </material>
     </visual>
 
     <collision> <!-- Wrist link collision -->
       <geometry>
-        <cylinder radius="0.23" length="0.15"/>
+        <box size="0.33712 0.27699 0.38135"/>
       </geometry>
     </collision>
 
@@ -192,7 +194,7 @@
 
     <visual> <!-- Wrist link visual -->
       <geometry>
-        <cylinder radius="0.23" length="0.15"/>
+        <box size="0.38129 0.36253 0.35895"/>
       </geometry>
       <material name="yellow">
         <color rgba="1 1 0 1"/>
@@ -201,7 +203,7 @@
 
     <collision> <!-- Wrist link collision -->
       <geometry>
-        <cylinder radius="0.23" length="0.15"/>
+        <box size="0.38129 0.36253 0.35895"/>
       </geometry>
     </collision>
 
@@ -223,16 +225,16 @@
 
     <visual> <!-- Wrist link visual -->
       <geometry>
-        <cylinder radius="0.23" length="0.15"/>
+        <box size="0.37427 0.37427 .44090"/>
       </geometry>
-      <material name="yellow">
-        <color rgba="1 1 0 1"/>
+      <material name="red">
+        <color rgba="1 0 0 1"/>
       </material>
     </visual>
     
     <collision> <!-- Wrist link collision -->
       <geometry>
-        <cylinder radius="0.23" length="0.15"/>
+        <box size="0.37427 0.37427 .44090"/>
       </geometry>
     </collision>
 
@@ -252,7 +254,7 @@
 
     <visual> <!-- End effector visual -->
       <geometry>
-        <sphere radius="0.05"/>
+        <sphere radius="0.25"/>
       </geometry>
       <material name="black">
         <color rgba="0 0 0 1"/>
@@ -261,7 +263,7 @@
 
     <collision> <!-- End effector collision -->
       <geometry>
-        <sphere radius="0.05"/>
+        <sphere radius="0.25"/>
       </geometry>
     </collision>
 
