@@ -139,8 +139,8 @@ def main():
     }
     sim.set_configuration(neutral_config)
     
-    # Run for 5 seconds
-    sim.run_simulation(duration=2.0)
+    # Run for 10 seconds
+    sim.run_simulation(duration=1000.0)
     
     # Move to a different configuration
     print("\nMoving to new configuration...")
