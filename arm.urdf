@@ -5,7 +5,7 @@
 
     <visual> <!-- Base link visual -->
       <geometry>
-        <box size="1 1 .1"/>
+        <box size="1 1 0"/>
       </geometry>
       <material name="blue">
         <color rgba="0 0 1 1"/>
@@ -14,7 +14,7 @@
     
     <collision> <!-- Base link collision -->
       <geometry>
-        <box size="1 1 .1"/>
+        <box size="1 1 0"/>
       </geometry>
     </collision>
 
@@ -26,7 +26,7 @@
 
   <!-- Shoulder Link 1 (Pitch) -->
   <joint name="shoulder_joint_1" type="revolute">
-    <origin xyz="0 0 0.1" rpy="0 0 0"/>
+    <origin xyz="0 0 0.22090" rpy="0 0 0"/>
     <parent link="base_link"/>
     <child link="shoulder_link_1"/>
     <axis xyz="1 0 0"/>
