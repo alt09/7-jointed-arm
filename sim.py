@@ -12,7 +12,7 @@ def main():
 
 	p.loadURDF("plane.urdf")
 
-	urdf_path = os.path.join(os.path.dirname(__file__), "test.urdf")
+	urdf_path = os.path.join(os.path.dirname(__file__), "arm.urdf")
 	p.setAdditionalSearchPath(os.path.dirname(urdf_path))
 	arm_id = p.loadURDF(urdf_path, basePosition=[0, 0, 0], useFixedBase=True)
 
