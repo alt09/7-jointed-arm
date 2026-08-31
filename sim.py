@@ -18,7 +18,7 @@ def main():
 
 	print(f"Loaded arm with id: {arm_id}")
 
-	go_to.go_to(arm_id, p.getNumJoints(arm_id), go_to=[0.5, 0.5, 0.5, 0.5, 0.5, 0.5,0.5,0.5])
+	go_to.go_to_target(arm_id, [1, 1, 0])
 
 	while p.isConnected(client):
 		p.stepSimulation()
@@ -59,7 +59,5 @@ def set_joint_positions( joint_index, target_position,arm_id):
 		targetPosition=target_position,
 		force=100
 	)
-	if p.getJointState(arm_id, 6)[0] ==1:
-			print(p.getJointState(arm_id, 6))
 if __name__ == "__main__":
 	main()
