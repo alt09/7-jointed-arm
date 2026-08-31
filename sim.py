@@ -18,7 +18,7 @@ def main():
 
 	print(f"Loaded arm with id: {arm_id}")
 
-	go_to.go_to_target(arm_id, [1, 1, 0])
+	go_to.go_to_target(arm_id, [float(input("Enter x: ")), float(input("Enter y: ")), float(input("Enter z: "))])
 
 	while p.isConnected(client):
 		p.stepSimulation()
