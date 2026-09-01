@@ -17,8 +17,7 @@ def main():
 	arm_id = p.loadURDF(urdf_path, basePosition=[0, 0, 0], useFixedBase=True)
 
 	print(f"Loaded arm with id: {arm_id}")
-
-	go_to.go_to_target(arm_id, [float(input("Enter x: ")), float(input("Enter y: ")), float(input("Enter z: "))])
+	
 
 	while p.isConnected(client):
 		p.stepSimulation()
