@@ -6,6 +6,8 @@ import numpy as np
 import pybullet as p
 import pybullet_data
 
+import go_to
+
 print("Starting PyBullet simulation...")
 def main():
     print("Starting simulation...")
@@ -14,32 +16,37 @@ def main():
     p.setGravity(0, 0, 0)
     
 
-    # p.loadURDF("plane.urdf")  # load the plane
+    p.loadURDF("plane.urdf")  # load the plane
     arm_id = p.loadURDF("arm.urdf", basePosition=[0, 0, 0], useFixedBase=True)
-    #r2d2_id = p.loadURDF("r2d2.urdf", basePosition=[0, 0, 0], useFixedBase=True)
-
+    r2d2_id = p.loadURDF("r2d2.urdf", basePosition=[1, 1, 1], useFixedBase=True)
+    print(p.getJointState(arm_id, 7))
     print(f"Loaded arm with id: {arm_id}")
     width, height = 320, 240
-    viewMatrix = p.computeViewMatrixFromYawPitchRoll(
-        cameraTargetPosition=[0, 0, 0],
-        distance=1.0,
-        yaw=45,
-        pitch=-30,
-        roll=0,
-        upAxisIndex=2
-    )
-    projectionMatrix = p.computeProjectionMatrixFOV(
-        fov=60, aspect=width/height, nearVal=0.1, farVal=100.0
-    )
+    go_to.go_to_target(arm_id, [1, 1, 1])
     while p.isConnected(client):
         p.stepSimulation()
         time.sleep(1.0 / 240.0)
+        # Camera Position and Orientation
+        viewMatrix = p.computeViewMatrixFromYawPitchRoll(
+        cameraTargetPosition=[go_to.where_is(arm_id)[0]+0.2, go_to.where_is(arm_id)[1]+0.2, go_to.where_is(arm_id)[2]+0.2],
+        distance=0.1,
+        yaw=0,
+        pitch=0,
+        roll=0,
+        upAxisIndex=2
+   		)
+        print(f"View Matrix: {viewMatrix}")
+        print((go_to.where_is(arm_id)))
+        projectionMatrix = p.computeProjectionMatrixFOV(
+    	    fov=60, aspect=width/height, nearVal=0.1, farVal=100.0
+    	)
         img_arr = p.getCameraImage(
             width, height,
 			viewMatrix=viewMatrix,
             projectionMatrix=projectionMatrix,
             renderer=p.ER_BULLET_HARDWARE_OPENGL
         )
+        
         # Extract RGB array (Index 2 holds the pixel data)
         rgba_img = np.reshape(img_arr[2], (height, width, 4)).astype(np.uint8)
 
@@ -54,7 +61,7 @@ def main():
         if M["m00"] != 0:
             cX = int(M["m10"] / M["m00"])
             cY = int(M["m01"] / M["m00"])
-            print(f"Detected red object at ({cX}, {cY})")
+            #print(f"Detected red object at ({cX}, {cY})")
 
             cv2.circle(bgr_img, (cX, cY), 5, (0, 255, 0), -1)
 
@@ -84,7 +91,7 @@ def get_joint_info(arm_id):
     return joint_info
 
 
-def get_joint_positions(arm_id):
+def get_joint_angle(arm_id):
     joint_positions = []
     num_joints = p.getNumJoints(arm_id)
 

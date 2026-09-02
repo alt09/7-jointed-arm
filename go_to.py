@@ -18,7 +18,7 @@ def go_to_target(arm_id,target_position):
         target_position (list): A list of 3 target coordinates [x, y, z] for the end effector.
     """
     # Get the current joint positions
-    current_joint_positions = sim.get_joint_positions(arm_id)
+    current_joint_positions = sim.get_joint_angle(arm_id)
 
     print(f"Current joint positions: {current_joint_positions}")
 
@@ -30,3 +30,23 @@ def go_to_target(arm_id,target_position):
     # Move the arm to the target joint positions
     for i in range(sim.p.getNumJoints(arm_id)):
         sim.set_joint_positions(i, target_joint_positions[i], arm_id)
+def where_is(arm_id,):
+    """
+    Returns the current position of the end effector of the robotic arm.
+    Args:
+        arm_id (int): The ID of the robotic arm in the PyBullet simulation.
+    Returns:
+        list: A list of 3 coordinates [x, y, z] representing the current position of the end effector.
+    """
+    # Get the current joint positions
+    current_joint_positions = sim.get_joint_angle(arm_id)
+
+    print(f"Current joint positions: {current_joint_positions}")
+
+    # Calculate the forward kinematics to find the position of the end effector
+    end_effector_state = sim.p.getLinkState(arm_id, 7)
+    end_effector_position = end_effector_state[4]  # Position is at index 4
+
+    print(f"End effector position: {end_effector_position}")
+
+    return end_effector_position
