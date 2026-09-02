@@ -1,4 +1,5 @@
 import sim
+import math
 def go_to(arm_id, num_joints, go_to):
     """
     Moves the robotic arm to the specified joint positions.
@@ -38,15 +39,14 @@ def where_is(arm_id,):
     Returns:
         list: A list of 3 coordinates [x, y, z] representing the current position of the end effector.
     """
-    # Get the current joint positions
-    current_joint_positions = sim.get_joint_angle(arm_id)
+    quaternion = sim.p.getLinkState(arm_id, 7)[5]  # Get the orientation of the end effector
 
-    print(f"Current joint positions: {current_joint_positions}")
-
+    roll = math.atan2(2 * (quaternion[3] * quaternion[0] + quaternion[1] * quaternion[2]), 1 - 2 * (quaternion[0] ** 2 + quaternion[1] ** 2))
+    pitch = math.asin(2 * (quaternion[3] * quaternion[1] - quaternion[2] * quaternion[0]))
+    yaw = math.atan2(2 * (quaternion[3] * quaternion[2] + quaternion[0] * quaternion[1]), 1 - 2 * (quaternion[1] ** 2 + quaternion[2] ** 2))
     # Calculate the forward kinematics to find the position of the end effector
     end_effector_state = sim.p.getLinkState(arm_id, 7)
-    end_effector_position = end_effector_state[4]  # Position is at index 4
-
+    end_effector_position = [end_effector_state[4],yaw,pitch,roll]  # Position is at index 4
     print(f"End effector position: {end_effector_position}")
 
     return end_effector_position

@@ -19,7 +19,7 @@ def main():
     p.loadURDF("plane.urdf")  # load the plane
     arm_id = p.loadURDF("arm.urdf", basePosition=[0, 0, 0], useFixedBase=True)
     r2d2_id = p.loadURDF("r2d2.urdf", basePosition=[1, 1, 1], useFixedBase=True)
-    print(p.getJointState(arm_id, 7))
+ 
     print(f"Loaded arm with id: {arm_id}")
     width, height = 320, 240
     go_to.go_to_target(arm_id, [1, 1, 1])
@@ -28,14 +28,13 @@ def main():
         time.sleep(1.0 / 240.0)
         # Camera Position and Orientation
         viewMatrix = p.computeViewMatrixFromYawPitchRoll(
-        cameraTargetPosition=[go_to.where_is(arm_id)[0]+0.2, go_to.where_is(arm_id)[1]+0.2, go_to.where_is(arm_id)[2]+0.2],
+        cameraTargetPosition=[go_to.where_is(arm_id)[0][0]+0.2, go_to.where_is(arm_id)[0][1]+0.2, go_to.where_is(arm_id)[0][2]+0.2],
         distance=0.1,
-        yaw=0,
-        pitch=0,
-        roll=0,
+        yaw=go_to.where_is(arm_id)[1],
+        pitch=go_to.where_is(arm_id)[2],
+        roll=go_to.where_is(arm_id)[3],
         upAxisIndex=2
    		)
-        print(f"View Matrix: {viewMatrix}")
         print((go_to.where_is(arm_id)))
         projectionMatrix = p.computeProjectionMatrixFOV(
     	    fov=60, aspect=width/height, nearVal=0.1, farVal=100.0
