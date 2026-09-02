@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 import pybullet as p
 import pybullet_data
+import math
 
 import go_to
 
@@ -16,13 +17,13 @@ def main():
     p.setGravity(0, 0, 0)
     
 
-    p.loadURDF("plane.urdf")  # load the plane
+    #p.loadURDF("plane.urdf")  # load the plane
     arm_id = p.loadURDF("arm.urdf", basePosition=[0, 0, 0], useFixedBase=True)
-    r2d2_id = p.loadURDF("r2d2.urdf", basePosition=[1, 1, 1], useFixedBase=True)
+    r2d2_id = p.loadURDF("r2d2.urdf", basePosition=[5, 5, 1], useFixedBase=True)
  
     print(f"Loaded arm with id: {arm_id}")
     width, height = 320, 240
-    go_to.go_to_target(arm_id, [1, 1, 1])
+    go_to.go_to_target(arm_id, [4, 4, 1])
     while p.isConnected(client):
         p.stepSimulation()
         time.sleep(1.0 / 240.0)
@@ -30,9 +31,9 @@ def main():
         viewMatrix = p.computeViewMatrixFromYawPitchRoll(
         cameraTargetPosition=[go_to.where_is(arm_id)[0][0]+0.2, go_to.where_is(arm_id)[0][1]+0.2, go_to.where_is(arm_id)[0][2]+0.2],
         distance=0.1,
-        yaw=go_to.where_is(arm_id)[1],
-        pitch=go_to.where_is(arm_id)[2],
-        roll=go_to.where_is(arm_id)[3],
+        yaw=(180/math.pi)*go_to.where_is(arm_id)[1],
+        pitch=(180/math.pi)*go_to.where_is(arm_id)[2],
+        roll=(180/math.pi)*go_to.where_is(arm_id)[3],
         upAxisIndex=2
    		)
         print((go_to.where_is(arm_id)))
