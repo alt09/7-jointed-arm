@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <robot name="canadarm3_large">
-	<material name="canadarm_white"><color rgba=".85 0.84 0.86 1"/></material>
-	<material name="test"><color rgba="1 0 0 1"/></material>
+	<material name="canadarm_white"><color rgba="1 0. 0. 1"/></material>
+	<material name="test"><color rgba=".85 0.84 0.86 1"/></material>
 	<link name="base_link">
 		<visual>
 			<origin xyz="0 0 0" rpy="0 0 0"/>

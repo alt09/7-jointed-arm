@@ -14,7 +14,28 @@ mp_drawing = mp.tasks.vision.drawing_utils
 mp_hands = mp.tasks.vision.HandLandmarksConnections
 mp_drawing_styles = mp.tasks.vision.drawing_styles
 
-#Draw landmarks on hand image using mediapipe drawing utils
+    #code to read video from webcam using OpenCV
+cap = cv2.VideoCapture(0)
+def main():
+    print("Starting OpenCV...")
+
+
+    while cap.isOpened():
+        ret, frame = cap.read()
+
+        if ret:
+            img = detect_hands(frame)
+            cv2.imshow("img", img)
+
+            key = cv2.waitKey(1)
+            if key == 27:
+                break
+        else:
+            break
+
+    cap.release()
+    cv2.destroyAllWindows()
+    #Draw landmarks on hand image using mediapipe drawing utils
 def draw_landmarks(img, detection_results):
     img_copy = np.copy(img)
 
@@ -28,7 +49,6 @@ def draw_landmarks(img, detection_results):
             mp_drawing_styles.get_default_hand_landmarks_style(),
             mp_drawing_styles.get_default_hand_connections_style()
         )
-        
         # Using PyAutoGUI and MediaPipe Landmarks
         index_tip_Left = hand_landmarks[8]
         index_mcp_Left = hand_landmarks[5]
@@ -64,21 +84,5 @@ def detect_hands(image):
 
     return cv2.cvtColor(drawn_image, cv2.COLOR_RGB2BGR)
 
-#code to read video from webcam using OpenCV
-cap = cv2.VideoCapture(0)
-
-while cap.isOpened():
-    ret, frame = cap.read()
-
-    if ret:
-        img = detect_hands(frame)
-        cv2.imshow("img", img)
-
-        key = cv2.waitKey(1)
-        if key == 27:
-            break
-    else:
-        break
-
-cap.release()
-cv2.destroyAllWindows()
+if __name__ == "__main__":
+    main()
