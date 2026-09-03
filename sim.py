@@ -19,19 +19,19 @@ def main():
 
     #p.loadURDF("plane.urdf")  # load the plane
     arm_id = p.loadURDF("arm.urdf", basePosition=[0, 0, 0], useFixedBase=True)
-    r2d2_id = p.loadURDF("r2d2.urdf", basePosition=[5, 5, 1], useFixedBase=True)
+    r2d2_id = p.loadURDF("r2d2.urdf", basePosition=[0, 4, 1], useFixedBase=True)
  
     print(f"Loaded arm with id: {arm_id}")
     width, height = 320, 240
-    go_to.go_to_target(arm_id, [4, 4, 1])
+    #go_to.go_to_target(arm_id, [0, 4, 1])
     while p.isConnected(client):
         p.stepSimulation()
         time.sleep(1.0 / 240.0)
         # Camera Position and Orientation
         viewMatrix = p.computeViewMatrixFromYawPitchRoll(
-        cameraTargetPosition=[go_to.where_is(arm_id)[0][0]+0.2, go_to.where_is(arm_id)[0][1]+0.2, go_to.where_is(arm_id)[0][2]+0.2],
+        cameraTargetPosition=[go_to.where_is(arm_id)[0][0], go_to.where_is(arm_id)[0][1], go_to.where_is(arm_id)[0][2]-0.2],
         distance=0.1,
-        yaw=(180/math.pi)*go_to.where_is(arm_id)[1],
+        yaw=(180/math.pi)*go_to.where_is(arm_id)[1], # RAD to DEG
         pitch=(180/math.pi)*go_to.where_is(arm_id)[2],
         roll=(180/math.pi)*go_to.where_is(arm_id)[3],
         upAxisIndex=2
@@ -47,15 +47,14 @@ def main():
             renderer=p.ER_BULLET_HARDWARE_OPENGL
         )
         
-        # Extract RGB array (Index 2 holds the pixel data)
+        # Extract HSV array (Index 2 holds the pixel data)
         rgba_img = np.reshape(img_arr[2], (height, width, 4)).astype(np.uint8)
 
         bgr_img = cv2.cvtColor(rgba_img, cv2.COLOR_RGBA2BGR)
-
         hsv = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2HSV)
-        lower_red = np.array([0, 120, 70])
-        upper_red = np.array([10, 255, 255])
-        mask = cv2.inRange(hsv, lower_red, upper_red)
+        lower_color = np.array([0, 0, 55]) 
+        upper_color = np.array([0, 0, 100])
+        mask = cv2.inRange(hsv, lower_color, upper_color)
 
         M = cv2.moments(mask)
         if M["m00"] != 0:
