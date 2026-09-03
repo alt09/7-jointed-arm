@@ -21,12 +21,12 @@ def go_to_target(arm_id,target_position):
     # Get the current joint positions
     current_joint_positions = sim.get_joint_angle(arm_id)
 
-    print(f"Current joint positions: {current_joint_positions}")
+    # print(f"Current joint positions: {current_joint_positions}")
 
     # Calculate the inverse kinematics to find the joint angles for the target position
     target_joint_positions = sim.p.calculateInverseKinematics(arm_id, 7, target_position)
 
-    print(f"Target joint positions: {target_joint_positions}")
+    # print(f"Target joint positions: {target_joint_positions}")
 
     # Move the arm to the target joint positions
     for i in range(sim.p.getNumJoints(arm_id)):
@@ -47,6 +47,6 @@ def where_is(arm_id):
     # Calculate the forward kinematics to find the position of the end effector
     end_effector_state = sim.p.getLinkState(arm_id, 7)
     end_effector_position = [end_effector_state[4],yaw,pitch,roll]  # Position is at index 4
-    print(f"End effector position: {end_effector_position}")
+    # print(f"End effector position: {end_effector_position}")
 
     return end_effector_position
