@@ -31,7 +31,7 @@ def go_to_target(arm_id,target_position):
     # Move the arm to the target joint positions
     for i in range(sim.p.getNumJoints(arm_id)):
         sim.set_joint_positions(i, target_joint_positions[i], arm_id)
-def where_is(arm_id,):
+def where_is(arm_id):
     """
     Returns the current position of the end effector of the robotic arm.
     Args:

@@ -7,9 +7,10 @@ import pybullet as p
 import pybullet_data
 import math
 
-import go_to
+import Movement.go_to as go_to
 
 print("Starting PyBullet simulation...")
+
 def main():
     print("Starting simulation...")
     client = p.connect(p.GUI)
@@ -23,7 +24,7 @@ def main():
  
     print(f"Loaded arm with id: {arm_id}")
     width, height = 320, 240
-    #go_to.go_to_target(arm_id, [0, 4, 1])
+    go_to.go_to_target(arm_id, [0, 4, 1])
     while p.isConnected(client):
         p.stepSimulation()
         time.sleep(1.0 / 240.0)
