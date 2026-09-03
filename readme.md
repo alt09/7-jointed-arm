@@ -51,3 +51,17 @@ GATEWAY / BASE
      │   LEE   │
      │  HAND   │
      └─────────┘
+## thanks 
+
+- thanks for my robotics club that teached me english and coding
+- my mom
+- my dad
+- my brother
+- my cousins
+- my friend Ben
+- my other friends
+- the family of my frieds
+- my goat monkey D luffy
+- gold D roger
+- joy boy
+- special thanks to eichiro oda
