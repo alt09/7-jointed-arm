@@ -11,7 +11,7 @@ import Movement.go_to as go_to
 
 print("Starting PyBullet simulation...")
 
-def main():
+def sim():
     print("Starting simulation...")
     client = p.connect(p.GUI)
     p.setAdditionalSearchPath(pybullet_data.getDataPath())
@@ -69,7 +69,6 @@ def main():
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-
 def get_joint_info(arm_id):
     joint_info = {}
     num_joints = p.getNumJoints(arm_id)
@@ -90,7 +89,6 @@ def get_joint_info(arm_id):
             }
     return joint_info
 
-
 def get_joint_angle(arm_id):
     joint_positions = []
     num_joints = p.getNumJoints(arm_id)
@@ -99,7 +97,6 @@ def get_joint_angle(arm_id):
         joint_state = p.getJointState(arm_id, i)
         joint_positions.append(joint_state[0])  # Append the position (first element of joint_state)
     return joint_positions
-
 
 def set_joint_positions(joint_index, target_position, arm_id):
     p.setJointMotorControl2(
@@ -111,5 +108,4 @@ def set_joint_positions(joint_index, target_position, arm_id):
     )
 
 
-if __name__ == "__main__":
-    main()
+
