@@ -74,20 +74,16 @@ def sim():
 
         opencv.center_of_mass(rgba_img1, [0, 0, 55], [0, 0, 100],"Left")
         opencv.center_of_mass(rgba_img2, [0, 0, 55], [0, 0, 100],"Right")
-        print("pybullet pose:", p.getLinkState(r2d2_id, 1)[4][0]-0.2199999988079071, p.getLinkState(r2d2_id, 1)[4][1], p.getLinkState(r2d2_id, 1)[4][2]-0.6499999761581421)
+        print("pybullet pose:", p.getLinkState(r2d2_id, 1)[4][0], p.getLinkState(r2d2_id, 1)[4][1], p.getLinkState(r2d2_id, 1)[4][2])
         print("3D Pose:", opencv.target_3d_pose(
-        R=opencv.rotation_matrix(
-            yaw=go_to.where_is(arm_id)[1], 
-            pitch=go_to.where_is(arm_id)[2],
-            roll=go_to.where_is(arm_id)[3]),
-        x=go_to.where_is(arm_id)[0][0],
-        y=go_to.where_is(arm_id)[0][1],
-        z=go_to.where_is(arm_id)[0][2],
-        rgba_img1=rgba_img1,
-        rgba_img2=rgba_img2,
-        lower_color=[0, 0, 55],
-        upper_color=[0, 0, 100]
-        ))
+            view_matrix_1=viewMatrix1,
+            view_matrix_2=viewMatrix2,
+            projectionMatrix=projectionMatrix,
+            rgba_img1=rgba_img1,
+            rgba_img2=rgba_img2,
+            lower_color=[0, 0, 55],
+            upper_color=[0, 0, 100]
+            ))
 
 def get_joint_info(arm_id):
     joint_info = {}
