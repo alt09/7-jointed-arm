@@ -19,11 +19,11 @@ def sim():
 
     #p.loadURDF("plane.urdf")  # load the plane
     arm_id = p.loadURDF("arm.urdf", basePosition=[0, 0, 0], useFixedBase=True)
-    r2d2_id = p.loadURDF("r2d2.urdf", basePosition=[0, 4, 1], useFixedBase=True)
+    r2d2_id = p.loadURDF("r2d2.urdf", basePosition=[0, 4, 0], useFixedBase=True)
  
     #print(f"Loaded arm with id: {arm_id}")
     width, height = 320, 240
-    go_to.go_to_target(arm_id, [0, 4, 1])
+  #  go_to.go_to_target(arm_id, [0, 4, 1])
     while p.isConnected(client):
         p.stepSimulation()
         time.sleep(1.0 / 240.0)
@@ -66,8 +66,17 @@ def sim():
 
         opencv.center_of_mass(rgba_img1, [0, 0, 55], [0, 0, 100],"Left")
         opencv.center_of_mass(rgba_img2, [0, 0, 55], [0, 0, 100],"Right")
+        print("Depth:", opencv.find_depth(rgba_img1,rgba_img2, [0, 0, 55], [0, 0, 100]))
+        #print("r2d2",p.getLinkState(r2d2_id, 1)[4])
+        #print("arm",p.getLinkState(arm_id, 7)[4])
+        d = math.hypot(p.getLinkState(r2d2_id, 1)[4][0]-p.getLinkState(arm_id, 0)[4][0],p.getLinkState(r2d2_id, 1)[4][1]-p.getLinkState(arm_id, 0)[4][1],p.getLinkState(r2d2_id, 1)[4][2]-p.getLinkState(arm_id, 0)[4][2]-0.2)
+        print("distance", d)
 
-
+        if opencv.find_depth(rgba_img1,rgba_img2, [0, 0, 55], [0, 0, 100]) != None:
+            if d - opencv.find_depth(rgba_img1,rgba_img2, [0, 0, 55], [0, 0, 100]) < 0.1 and d - opencv.find_depth(rgba_img1,rgba_img2, [0, 0, 55], [0, 0, 100]) > -0.1:
+                print("is close")
+            else:
+                print("is far by", d - opencv.find_depth(rgba_img1,rgba_img2, [0, 0, 55], [0, 0, 100]))
 def get_joint_info(arm_id):
     joint_info = {}
     num_joints = p.getNumJoints(arm_id)
@@ -106,9 +115,3 @@ def set_joint_positions(joint_index, target_position, arm_id):
         force=100
     )
 
-def camera_feed_pose_estimator(rgba_img):
-
-    COM =opencv.center_of_mass(rgba_img, [0, 0, 55], [0, 0, 100])
-
-
-    pass
