@@ -27,9 +27,17 @@ def sim():
     while p.isConnected(client):
         p.stepSimulation()
         time.sleep(1.0 / 240.0)
-        # Camera Position and Orientation
-        viewMatrix = p.computeViewMatrixFromYawPitchRoll(
+        # Camera 1 Position and Orientation 
+        viewMatrix1 = p.computeViewMatrixFromYawPitchRoll(
         cameraTargetPosition=[go_to.where_is(arm_id)[0][0], go_to.where_is(arm_id)[0][1], go_to.where_is(arm_id)[0][2]-0.2],
+        distance=0.1,
+        yaw=(180/math.pi)*go_to.where_is(arm_id)[1], # RAD to DEG
+        pitch=(180/math.pi)*go_to.where_is(arm_id)[2],
+        roll=(180/math.pi)*go_to.where_is(arm_id)[3],
+        upAxisIndex=2
+   		)
+        viewMatrix2 = p.computeViewMatrixFromYawPitchRoll(
+        cameraTargetPosition=[go_to.where_is(arm_id)[0][0]+1, go_to.where_is(arm_id)[0][1], go_to.where_is(arm_id)[0][2]-0.2],
         distance=0.1,
         yaw=(180/math.pi)*go_to.where_is(arm_id)[1], # RAD to DEG
         pitch=(180/math.pi)*go_to.where_is(arm_id)[2],
@@ -40,16 +48,24 @@ def sim():
         projectionMatrix = p.computeProjectionMatrixFOV(
     	    fov=60, aspect=width/height, nearVal=0.1, farVal=100.0
     	)
-        img_arr = p.getCameraImage(
+        img_arr1 = p.getCameraImage(
             width, height,
-			viewMatrix=viewMatrix,
+			viewMatrix=viewMatrix1,
+            projectionMatrix=projectionMatrix,
+            renderer=p.ER_BULLET_HARDWARE_OPENGL
+        )
+        img_arr2 = p.getCameraImage(
+            width, height,
+			viewMatrix=viewMatrix2,
             projectionMatrix=projectionMatrix,
             renderer=p.ER_BULLET_HARDWARE_OPENGL
         )
         # Extract the RGBA image
-        rgba_img = np.reshape(img_arr[2], (height, width, 4)).astype(np.uint8)
+        rgba_img1 = np.reshape(img_arr1[2], (height, width, 4)).astype(np.uint8)
+        rgba_img2 = np.reshape(img_arr2[2], (height, width, 4)).astype(np.uint8)
 
-        opencv.center_of_mass(rgba_img, [0, 0, 55], [0, 0, 100])
+        opencv.center_of_mass(rgba_img1, [0, 0, 55], [0, 0, 100],"Left")
+        opencv.center_of_mass(rgba_img2, [0, 0, 55], [0, 0, 100],"Right")
 
 
 def get_joint_info(arm_id):
@@ -90,3 +106,9 @@ def set_joint_positions(joint_index, target_position, arm_id):
         force=100
     )
 
+def camera_feed_pose_estimator(rgba_img):
+
+    COM =opencv.center_of_mass(rgba_img, [0, 0, 55], [0, 0, 100])
+
+
+    pass
