@@ -17,9 +17,9 @@ def sim():
     p.setGravity(0, 0, 0)
     
 
-    #p.loadURDF("plane.urdf")  # load the plane
-    arm_id = p.loadURDF("arm.urdf", basePosition=[0, 0, 0], useFixedBase=True)
-    r2d2_id = p.loadURDF("r2d2.urdf", basePosition=[0, 4, 0], useFixedBase=True)
+    p.loadURDF("plane.urdf")  # load the plane
+    arm_id = p.loadURDF("arm.urdf", basePosition=[0, 0, 1], useFixedBase=True)
+    r2d2_id = p.loadURDF("r2d2.urdf", basePosition=[0, 4, 1], useFixedBase=True)
  
     #print(f"Loaded arm with id: {arm_id}")
     width, height = 320, 240
@@ -29,7 +29,11 @@ def sim():
         time.sleep(1.0 / 240.0)
         # Camera 1 Position and Orientation 
         viewMatrix1 = p.computeViewMatrixFromYawPitchRoll(
-        cameraTargetPosition=[go_to.where_is(arm_id)[0][0], go_to.where_is(arm_id)[0][1], go_to.where_is(arm_id)[0][2]-0.2],
+        cameraTargetPosition=[
+            go_to.where_is(arm_id)[0][0],
+            go_to.where_is(arm_id)[0][1],
+            go_to.where_is(arm_id)[0][2]-0.2
+        ],
         distance=0.1,
         yaw=(180/math.pi)*go_to.where_is(arm_id)[1], # RAD to DEG
         pitch=(180/math.pi)*go_to.where_is(arm_id)[2],
@@ -37,7 +41,11 @@ def sim():
         upAxisIndex=2
    		)
         viewMatrix2 = p.computeViewMatrixFromYawPitchRoll(
-        cameraTargetPosition=[go_to.where_is(arm_id)[0][0]+1, go_to.where_is(arm_id)[0][1], go_to.where_is(arm_id)[0][2]-0.2],
+        cameraTargetPosition=[
+            go_to.where_is(arm_id)[0][0]+1,
+            go_to.where_is(arm_id)[0][1],
+            go_to.where_is(arm_id)[0][2]-0.2
+        ],
         distance=0.1,
         yaw=(180/math.pi)*go_to.where_is(arm_id)[1], # RAD to DEG
         pitch=(180/math.pi)*go_to.where_is(arm_id)[2],
@@ -66,17 +74,21 @@ def sim():
 
         opencv.center_of_mass(rgba_img1, [0, 0, 55], [0, 0, 100],"Left")
         opencv.center_of_mass(rgba_img2, [0, 0, 55], [0, 0, 100],"Right")
-        print("Depth:", opencv.find_depth(rgba_img1,rgba_img2, [0, 0, 55], [0, 0, 100]))
-        #print("r2d2",p.getLinkState(r2d2_id, 1)[4])
-        #print("arm",p.getLinkState(arm_id, 7)[4])
-        d = math.hypot(p.getLinkState(r2d2_id, 1)[4][0]-p.getLinkState(arm_id, 0)[4][0],p.getLinkState(r2d2_id, 1)[4][1]-p.getLinkState(arm_id, 0)[4][1],p.getLinkState(r2d2_id, 1)[4][2]-p.getLinkState(arm_id, 0)[4][2]-0.2)
-        print("distance", d)
+        print("pybullet pose:", p.getLinkState(r2d2_id, 1)[4][0]-0.2199999988079071, p.getLinkState(r2d2_id, 1)[4][1], p.getLinkState(r2d2_id, 1)[4][2]-0.6499999761581421)
+        print("3D Pose:", opencv.target_3d_pose(
+        R=opencv.rotation_matrix(
+            yaw=go_to.where_is(arm_id)[1], 
+            pitch=go_to.where_is(arm_id)[2],
+            roll=go_to.where_is(arm_id)[3]),
+        x=go_to.where_is(arm_id)[0][0],
+        y=go_to.where_is(arm_id)[0][1],
+        z=go_to.where_is(arm_id)[0][2],
+        rgba_img1=rgba_img1,
+        rgba_img2=rgba_img2,
+        lower_color=[0, 0, 55],
+        upper_color=[0, 0, 100]
+        ))
 
-        if opencv.find_depth(rgba_img1,rgba_img2, [0, 0, 55], [0, 0, 100]) != None:
-            if d - opencv.find_depth(rgba_img1,rgba_img2, [0, 0, 55], [0, 0, 100]) < 0.1 and d - opencv.find_depth(rgba_img1,rgba_img2, [0, 0, 55], [0, 0, 100]) > -0.1:
-                print("is close")
-            else:
-                print("is far by", d - opencv.find_depth(rgba_img1,rgba_img2, [0, 0, 55], [0, 0, 100]))
 def get_joint_info(arm_id):
     joint_info = {}
     num_joints = p.getNumJoints(arm_id)
