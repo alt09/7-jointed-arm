@@ -1,5 +1,9 @@
+from Utils import utils
+from Vision import opencv
 import sim
 import math
+import numpy as np
+from scipy.spatial.transform import Rotation as R
 def go_to(arm_id, num_joints, go_to):
     """
     Moves the robotic arm to the specified joint positions.
@@ -17,14 +21,11 @@ def go_to_target(arm_id,target_position):
     Args:
         arm_id (int): The ID of the robotic arm in the PyBullet simulation.
         target_position (list): A list of 3 target coordinates [x, y, z] for the end effector.
+        targetOrientation (list): A list of 4 target orientation values [x, y, z, w] for the end effector.
     """
-    # Get the current joint positions
-    current_joint_positions = sim.get_joint_angle(arm_id)
-
-    # print(f"Current joint positions: {current_joint_positions}")
 
     # Calculate the inverse kinematics to find the joint angles for the target position
-    target_joint_positions = sim.p.calculateInverseKinematics(arm_id, 7, target_position)
+    target_joint_positions = sim.p.calculateInverseKinematics(arm_id, 7, target_position)  # 7 is the index of the end effector link
 
     # print(f"Target joint positions: {target_joint_positions}")
 
@@ -41,12 +42,36 @@ def where_is(arm_id):
     """
     quaternion = sim.p.getLinkState(arm_id, 7)[5]  # Get the orientation of the end effector
 
-    roll = math.atan2(2 * (quaternion[3] * quaternion[0] + quaternion[1] * quaternion[2]), 1 - 2 * (quaternion[0] ** 2 + quaternion[1] ** 2))
-    pitch = math.asin(2 * (quaternion[3] * quaternion[1] - quaternion[2] * quaternion[0]))
-    yaw = math.atan2(2 * (quaternion[3] * quaternion[2] + quaternion[0] * quaternion[1]), 1 - 2 * (quaternion[1] ** 2 + quaternion[2] ** 2))
+    yaw, pitch, roll = utils.Yaw_pitch_roll_from_quaternion(quaternion)
     # Calculate the forward kinematics to find the position of the end effector
     end_effector_state = sim.p.getLinkState(arm_id, 7)
     end_effector_position = [end_effector_state[4],yaw,pitch,roll]  # Position is at index 4
     # print(f"End effector position: {end_effector_position}")
 
     return end_effector_position
+def auto_aim(target_3Dposition,viewMatrix1,viewMatrix2):
+    """
+    Returns the yaw, pitch, and roll angles needed to aim at a target 3D position from the average camera pose.
+    Args:
+        target_3Dposition (list): A list of 3 coordinates [x, y, z] representing the target position in 3D space.
+        viewMatrix1 (list): The view matrix of the first camera.
+        viewMatrix2 (list): The view matrix of the second camera.
+    """
+    view_matrix4x4 = np.array(viewMatrix1).reshape(4, 4).T  # Reshape the view matrix to a 4x4 matrix
+    avg_camera_pose = (opencv.camera_pose_from_view_matrix(viewMatrix1)[0] + opencv.camera_pose_from_view_matrix(viewMatrix2)[0]) / 2  # Get the average camera pose from the two view matrices
+    d = target_3Dposition - avg_camera_pose  # Calculate the direction vector from the average camera position to the target position
+    target_yaw = math.atan2(d[1], d[2])  # Calculate the yaw angle
+    target_pitch = math.atan2(d[1], math.sqrt(d[0] ** 2 + d[2] ** 2))  # Calculate the pitch angle
+    target_quaternion = np.array(utils.quaternion_from_yaw_pitch_roll(target_yaw, target_pitch, 0)).T  # Convert yaw and pitch to a quaternion roll is set to 0
+
+    R_camera_to_world = view_matrix4x4[:3, :3].T  # Extract the rotation matrix from the view matrix and transpose it to get the camera-to-world rotation
+    camera_quaternion = R.from_matrix(R_camera_to_world).as_quat()  # Convert the rotation matrix to a quaternion
+    difangle = np.subtract(utils.Yaw_pitch_roll_from_quaternion(target_quaternion), utils.Yaw_pitch_roll_from_quaternion(camera_quaternion))  # Calculate the final quaternion by subtracting the camera quaternion from the target quaternion
+    finalangle = utils.Yaw_pitch_roll_from_quaternion(target_quaternion)  # Convert the final quaternion to yaw, pitch, and roll angles
+    return difangle, finalangle
+# def cheats(arm_id,target_3Dposition,viewMatrix1,viewMatrix2):
+#   if target_3Dposition is not None:
+#        angle = auto_aim(target_3Dposition,viewMatrix1,viewMatrix2)[1]  # Get the final angle from auto_aim
+#   
+#        kinematics = sim.p.calculateInverseKinematics(arm_id, 7, where_is(arm_id)[0],utils.quaternion_from_yaw_pitch_roll(angle[0], angle[1], angle[2]))  # 7 is the index of the end effector link
+#        sim.set_joint_velocities(7, 1/kinematics[7], arm_id)
