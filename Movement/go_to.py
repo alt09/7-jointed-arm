@@ -75,3 +75,4 @@ def cheats(arm_id,target_3Dposition,viewMatrix1,viewMatrix2):
         kinematics = sim.p.calculateInverseKinematics(arm_id, 7, where_is(arm_id)[0],utils.quaternion_from_yaw_pitch_roll(angle[0], angle[1], angle[2]))  # 7 is the index of the end effector link
         
         sim.set_joint_positions(7, kinematics[7], arm_id)
+        
