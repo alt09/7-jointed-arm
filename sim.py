@@ -20,7 +20,7 @@ def sim():
     #p.loadURDF("plane.urdf")  # load the plane
     arm_id = p.loadURDF("arm.urdf", basePosition=[0, 0, 1], useFixedBase=True)
     r2d2_id = p.loadURDF("r2d2.urdf", basePosition=[0, 4, 1], useFixedBase=True)
- 
+    #r2d22_id = p.loadURDF("r2d2.urdf", basePosition=[-1, -.76, 1], useFixedBase=True)
     #print(f"Loaded arm with id: {arm_id}")
     width, height = 320, 240
   #  go_to.go_to_target(arm_id, [0, 4, 1])
@@ -75,8 +75,9 @@ def sim():
         opencv.center_of_mass(rgba_img1, [0, 0, 55], [0, 0, 100],"Left")
         opencv.center_of_mass(rgba_img2, [0, 0, 55], [0, 0, 100],"Right")
         if opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 100]) is not None:
-            #go_to.cheats(arm_id,opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 100])[0],viewMatrix1,viewMatrix2)
+            go_to.cheats(arm_id,opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 100])[0],viewMatrix1,viewMatrix2)
             print("auto aiming at target",go_to.auto_aim(opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 100])[0],viewMatrix1,viewMatrix2))
+
 def get_joint_info(arm_id):
     joint_info = {}
     num_joints = p.getNumJoints(arm_id)

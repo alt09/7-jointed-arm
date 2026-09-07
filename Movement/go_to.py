@@ -69,9 +69,9 @@ def auto_aim(target_3Dposition,viewMatrix1,viewMatrix2):
     difangle = np.subtract(utils.Yaw_pitch_roll_from_quaternion(target_quaternion), utils.Yaw_pitch_roll_from_quaternion(camera_quaternion))  # Calculate the final quaternion by subtracting the camera quaternion from the target quaternion
     finalangle = utils.Yaw_pitch_roll_from_quaternion(target_quaternion)  # Convert the final quaternion to yaw, pitch, and roll angles
     return difangle, finalangle
-# def cheats(arm_id,target_3Dposition,viewMatrix1,viewMatrix2):
-#   if target_3Dposition is not None:
-#        angle = auto_aim(target_3Dposition,viewMatrix1,viewMatrix2)[1]  # Get the final angle from auto_aim
-#   
-#        kinematics = sim.p.calculateInverseKinematics(arm_id, 7, where_is(arm_id)[0],utils.quaternion_from_yaw_pitch_roll(angle[0], angle[1], angle[2]))  # 7 is the index of the end effector link
-#        sim.set_joint_velocities(7, 1/kinematics[7], arm_id)
+def cheats(arm_id,target_3Dposition,viewMatrix1,viewMatrix2):
+    if target_3Dposition is not None:
+        angle = auto_aim(target_3Dposition,viewMatrix1,viewMatrix2)[1]  # Get the final angle from auto_aim
+        kinematics = sim.p.calculateInverseKinematics(arm_id, 7, where_is(arm_id)[0],utils.quaternion_from_yaw_pitch_roll(angle[0], angle[1], angle[2]))  # 7 is the index of the end effector link
+        
+        sim.set_joint_positions(7, kinematics[7], arm_id)

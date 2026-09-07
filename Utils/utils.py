@@ -7,29 +7,10 @@ def Yaw_pitch_roll_from_quaternion(quaternion):
     Returns:
         tuple: A tuple containing the yaw, pitch, and roll angles.
     """
-    x, y, z, w = quaternion
-
-    # Calculate yaw (z-axis rotation)
-    sin_yaw = 2 * (w * z + x * y)
-    cos_yaw = 1 - 2 * (y * y + z * z)
-    yaw = math.atan2(sin_yaw, cos_yaw)
-
-    # Calculate pitch (y-axis rotation)
-    sin_pitch = 2 * (w * y - z * x)
-    if abs(sin_pitch) >= 1:
-        # Handle the gimbal lock case
-        pitch = math.copysign(math.pi / 2, sin_pitch)
-    else:
-        pitch = math.asin(sin_pitch)
-
-    # Calculate roll (x-axis rotation)
-    sin_roll = 2 * (w * x + y * z)
-    cos_roll = 1 - 2 * (x * x + y * y)
-    roll = math.atan2(sin_roll, cos_roll)
-
-    yaw = math.degrees(yaw)
-    pitch = math.degrees(pitch)
-    roll = math.degrees(roll)
+    roll = math.atan2(2 * (quaternion[3] * quaternion[0] + quaternion[1] * quaternion[2]), 1 - 2 * (quaternion[0] ** 2 + quaternion[1] ** 2))
+    pitch = math.asin(2 * (quaternion[3] * quaternion[1] - quaternion[2] * quaternion[0]))
+    yaw = math.atan2(2 * (quaternion[3] * quaternion[2] + quaternion[0] * quaternion[1]), 1 - 2 * (quaternion[1] ** 2 + quaternion[2] ** 2))
+   
     
     return yaw, pitch, roll
 def quaternion_from_yaw_pitch_roll(yaw, pitch, roll):
