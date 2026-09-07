@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<robot name="line">
+	<material name="test"><color rgba=".85 0.84 0.86 1"/></material>
+	<link name="base_link">
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry><box size="00000.1 00000.1 00000.1"/></geometry>
+			<material name="test"/>
+		</visual>
+		<inertial><mass value="1.0"/><inertia ixx="0.05" ixy="0" ixz="0" iyy="0.05" iyz="0" izz="0.05"/></inertial>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry><box size="00000.1 00000.1 00000.1"/></geometry>
+        </collision>
+	</link>
+    <link name="link_1"><visual><geometry><box size="0.1 1 0.1"/></geometry><material name="test"/></visual><inertial><mass value="0.7"/><inertia ixx="0.015" ixy="0" ixz="0" iyy="0.015" iyz="0" izz="0.015"/></inertial><collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><box size="0.1 1 0.1"/></geometry></collision></link>
+    <joint name="joint_1" type="revolute"><parent link="base_link"/><child link="link_1"/><origin xyz="0.01 0.001 -1" rpy="0 0 0"/><axis xyz="0 0 1"/><limit lower="-6.248" upper="6.248" effort="100" velocity="1"/></joint>
+</robot>

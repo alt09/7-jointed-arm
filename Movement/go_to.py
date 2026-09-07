@@ -71,8 +71,7 @@ def auto_aim(target_3Dposition,viewMatrix1,viewMatrix2):
     return difangle, finalangle
 def cheats(arm_id,target_3Dposition,viewMatrix1,viewMatrix2):
     if target_3Dposition is not None:
-        angle = auto_aim(target_3Dposition,viewMatrix1,viewMatrix2)[1]  # Get the final angle from auto_aim
-        kinematics = sim.p.calculateInverseKinematics(arm_id, 7, where_is(arm_id)[0],utils.quaternion_from_yaw_pitch_roll(angle[0], angle[1], angle[2]))  # 7 is the index of the end effector link
-        
-        sim.set_joint_positions(7, kinematics[7], arm_id)
+        angle = auto_aim(target_3Dposition,viewMatrix1,viewMatrix2)[0]  # Get the final angle from auto_aim
+        #sim.set_joint_positions(6, kinematics[6], arm_id) # arriba
+        sim.set_joint_positions(7,where_is(arm_id)[0][0] + angle[0]-1.63, arm_id) # izquierda Move the arm to the calculated joint positions
         

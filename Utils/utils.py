@@ -5,7 +5,7 @@ def Yaw_pitch_roll_from_quaternion(quaternion):
     Args:
         quaternion (list): A list of 4 values representing the quaternion [x, y, z, w].
     Returns:
-        tuple: A tuple containing the yaw, pitch, and roll angles.
+        tuple: A tuple containing the yaw, pitch, and roll angles in radians.
     """
     roll = math.atan2(2 * (quaternion[3] * quaternion[0] + quaternion[1] * quaternion[2]), 1 - 2 * (quaternion[0] ** 2 + quaternion[1] ** 2))
     pitch = math.asin(2 * (quaternion[3] * quaternion[1] - quaternion[2] * quaternion[0]))
