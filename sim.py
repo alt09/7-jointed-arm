@@ -12,7 +12,9 @@ import Movement.go_to as go_to
 print("Starting PyBullet simulation...")
 target_last_pose = None
 def sim():
-    print("Starting simulation...")
+    """
+    Runs the PyBullet simulation.
+    """
     client = p.connect(p.GUI)
     p.setAdditionalSearchPath(pybullet_data.getDataPath())
     p.setGravity(0, 0, 0)
@@ -21,11 +23,8 @@ def sim():
     #p.loadURDF("plane.urdf")  # load the plane
     arm_id = p.loadURDF("arm.urdf", basePosition=[0, 0, 1], useFixedBase=True)
     r2d2_id = p.loadURDF("r2d2.urdf", basePosition=[0, 4, 1], useFixedBase=True)
-    #r2d22_id = p.loadURDF("r2d2.urdf", basePosition=[-1, -.76, 1], useFixedBase=True)
-    #print(f"Loaded arm with id: {arm_id}")
-    width, height = 320, 240
-    #go_to.go_to_target(arm_id, [1, 2, 1])
-    
+
+    width, height = 320, 240    
     while p.isConnected(client):
         p.stepSimulation()
         time.sleep(1.0 / 240.0)
@@ -77,16 +76,21 @@ def sim():
         opencv.center_of_mass(rgba_img1, [0, 0, 55], [0, 0, 100],"Left")
         opencv.center_of_mass(rgba_img2, [0, 0, 55], [0, 0, 100],"Right")
         
-        go_to.go_to_target(arm_id, [1, 3, 1])
+        go_to.go_to_target(arm_id, [4, 0, 1])
         if opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 100]) is not None:
             go_to.cheats(arm_id,opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 100])[0],viewMatrix1,viewMatrix2)
             target_last_pose = opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 100])[0]
         if target_last_pose is not None and opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 100]) is None:
             go_to.cheats(arm_id,target_last_pose,viewMatrix1,viewMatrix2)
             print("target_last_pose",target_last_pose)
-            #print("target 3D position",opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 100]))
-           # print("auto aiming at target",go_to.auto_aim(opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 100])[0],viewMatrix1,viewMatrix2))
 def get_joint_info(arm_id):
+    """
+    Returns information about the joints of the robotic arm.
+    Args:
+        arm_id (int): The ID of the robotic arm in the PyBullet simulation.
+    Returns:
+        dict: A dictionary containing joint information, including joint names, indices, limits, and other properties.
+    """
     joint_info = {}
     num_joints = p.getNumJoints(arm_id)
 
@@ -94,7 +98,6 @@ def get_joint_info(arm_id):
         info = p.getJointInfo(arm_id, i)
         joint_name = info[1].decode('utf-8')
         joint_type = info[2]
-        #print(info)
 
         if joint_type == p.JOINT_REVOLUTE:
             joint_info[joint_name] = {
@@ -107,6 +110,13 @@ def get_joint_info(arm_id):
     return joint_info
 
 def get_joint_angle(arm_id):
+    """
+    Returns the current angles of all joints in the robotic arm.
+    Args:
+        arm_id (int): The ID of the robotic arm in the PyBullet simulation.
+    Returns:
+        list: A list of current joint angles for the robotic arm.
+    """
     joint_positions = []
     num_joints = p.getNumJoints(arm_id)
 
@@ -116,14 +126,28 @@ def get_joint_angle(arm_id):
     return joint_positions
 
 def set_joint_positions(joint_index, target_position, arm_id):
+    """
+    Sets the position of a specific joint in the robotic arm.
+    Args:
+        joint_index (int): The index of the joint to be set.
+        target_position (float): The target position for the joint in radians.
+        arm_id (int): The ID of the robotic arm in the PyBullet simulation.
+    """
     p.setJointMotorControl2(
         arm_id,
         joint_index,
         p.POSITION_CONTROL,
-        targetPosition=target_position, #radians
+        targetPosition=target_position, 
         force=100
     )
 def set_joint_velocities(joint_index, target_velocity, arm_id):
+    """
+    Sets the velocity of a specific joint in the robotic arm.
+    Args:
+        joint_index (int): The index of the joint to be set.
+        target_velocity (float): The target velocity for the joint in radians/second.
+        arm_id (int): The ID of the robotic arm in the PyBullet simulation.
+    """
     p.setJointMotorControl2(
         arm_id,
         joint_index,
@@ -132,6 +156,13 @@ def set_joint_velocities(joint_index, target_velocity, arm_id):
         force=100
     )
 def set_joint_torques(joint_index, target_torque, arm_id):
+    """
+    Sets the torque of a specific joint in the robotic arm.
+    Args:
+        joint_index (int): The index of the joint to be set.
+        target_torque (float): The target torque for the joint.
+        arm_id (int): The ID of the robotic arm in the PyBullet simulation.
+    """
     p.setJointMotorControl2(
         arm_id,
         joint_index,

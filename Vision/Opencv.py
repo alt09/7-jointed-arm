@@ -2,6 +2,15 @@ import cv2
 import numpy as np
 
 def moments(rgba_img,lower_color,upper_color):
+    """
+    Computes the moments of a binary mask created from the input RGBA image based on the specified color range.
+    Args:
+        rgba_img (numpy.ndarray): The RGBA image from the camera.
+        lower_color (list): The lower bound of the color range for object detection in HSV format.
+        upper_color (list): The upper bound of the color range for object detection in HSV format.
+    Returns:
+        dict: A dictionary containing the moments of the binary mask.
+    """
 
     bgr_img = cv2.cvtColor(rgba_img, cv2.COLOR_RGBA2BGR)
     hsv = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2HSV)
@@ -10,6 +19,14 @@ def moments(rgba_img,lower_color,upper_color):
     M = cv2.moments(mask)
     return M
 def center_of_mass(rgba_img, lower_color,upper_color, LoR):
+    """
+    Finds the center of mass of a red object in the image.
+    Args:
+        rgba_img (numpy.ndarray): The RGBA image from the camera.
+        lower_color (list): The lower bound of the color range for object detection in HSV format.
+        upper_color (list): The upper bound of the color range for object detection in HSV format.
+        LoR (str): A string indicating whether the image is from the left or right camera.
+    """
     bgr_img = cv2.cvtColor(rgba_img, cv2.COLOR_RGBA2BGR)
     hsv = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2HSV)
     mask = cv2.inRange(hsv, np.array(lower_color), np.array(upper_color))
@@ -29,12 +46,30 @@ def center_of_mass(rgba_img, lower_color,upper_color, LoR):
         return None
 
 def test_new_cameras(rgba_img):
+    """
+    Tests the new cameras by displaying their feeds.
+    Args:
+        rgba_img (numpy.ndarray): The RGBA image from the camera.
+    """
     bgr_img = cv2.cvtColor(rgba_img, cv2.COLOR_RGBA2BGR)
     cv2.imshow("Camera Feed 2", bgr_img)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         return None
 
-def target_3d_pose(view_matrix_1,view_matrix_2,projectionMatrix,rgba_img1,rgba_img2,lower_color,upper_color): #find the 3D position of the target object using stereo vision
+def target_3d_pose(view_matrix_1,view_matrix_2,projectionMatrix,rgba_img1,rgba_img2,lower_color,upper_color): #
+    """
+    Computes the 3D position of a target object based on its 2D positions in two camera images.
+    Args:
+        view_matrix_1 (list): The view matrix of the first camera.
+        view_matrix_2 (list): The view matrix of the second camera.
+        projectionMatrix (list): The projection matrix used for both cameras.
+        rgba_img1 (numpy.ndarray): The RGBA image from the first camera.
+        rgba_img2 (numpy.ndarray): The RGBA image from the second camera.
+        lower_color (list): The lower bound of the color range for object detection in HSV format.
+        upper_color (list): The upper bound of the color range for object detection in HSV format.
+    Returns:
+        tuple: A tuple containing the 3D position of the target object and the triangulation error.
+    """
 
     M1=moments(rgba_img1, lower_color, upper_color)
     M2=moments(rgba_img2, lower_color, upper_color)
@@ -79,6 +114,13 @@ def target_3d_pose(view_matrix_1,view_matrix_2,projectionMatrix,rgba_img1,rgba_i
 
 
 def camera_pose_from_view_matrix(viewMatrix):
+    """
+    Computes the camera position and rotation matrix from the view matrix.
+    Args:
+        viewMatrix (list): The view matrix of the camera.
+    Returns:
+        tuple: A tuple containing the camera position (C) and rotation matrix (R).
+    """
 
     view = np.array(viewMatrix, dtype=float).reshape((4, 4), order='F')
 
@@ -89,6 +131,18 @@ def camera_pose_from_view_matrix(viewMatrix):
 
     return C, R
 def pixel_to_world_ray(u,v,view_matrix,projection_matrix,width,height):
+    """
+    Computes the world ray direction from a pixel coordinate in the image.
+    Args:
+        u (float): The x-coordinate of the pixel in the image.
+        v (float): The y-coordinate of the pixel in the image.
+        view_matrix (list): The view matrix of the camera.
+        projection_matrix (list): The projection matrix used for the camera.
+        width (int): The width of the image in pixels.
+        height (int): The height of the image in pixels.
+    Returns:
+        numpy.ndarray: A 3D unit vector representing the direction of the ray in world coordinates
+    """
     x_ndc = (2.0 * u) / width - 1.0
     y_ndc = 1.0 - (2.0 * v) / height
 
