@@ -57,18 +57,12 @@ def auto_aim(target_3Dposition,viewMatrix1,viewMatrix2):
         viewMatrix1 (list): The view matrix of the first camera.
         viewMatrix2 (list): The view matrix of the second camera.
     """
-    view_matrix4x4 = np.array(viewMatrix1).reshape(4, 4).T  # Reshape the view matrix to a 4x4 matrix
     avg_camera_pose = (opencv.camera_pose_from_view_matrix(viewMatrix1)[0] + opencv.camera_pose_from_view_matrix(viewMatrix2)[0]) / 2  # Get the average camera pose from the two view matrices
     d = target_3Dposition - avg_camera_pose  # Calculate the direction vector from the average camera position to the target position
     target_yaw = math.atan2(d[0], d[1])  # Calculate the yaw angle
     target_pitch = math.atan2(d[2], math.sqrt(d[0] ** 2 + d[1] ** 2))  # Calculate the pitch angle
-    target_quaternion = np.array(utils.quaternion_from_yaw_pitch_roll(target_yaw, target_pitch, 0)).T  # Convert yaw and pitch to a quaternion roll is set to 0
-
-    R_camera_to_world = view_matrix4x4[:3, :3].T  # Extract the rotation matrix from the view matrix and transpose it to get the camera-to-world rotation
-    camera_quaternion = R.from_matrix(R_camera_to_world).as_quat()  # Convert the rotation matrix to a quaternion
-    difangle = np.subtract(utils.Yaw_pitch_roll_from_quaternion(target_quaternion), utils.Yaw_pitch_roll_from_quaternion(camera_quaternion))  # Calculate the final quaternion by subtracting the camera quaternion from the target quaternion
-    finalangle = utils.Yaw_pitch_roll_from_quaternion(target_quaternion)  # Convert the final quaternion to yaw, pitch, and roll angles
-
+    target_yaw = (target_yaw + math.pi) % (2 * math.pi) - math.pi
+    target_pitch = (target_pitch + math.pi) % (2 * math.pi) - math.pi
 
     print("Yaw:", math.degrees(target_yaw))
     print("Pitch:", math.degrees(target_pitch))
@@ -81,7 +75,6 @@ def cheats(arm_id,target_3Dposition,viewMatrix1,viewMatrix2):
        
         wrist_pitch = utils.Yaw_pitch_roll_from_quaternion(sim.p.getLinkState(arm_id, 6)[5])[1]  # Get the current position of the wrist
         shoulder_roll = utils.Yaw_pitch_roll_from_quaternion(sim.p.getLinkState(arm_id, 5)[5])[2]  # Get the current position of the shoulder
-        #sim.set_joint_positions(6, kinematics[6], arm_id) # arriba
         sim.set_joint_positions(7,-(end_effector_yaw+angle[0]), arm_id) # izquierda Move the arm to the calculated joint positions
         sim.set_joint_positions(6,-(wrist_pitch+angle[1]), arm_id) # abajo
-        #sim.set_joint_positions(5,0, arm_id) # derecha
+

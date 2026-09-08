@@ -10,7 +10,7 @@ import Vision.opencv as opencv
 import Movement.go_to as go_to
 
 print("Starting PyBullet simulation...")
-
+target_last_pose = None
 def sim():
     print("Starting simulation...")
     client = p.connect(p.GUI)
@@ -77,9 +77,13 @@ def sim():
         opencv.center_of_mass(rgba_img1, [0, 0, 55], [0, 0, 100],"Left")
         opencv.center_of_mass(rgba_img2, [0, 0, 55], [0, 0, 100],"Right")
         
-
+        go_to.go_to_target(arm_id, [1, 3, 1])
         if opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 100]) is not None:
             go_to.cheats(arm_id,opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 100])[0],viewMatrix1,viewMatrix2)
+            target_last_pose = opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 100])[0]
+        if target_last_pose is not None and opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 100]) is None:
+            go_to.cheats(arm_id,target_last_pose,viewMatrix1,viewMatrix2)
+            print("target_last_pose",target_last_pose)
             #print("target 3D position",opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 100]))
            # print("auto aiming at target",go_to.auto_aim(opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 100])[0],viewMatrix1,viewMatrix2))
 def get_joint_info(arm_id):
