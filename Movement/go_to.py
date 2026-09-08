@@ -83,12 +83,5 @@ def cheats(arm_id,target_3Dposition,viewMatrix1,viewMatrix2):
         shoulder_roll = utils.Yaw_pitch_roll_from_quaternion(sim.p.getLinkState(arm_id, 5)[5])[2]  # Get the current position of the shoulder
         #sim.set_joint_positions(6, kinematics[6], arm_id) # arriba
         sim.set_joint_positions(7,-(end_effector_yaw+angle[0]), arm_id) # izquierda Move the arm to the calculated joint positions
-        
-        print("angle yaw",math.degrees(end_effector_yaw - angle[0]))
-        print("angle pitch",math.degrees(wrist_pitch + angle[1]))
-        print("current yaw",math.degrees(end_effector_yaw))
-        print("current pitch",math.degrees(wrist_pitch))
-        #print("final angle",angle[1])
-
-       # sim.set_joint_positions(6,3.14, arm_id) # abajo
+        sim.set_joint_positions(6,-(wrist_pitch+angle[1]), arm_id) # abajo
         #sim.set_joint_positions(5,0, arm_id) # derecha
