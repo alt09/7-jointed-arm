@@ -74,6 +74,7 @@ def target_3d_pose(view_matrix_1,view_matrix_2,projectionMatrix,rgba_img1,rgba_i
         target_position = (point1 + point2) / 2
         triangulation_error = np.linalg.norm(point1 - point2)
 
+
         return target_position, triangulation_error
 
 

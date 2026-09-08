@@ -24,9 +24,8 @@ def sim():
     #r2d22_id = p.loadURDF("r2d2.urdf", basePosition=[-1, -.76, 1], useFixedBase=True)
     #print(f"Loaded arm with id: {arm_id}")
     width, height = 320, 240
-  #  go_to.go_to_target(arm_id, [0, 4, 1])
+    #go_to.go_to_target(arm_id, [1, 2, 1])
     
-    line = p.loadURDF("line.urdf", basePosition=go_to.where_is(arm_id)[0], useFixedBase=True)
     while p.isConnected(client):
         p.stepSimulation()
         time.sleep(1.0 / 240.0)
@@ -77,13 +76,12 @@ def sim():
 
         opencv.center_of_mass(rgba_img1, [0, 0, 55], [0, 0, 100],"Left")
         opencv.center_of_mass(rgba_img2, [0, 0, 55], [0, 0, 100],"Right")
+        
 
         if opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 100]) is not None:
             go_to.cheats(arm_id,opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 100])[0],viewMatrix1,viewMatrix2)
-            print("target 3D position",opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 100]))
-            print("auto aiming at target",go_to.auto_aim(opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 100])[0],viewMatrix1,viewMatrix2))
-
-            p.setJointMotorControl2(line,0,controlMode=p.POSITION_CONTROL,targetPosition=go_to.where_is(arm_id)[0][0] + go_to.auto_aim(opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 100])[0],viewMatrix1,viewMatrix2)[0][0]-1.63)
+            #print("target 3D position",opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 100]))
+           # print("auto aiming at target",go_to.auto_aim(opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 100])[0],viewMatrix1,viewMatrix2))
 def get_joint_info(arm_id):
     joint_info = {}
     num_joints = p.getNumJoints(arm_id)
