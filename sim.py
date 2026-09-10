@@ -73,14 +73,15 @@ def sim():
         rgba_img1 = np.reshape(img_arr1[2], (height, width, 4)).astype(np.uint8)
         rgba_img2 = np.reshape(img_arr2[2], (height, width, 4)).astype(np.uint8)
 
-        opencv.center_of_mass(rgba_img1, [0, 0, 55], [0, 0, 100],"Left")
-        opencv.center_of_mass(rgba_img2, [0, 0, 55], [0, 0, 100],"Right")
+
+        opencv.center_of_mass(rgba_img1, [0, 0, 55], [0, 0, 255],"Left")
+        opencv.center_of_mass(rgba_img2, [0, 0, 55], [0, 0, 255],"Right")
         
-        go_to.go_to_target(arm_id, [4, 0, 1])
-        if opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 100]) is not None:
-            go_to.cheats(arm_id,opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 100])[0],viewMatrix1,viewMatrix2)
-            target_last_pose = opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 100])[0]
-        if target_last_pose is not None and opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 100]) is None:
+       # go_to.go_to_target(arm_id, [4, 0, 1])
+        if opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 255]) is not None:
+            go_to.cheats(arm_id,opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 255])[0],viewMatrix1,viewMatrix2)
+            target_last_pose = opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 255])[0]
+        if target_last_pose is not None and opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 255], [0, 0, 100]) is None:
             go_to.cheats(arm_id,target_last_pose,viewMatrix1,viewMatrix2)
             print("target_last_pose",target_last_pose)
 def get_joint_info(arm_id):
