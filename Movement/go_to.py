@@ -44,7 +44,7 @@ def go_to_target(arm_id,target_position, target_orientation):
     # Move the arm to the target joint positions
     for i in range(sim.p.getNumJoints(arm_id)):
         sim.set_joint_positions(i, target_joint_positions[i], arm_id)
-def where_is(arm_id):
+def where_is_endeffector(arm_id):
     """
     Returns the current position of the end effector of the robotic arm.
     Args:
@@ -90,7 +90,7 @@ def cheats(arm_id,target_3Dposition,viewMatrix1,viewMatrix2):
     if target_3Dposition is not None:
         angle = auto_aim(target_3Dposition,viewMatrix1,viewMatrix2)  # Get the final angle from auto_aim
         print("target_3Dposition",target_3Dposition)
-        end_effector_yaw = where_is(arm_id)[1]  # Get the current position of the end effector
+        end_effector_yaw = where_is_endeffector(arm_id)[1]  # Get the current position of the end effector
         wrist_pitch = utils.Yaw_pitch_roll_from_quaternion(sim.p.getLinkState(arm_id, 6)[5])[1]  # Get the current position of the wrist
         sim.set_joint_positions(7,-(end_effector_yaw+angle[0]), arm_id) # izquierda Move the arm to the calculated joint positions
         sim.set_joint_positions(6,-(wrist_pitch+angle[1]), arm_id) # abajo

@@ -10,11 +10,11 @@ import Vision.opencv as opencv
 import Movement.go_to as go_to
 
 print("Starting PyBullet simulation...")
-target_last_pose = None
 def sim():
     """
     Runs the PyBullet simulation.
     """
+    target_last_info = None
     client = p.connect(p.GUI)
     p.setAdditionalSearchPath(pybullet_data.getDataPath())
     p.setGravity(0, 0, 0)
@@ -31,29 +31,29 @@ def sim():
         # Camera 1 Position and Orientation 
         viewMatrix1 = p.computeViewMatrixFromYawPitchRoll(
         cameraTargetPosition=[
-            go_to.where_is(arm_id)[0][0],
-            go_to.where_is(arm_id)[0][1],
-            go_to.where_is(arm_id)[0][2]-0.2
+            go_to.where_is_endeffector(arm_id)[0][0],
+            go_to.where_is_endeffector(arm_id)[0][1],
+            go_to.where_is_endeffector(arm_id)[0][2]-0.2
         ],
         distance=0.1,
-        yaw=(180/math.pi)*go_to.where_is(arm_id)[1], # RAD to DEG
-        pitch=(180/math.pi)*go_to.where_is(arm_id)[2],
-        roll=(180/math.pi)*go_to.where_is(arm_id)[3],
+        yaw=(180/math.pi)*go_to.where_is_endeffector(arm_id)[1], # RAD to DEG
+        pitch=(180/math.pi)*go_to.where_is_endeffector(arm_id)[2],
+        roll=(180/math.pi)*go_to.where_is_endeffector(arm_id)[3],
         upAxisIndex=2
    		)
         viewMatrix2 = p.computeViewMatrixFromYawPitchRoll(
         cameraTargetPosition=[
-            go_to.where_is(arm_id)[0][0]+1,
-            go_to.where_is(arm_id)[0][1],
-            go_to.where_is(arm_id)[0][2]-0.2
+            go_to.where_is_endeffector(arm_id)[0][0]+1,
+            go_to.where_is_endeffector(arm_id)[0][1],
+            go_to.where_is_endeffector(arm_id)[0][2]-0.2
         ],
         distance=0.1,
-        yaw=(180/math.pi)*go_to.where_is(arm_id)[1], # RAD to DEG
-        pitch=(180/math.pi)*go_to.where_is(arm_id)[2],
-        roll=(180/math.pi)*go_to.where_is(arm_id)[3],
+        yaw=(180/math.pi)*go_to.where_is_endeffector(arm_id)[1], # RAD to DEG
+        pitch=(180/math.pi)*go_to.where_is_endeffector(arm_id)[2],
+        roll=(180/math.pi)*go_to.where_is_endeffector(arm_id)[3],
         upAxisIndex=2
    		)
-        # print((go_to.where_is(arm_id)))
+        # print((go_to.where_is_endeffector(arm_id)))
         projectionMatrix = p.computeProjectionMatrixFOV(
     	    fov=60, aspect=width/height, nearVal=0.1, farVal=100.0
     	)
@@ -76,14 +76,20 @@ def sim():
 
         opencv.center_of_mass(rgba_img1, [0, 0, 55], [0, 0, 255],"Left")
         opencv.center_of_mass(rgba_img2, [0, 0, 55], [0, 0, 255],"Right")
-        
+
        # go_to.go_to_target(arm_id, [4, 0, 1])
         if opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 255]) is not None:
-            go_to.approach(arm_id,opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 255])[0],viewMatrix1,viewMatrix2)
-            target_last_pose = opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 255])[0]
-        if target_last_pose is not None and opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 255], [0, 0, 100]) is None:
-            go_to.approach(arm_id,target_last_pose,viewMatrix1,viewMatrix2)
-            print("target_last_pose",target_last_pose)
+            target_last_info = opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 255])
+            if target_last_info[1] < 0.2:
+                go_to.approach(arm_id,target_last_info[2],viewMatrix1,viewMatrix2)
+                target_last_good_pose=target_last_info[2]
+        else:
+           # go_to.approach(arm_id,target_last_pose,viewMatrix1,viewMatrix2)
+           if target_last_info is not None:
+                go_to.approach(arm_id,target_last_info[2],viewMatrix1,viewMatrix2)
+                print("target_last_pose good",target_last_info[2])
+                print("target_last_posebad?",target_last_info[1])
+
 def get_joint_info(arm_id):
     """
     Returns information about the joints of the robotic arm.

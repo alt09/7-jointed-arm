@@ -56,9 +56,9 @@ def test_new_cameras(rgba_img):
     if cv2.waitKey(1) & 0xFF == ord('q'):
         return None
 
-def target_3d_pose(view_matrix_1,view_matrix_2,projectionMatrix,rgba_img1,rgba_img2,lower_color,upper_color): #
+def target_3d_pose(view_matrix_1,view_matrix_2,projectionMatrix,rgba_img1,rgba_img2,lower_color,upper_color): 
     """
-    Computes the 3D position of a target object based on its 2D positions in two camera images.
+    Computes the 3D position of a target object based on its 2D positions in two camera images (in the Camera coordinate system).
     Args:
         view_matrix_1 (list): The view matrix of the first camera.
         view_matrix_2 (list): The view matrix of the second camera.
@@ -68,7 +68,9 @@ def target_3d_pose(view_matrix_1,view_matrix_2,projectionMatrix,rgba_img1,rgba_i
         lower_color (list): The lower bound of the color range for object detection in HSV format.
         upper_color (list): The upper bound of the color range for object detection in HSV format.
     Returns:
-        tuple: A tuple containing the 3D position of the target object and the triangulation error.
+        tuple: A tuple containing the 3D position of the target object (in the Camera coordinate system) and the triangulation error.
+        the triangulation error is the distance between the two rays from the cameras to the target object, which indicates the accuracy of the triangulation.
+        The third element of the tuple is the 3D position of the target object in the world coordinate system.
     """
 
     M1=moments(rgba_img1, lower_color, upper_color)
@@ -109,8 +111,9 @@ def target_3d_pose(view_matrix_1,view_matrix_2,projectionMatrix,rgba_img1,rgba_i
         target_position = (point1 + point2) / 2
         triangulation_error = np.linalg.norm(point1 - point2)
 
+        target_position_world =   target_position
 
-        return target_position, triangulation_error
+        return target_position, triangulation_error, target_position_world
 
 
 def camera_pose_from_view_matrix(viewMatrix):
