@@ -7,7 +7,7 @@ import math
 
 import Vision.opencv as opencv
 
-import Movement.go_to as go_to
+import Movement.robot_controller as robot_controller
 
 print("Starting PyBullet simulation...")
 def sim():
@@ -31,26 +31,26 @@ def sim():
         # Camera 1 Position and Orientation 
         viewMatrix1 = p.computeViewMatrixFromYawPitchRoll(
         cameraTargetPosition=[
-            go_to.where_is_endeffector(arm_id)[0][0],
-            go_to.where_is_endeffector(arm_id)[0][1],
-            go_to.where_is_endeffector(arm_id)[0][2]-0.2
+            robot_controller.where_is_endeffector(arm_id)[0][0],
+            robot_controller.where_is_endeffector(arm_id)[0][1],
+            robot_controller.where_is_endeffector(arm_id)[0][2]-0.2
         ],
         distance=0.1,
-        yaw=(180/math.pi)*go_to.where_is_endeffector(arm_id)[1], # RAD to DEG
-        pitch=(180/math.pi)*go_to.where_is_endeffector(arm_id)[2],
-        roll=(180/math.pi)*go_to.where_is_endeffector(arm_id)[3],
+        yaw=(180/math.pi)*robot_controller.where_is_endeffector(arm_id)[1], # RAD to DEG
+        pitch=(180/math.pi)*robot_controller.where_is_endeffector(arm_id)[2],
+        roll=(180/math.pi)*robot_controller.where_is_endeffector(arm_id)[3],
         upAxisIndex=2
    		)
         viewMatrix2 = p.computeViewMatrixFromYawPitchRoll(
         cameraTargetPosition=[
-            go_to.where_is_endeffector(arm_id)[0][0]+1,
-            go_to.where_is_endeffector(arm_id)[0][1],
-            go_to.where_is_endeffector(arm_id)[0][2]-0.2
+            robot_controller.where_is_endeffector(arm_id)[0][0]+1,
+            robot_controller.where_is_endeffector(arm_id)[0][1],
+            robot_controller.where_is_endeffector(arm_id)[0][2]-0.2
         ],
         distance=0.1,
-        yaw=(180/math.pi)*go_to.where_is_endeffector(arm_id)[1], # RAD to DEG
-        pitch=(180/math.pi)*go_to.where_is_endeffector(arm_id)[2],
-        roll=(180/math.pi)*go_to.where_is_endeffector(arm_id)[3],
+        yaw=(180/math.pi)*robot_controller.where_is_endeffector(arm_id)[1], # RAD to DEG
+        pitch=(180/math.pi)*robot_controller.where_is_endeffector(arm_id)[2],
+        roll=(180/math.pi)*robot_controller.where_is_endeffector(arm_id)[3],
         upAxisIndex=2
    		)
         # print((go_to.where_is_endeffector(arm_id)))
@@ -81,12 +81,12 @@ def sim():
         if opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 255]) is not None:
             target_last_info = opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 255])
             if target_last_info[1] < 0.2:
-                go_to.approach(arm_id,target_last_info[0],viewMatrix1,viewMatrix2)
+                robot_controller.approach(arm_id,target_last_info[0],viewMatrix1,viewMatrix2)
                 target_last_good_pose=target_last_info[0]
         else:
            # go_to.approach(arm_id,target_last_pose,viewMatrix1,viewMatrix2)
            if target_last_info is not None:
-                go_to.approach(arm_id,target_last_good_pose,viewMatrix1,viewMatrix2)
+                robot_controller.approach(arm_id,target_last_good_pose,viewMatrix1,viewMatrix2)
                 print("target_last_pose good",target_last_good_pose)
                 print("target_last_posebad?",target_last_info[1])
 
