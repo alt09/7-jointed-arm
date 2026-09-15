@@ -4,7 +4,7 @@ import numpy as np
 import pybullet as p
 import pybullet_data
 import math
-
+import Movement.kinematics as kinematics
 import Vision.opencv as opencv
 
 import Movement.robot_controller as robot_controller
@@ -76,6 +76,14 @@ def sim():
 
         opencv.center_of_mass(rgba_img1, [0, 0, 55], [0, 0, 255],"Left")
         opencv.center_of_mass(rgba_img2, [0, 0, 55], [0, 0, 255],"Right")
+
+        q = np.zeros(7)
+        for i in range(7):
+            print(f"Joint {i} ")
+            q[i] = math.radians(30)
+
+            kinematics.test_fk(q)
+
 
        # go_to.go_to_target(arm_id, [4, 0, 1])
         # if opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 255]) is not None:
