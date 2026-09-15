@@ -2,6 +2,7 @@ from Utils import utils
 from Vision import opencv
 import sim
 import math
+import constants
 import numpy as np
 def go_to(arm_id, num_joints, go_to):
     """
@@ -24,12 +25,12 @@ def go_to_target(arm_id,target_position, target_orientation):
     """
 
     # Calculate the inverse kinematics to find the joint angles for the target position
-    target_joint_positions = sim.p.calculateInverseKinematics(arm_id, 6, target_position, target_orientation)  # 7 is the index of the end effector link
+    target_joint_positions = sim.p.calculateInverseKinematics(arm_id, constants.Constants.Robot.end_effector_link_index, target_position, target_orientation)  # 7 is the index of the end effector link
 
     # print(f"Target joint positions: {target_joint_positions}")
 
     # Move the arm to the target joint positions
-    for i in range(sim.p.getNumJoints(arm_id)):
+    for i in range(constants.Constants.Robot.end_effector_link_index):
         sim.set_joint_positions(i, target_joint_positions[i], arm_id)
 def where_is_endeffector(arm_id):
     """
@@ -39,11 +40,11 @@ def where_is_endeffector(arm_id):
     Returns:
         list: A list of 2 values [End_effector_position, End_effector_orientation] representing the current position and orientation of the end effector.
     """
-    quaternion = sim.p.getLinkState(arm_id, 6)[5]  # Get the orientation of the end effector
+    quaternion = sim.p.getLinkState(arm_id, constants.Constants.Robot.end_effector_link_index)[5]  # Get the orientation of the end effector
 
     yaw, pitch, roll = utils.Yaw_pitch_roll_from_quaternion(quaternion)
     # Calculate the forward kinematics to find the position of the end effector
-    end_effector_state = sim.p.getLinkState(arm_id, 6)
+    end_effector_state = sim.p.getLinkState(arm_id, constants.Constants.Robot.end_effector_link_index)
     end_effector_position = [end_effector_state[4],yaw,pitch,roll]  # Position is at index 4
 
     return end_effector_position
@@ -79,8 +80,8 @@ def cheats(arm_id,target_3Dposition,viewMatrix1,viewMatrix2):
         print("target_3Dposition",target_3Dposition)
         end_effector_yaw = where_is_endeffector(arm_id)[1]  # Get the current position of the end effector
         wrist_pitch = utils.Yaw_pitch_roll_from_quaternion(sim.p.getLinkState(arm_id, 6)[5])[1]  # Get the current position of the wrist
-        sim.set_joint_positions(7,-(end_effector_yaw+angle[0]), arm_id) # izquierda Move the arm to the calculated joint positions
-        sim.set_joint_positions(6,-(wrist_pitch+angle[1]), arm_id) # abajo
+        sim.set_joint_positions(7,-(end_effector_yaw+angle[0]), arm_id) #  Move the arm to the calculated joint positions
+        sim.set_joint_positions(6,-(wrist_pitch+angle[1]), arm_id) 
 
 def approach(arm_id,target_3Dposition,viewMatrix1,viewMatrix2):
     """
@@ -93,7 +94,7 @@ def approach(arm_id,target_3Dposition,viewMatrix1,viewMatrix2):
     Returns:
         None
     """
-    target_approach_position = target_3Dposition - np.array([1, 1, 0])  # Move 10 cm above the target position
+    target_approach_position = target_3Dposition - np.array([1, 1, 0])  
     
     end_effector_yaw = where_is_endeffector(arm_id)[1]  # Get the current position of the end effector
     wrist_pitch = utils.Yaw_pitch_roll_from_quaternion(sim.p.getLinkState(arm_id, 6)[5])[1]  # Get the current position of the wrist

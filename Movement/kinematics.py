@@ -1,6 +1,8 @@
 import Utils.utils as utils
 import numpy as np
 import math
+
+import constants
 def inverse_kinematics(arm_id, target_position, target_orientation):
     """
     Computes the inverse kinematics for the robotic arm to reach a target position and orientation.
@@ -14,26 +16,6 @@ def inverse_kinematics(arm_id, target_position, target_orientation):
 
     target_joint_positions = []
 
-joint_origins = np.array([
-    [0.0,  0.0,  0.613788085],
-    [0.0, -0.345, 0.0],
-    [0.323, 0.0, 0.0],
-    [0.37, 0.0, 3.646211915],
-    [0.335, 0.0, -3.646211915],
-    [0.0, -0.345, 0.0],
-    [0.0, 0.0, -0.613788085]
-])
-
-
-joint_axes = np.array([
-    [0, 0, 1],
-    [0, 1, 0],
-    [1, 0, 0],
-    [1, 0, 0],
-    [1, 0, 0],
-    [0, 1, 0],
-    [0, 0, 1]
-])
 
 def forward_kinematics(q):
     """
@@ -59,11 +41,11 @@ def forward_kinematics(q):
 
     for i in range(7):
 
-        T[:3,3] += T[:3,:3] @ joint_origins[i]
+        T[:3,3] += T[:3,:3] @ constants.Constants.Robot.joint_origins[i]
         joint_positions.append(T[:3,3].copy())
-        axis_world = T[:3,:3] @ joint_axes[i]
+        axis_world = T[:3,:3] @ constants.Constants.Robot.joint_axes[i]
         joint_axes_world.append(axis_world.copy())
-        R = utils.rotation_matrix(joint_axes[i], q[i])
+        R = utils.rotation_matrix(constants.Constants.Robot.joint_axes[i], q[i])
         T[:3,:3] = T[:3,:3] @ R
         transforms.append(T.copy())
         

@@ -6,6 +6,7 @@ import pybullet_data
 import math
 import Movement.kinematics as kinematics
 import Vision.opencv as opencv
+import constants
 
 import Movement.robot_controller as robot_controller
 
@@ -21,10 +22,9 @@ def sim():
     
 
     #p.loadURDF("plane.urdf")  # load the plane
-    arm_id = p.loadURDF("arm.urdf", basePosition=[0, 0, 1], useFixedBase=True)
-    r2d2_id = p.loadURDF("r2d2.urdf", basePosition=[0, 4, 1], useFixedBase=True)
-
-    width, height = 320, 240    
+    arm_id = p.loadURDF("URDF/arm.urdf", basePosition=constants.Constants.Robot.arm_base_position, useFixedBase=True)
+    r2d2_id = p.loadURDF("r2d2.urdf", basePosition=constants.Constants.Robot.r2d2_base_position, useFixedBase=True)
+   
     while p.isConnected(client):
         p.stepSimulation()
         time.sleep(1.0 / 240.0)
@@ -55,27 +55,32 @@ def sim():
    		)
         # print((go_to.where_is_endeffector(arm_id)))
         projectionMatrix = p.computeProjectionMatrixFOV(
-    	    fov=60, aspect=width/height, nearVal=0.1, farVal=100.0
+    	    fov = constants.Constants.Camera.fov,
+            aspect = constants.Constants.Camera.width/constants.Constants.Camera.height,
+            nearVal=0.1,
+            farVal=100.0
     	)
         img_arr1 = p.getCameraImage(
-            width, height,
+            constants.Constants.Camera.width,
+            constants.Constants.Camera.height,
 			viewMatrix=viewMatrix1,
             projectionMatrix=projectionMatrix,
             renderer=p.ER_BULLET_HARDWARE_OPENGL
         )
         img_arr2 = p.getCameraImage(
-            width, height,
+            constants.Constants.Camera.width, constants.Constants.Camera.height,
 			viewMatrix=viewMatrix2,
             projectionMatrix=projectionMatrix,
             renderer=p.ER_BULLET_HARDWARE_OPENGL
         )
         # Extract the RGBA image
-        rgba_img1 = np.reshape(img_arr1[2], (height, width, 4)).astype(np.uint8)
-        rgba_img2 = np.reshape(img_arr2[2], (height, width, 4)).astype(np.uint8)
+        rgba_img1 = np.reshape(img_arr1[2], (constants.Constants.Camera.height, constants.Constants.Camera.width, 4)).astype(np.uint8)
+        rgba_img2 = np.reshape(img_arr2[2], (constants.Constants.Camera.height, constants.Constants.Camera.width, 4)).astype(np.uint8)
 
 
-        opencv.center_of_mass(rgba_img1, [0, 0, 55], [0, 0, 255],"Left")
-        opencv.center_of_mass(rgba_img2, [0, 0, 55], [0, 0, 255],"Right")
+
+        opencv.center_of_mass(rgba_img1, constants.Constants.Camera.detect_color_min, constants.Constants.Camera.detect_color_max,"Left")
+        opencv.center_of_mass(rgba_img2, constants.Constants.Camera.detect_color_min, constants.Constants.Camera.detect_color_max,"Right")
 
         q = np.zeros(7)
 
