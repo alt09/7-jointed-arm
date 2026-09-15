@@ -108,8 +108,13 @@ def approach(arm_id,target_3Dposition,viewMatrix1,viewMatrix2):
     """
     target_approach_position = target_3Dposition - np.array([1, 1, 0])  # Move 10 cm above the target position
     
-    if target_3Dposition is not None:
-        angle = auto_aim(target_approach_position,viewMatrix1,viewMatrix2)  # Get the final angle from auto_aim
-        go_to_target(arm_id, target_3Dposition, utils.quaternion_from_yaw_pitch_roll(angle[0], angle[1], 0))  # Move to a predefined approach position
-        print("target_3Dposition",target_3Dposition)
+    end_effector_yaw = where_is_endeffector(arm_id)[1]  # Get the current position of the end effector
+    wrist_pitch = utils.Yaw_pitch_roll_from_quaternion(sim.p.getLinkState(arm_id, 6)[5])[1]  # Get the current position of the wrist
+    
+
+    diff_angle = auto_aim(target_approach_position,viewMatrix1,viewMatrix2)  # Get the final angle from auto_aim
+    yaw =  -(end_effector_yaw+diff_angle[0])
+    pitch = -(wrist_pitch+diff_angle[1])
+    go_to_target(arm_id, target_3Dposition, utils.quaternion_from_yaw_pitch_roll(yaw, pitch, 0))  # Move to a predefined approach position
+    print("target_3Dposition",target_3Dposition)
 
