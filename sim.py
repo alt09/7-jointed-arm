@@ -78,17 +78,17 @@ def sim():
         opencv.center_of_mass(rgba_img2, [0, 0, 55], [0, 0, 255],"Right")
 
        # go_to.go_to_target(arm_id, [4, 0, 1])
-        if opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 255]) is not None:
-            target_last_info = opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 255])
-            if target_last_info[1] < 0.2:
-                robot_controller.approach(arm_id,target_last_info[0],viewMatrix1,viewMatrix2)
-                target_last_good_pose=target_last_info[0]
-        else:
-           # go_to.approach(arm_id,target_last_pose,viewMatrix1,viewMatrix2)
-           if target_last_info is not None:
-                robot_controller.approach(arm_id,target_last_good_pose,viewMatrix1,viewMatrix2)
-                print("target_last_pose good",target_last_good_pose)
-                print("target_last_posebad?",target_last_info[1])
+        # if opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 255]) is not None:
+        #     target_last_info = opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 255])
+        #     if target_last_info[1] < 0.2:
+        #         robot_controller.approach(arm_id,target_last_info[0],viewMatrix1,viewMatrix2)
+        #         target_last_good_pose=target_last_info[0]
+        # else:
+        #    # go_to.approach(arm_id,target_last_pose,viewMatrix1,viewMatrix2)
+        #    if target_last_info is not None:
+        #         robot_controller.approach(arm_id,target_last_good_pose,viewMatrix1,viewMatrix2)
+        #         print("target_last_pose good",target_last_good_pose)
+        #         print("target_last_posebad?",target_last_info[1])
 
 def get_joint_info(arm_id):
     """
