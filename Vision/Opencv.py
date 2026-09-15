@@ -111,9 +111,7 @@ def target_3d_pose(view_matrix_1,view_matrix_2,projectionMatrix,rgba_img1,rgba_i
         target_position = (point1 + point2) / 2
         triangulation_error = np.linalg.norm(point1 - point2)
 
-        target_position_world =   target_position
-
-        return target_position, triangulation_error, target_position_world
+        return target_position, triangulation_error
 
 
 def camera_pose_from_view_matrix(viewMatrix):
