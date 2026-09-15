@@ -78,12 +78,20 @@ def sim():
         opencv.center_of_mass(rgba_img2, [0, 0, 55], [0, 0, 255],"Right")
 
         q = np.zeros(7)
-        for i in range(7):
-            print(f"Joint {i} ")
-            q[i] = math.radians(30)
 
-            kinematics.test_fk(q)
+        T, joint_positions, joint_axes_world, transforms = kinematics.forward_kinematics(q)
+        print("\nEnd effector:")
+        print(T[:3, 3])
 
+        print("\nJoint positions:")
+
+        for i, position in enumerate(joint_positions):
+            print(f"Joint {i+1}: {position}")
+
+        print("\nJoint axes:")
+
+        for i, axis in enumerate(joint_axes_world):
+            print(f"Joint {i+1}: {axis}")
 
        # go_to.go_to_target(arm_id, [4, 0, 1])
         # if opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 255]) is not None:
