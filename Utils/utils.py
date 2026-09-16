@@ -199,7 +199,7 @@ def damped_least_squares(J, error, damping=0.01):
     Returns:
         numpy.ndarray: The change in joint angles.
     """
-    identity = np.eye(3)
+    identity = np.eye(6)
     j_damped_inverse = (
         J.T @ np.linalg.inv(
             J @ J.T + damping**2 * identity
@@ -247,7 +247,7 @@ def pose_error(current_T, target_position, target_orientation):
         current_orientation,
         target_orientation
     )
-    
+
     error = np.concatenate([
         position_error,
         rotation_error

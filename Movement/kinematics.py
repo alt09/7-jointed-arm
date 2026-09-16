@@ -39,33 +39,23 @@ def forward_kinematics(q):
 
     return T, joint_positions, joint_axes_world, transforms
 
-def inverse_kinematics(target_position,initial_q,max_iterations=1000, tolerance=1e-4,learning_rate=0.5, damping=0.05):
+def inverse_kinematics(target_position,target_orientation,initial_q=None,max_iterations=1000, tolerance=1e-4,learning_rate=0.5, damping=0.05):
+    if initial_q is None:
+        q = np.zeros(7)
+    else:
+        q = np.asarray(initial_q, dtype=float)
 
-    q = np.asarray(initial_q, dtype=float).copy()
-    target_position = np.asarray(target_position, dtype=float)
+    for i in range(max_iterations):
+        T, joint_positions, joint_axes_world, transforms = forward_kinematics(q)
 
-    q = np.clip(q, 
-                constants.Constants.Robot.JOINT_MIN,
-                constants.Constants.Robot.JOINT_MAX
-                )
-    for iteration in range(max_iterations):
-        t, joint_positions, joint_axes_world, transforms = forward_kinematics(q)
-        current_position = t[:3, 3]
+        error = utils.pose_error(T,target_position,target_orientation)
 
-        error = target_position - current_position
-
-        error_magnitude = np.linalg.norm(error)
-        if error_magnitude < tolerance:
-            print(
-                f"IK converged in {iteration} iterations "
-                f"with error {error_magnitude}"
-            )
+        if np.linalg.norm(error) < tolerance:
+            print(f"IK converged in {i} iterations.")
             return q
         J = utils.calculate_jacobian(q)
 
-        J_position = J[:3, :]
-
-        delta_q = utils.damped_least_squares(J_position, error, damping)
+        delta_q = utils.damped_least_squares(J, error, damping)
 
         delta_q *= learning_rate
 
@@ -83,7 +73,6 @@ def inverse_kinematics(target_position,initial_q,max_iterations=1000, tolerance=
 
     print(
         f"IK did not converge after {max_iterations} iterations. "
-        f"Final error: {error_magnitude}"
     )
 
     return q
