@@ -1,5 +1,7 @@
 import math
 import numpy as np
+
+from Movement import kinematics
 def Yaw_pitch_roll_from_quaternion(quaternion):
     """
     Converts a quaternion to yaw, pitch, and roll angles.
@@ -159,3 +161,31 @@ def rotation_matrix(axis, angle):
         [y*x*C + z*s,   c + y*y*C,   y*z*C - x*s],
         [z*x*C - y*s,   z*y*C + x*s, c + z*z*C]
     ])
+def calculate_jacobian(q):
+    """
+    Calculates the Jacobian matrix for the robotic arm given a set of joint angles.
+    Args:
+        q (list): A list of joint angles for the robotic arm(in radians).
+                q = [q1, q2, q3, q4, q5, q6, q7]
+    Returns:
+        np.ndarray: A 6x7 Jacobian matrix.
+    """
+    T, joint_positions, joint_axes_world, transforms = kinematics.forward_kinematics(q)
+    end_effector_position = T[:3, 3]
+
+    J = np.zeros((6, 7))
+
+    for i in range(7):
+        joint_axis = joint_axes_world[i]
+        joint_position = joint_positions[i]
+
+        # Linear velocity component
+        J_linear = np.cross(joint_axis, end_effector_position - joint_position)
+
+        # Angular velocity component
+        J_angular = joint_axis
+
+        J[:3, i] = J_linear
+        J[3:, i] = J_angular
+
+    return J
