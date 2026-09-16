@@ -3,19 +3,6 @@ import numpy as np
 import math
 
 import constants
-def inverse_kinematics(arm_id, target_position, target_orientation):
-    """
-    Computes the inverse kinematics for the robotic arm to reach a target position and orientation.
-    Args:
-        arm_id (int): The ID of the robotic arm in the PyBullet simulation.
-        target_position (list): A list of 3 coordinates [x, y, z] representing the target position in 3D space.
-        target_orientation (list): A list of 4 coordinates [x, y, z, w] representing the target orientation as a quaternion.
-    Returns:
-        list: A list of joint angles for the robotic arm to reach the target position and orientation.
-    """
-
-    target_joint_positions = []
-
 
 def forward_kinematics(q):
     """
@@ -51,3 +38,27 @@ def forward_kinematics(q):
         
 
     return T, joint_positions, joint_axes_world, transforms
+
+def inverse_kinematics(target_position,initial_q,max_iterations=1000, tolerance=1e-4,learning_rate=0.5):
+
+    q = np.asarray(initial_q, dtype=float)
+    target_position = np.asarray(target_position, dtype=float)
+
+    for iteration in range(max_iterations):
+        t, joint_positions, joint_axes_world, transforms = forward_kinematics(q)
+        current_position = t[:3, 3]
+
+        error = target_position - current_position
+
+        if np.linalg.norm(error) < tolerance:
+            return q
+        J = utils.calculate_jacobian(q)
+
+        J_position = J[:3, :]
+
+        j_pseudo_inverse = np.linalg.pinv(J_position)
+
+        delta_q = learning_rate * (j_pseudo_inverse @ error)
+
+        q+= delta_q
+    return q
