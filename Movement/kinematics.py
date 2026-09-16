@@ -41,16 +41,25 @@ def forward_kinematics(q):
 
 def inverse_kinematics(target_position,initial_q,max_iterations=1000, tolerance=1e-4,learning_rate=0.5):
 
-    q = np.asarray(initial_q, dtype=float)
+    q = np.asarray(initial_q, dtype=float).copy()
     target_position = np.asarray(target_position, dtype=float)
 
+    q = np.clip(q, 
+                constants.Constants.Robot.JOINT_MIN,
+                constants.Constants.Robot.JOINT_MAX
+                )
     for iteration in range(max_iterations):
         t, joint_positions, joint_axes_world, transforms = forward_kinematics(q)
         current_position = t[:3, 3]
 
         error = target_position - current_position
 
-        if np.linalg.norm(error) < tolerance:
+        error_magnitude = np.linalg.norm(error)
+        if error_magnitude < tolerance:
+            print(
+                f"IK converged in {iteration} iterations "
+                f"with error {error_magnitude}"
+            )
             return q
         J = utils.calculate_jacobian(q)
 
@@ -58,7 +67,18 @@ def inverse_kinematics(target_position,initial_q,max_iterations=1000, tolerance=
 
         j_pseudo_inverse = np.linalg.pinv(J_position)
 
-        delta_q = learning_rate * (j_pseudo_inverse @ error)
+        delta_q = (learning_rate * j_pseudo_inverse @ error)
 
         q+= delta_q
+
+        q = np.clip(q,
+                    constants.Constants.Robot.JOINT_MIN,
+                    constants.Constants.Robot.JOINT_MAX
+                    )
+
+    print(
+        f"IK did not converge after {max_iterations} iterations. "
+        f"Final error: {error_magnitude}"
+    )
+
     return q

@@ -82,23 +82,45 @@ def sim():
         opencv.center_of_mass(rgba_img1, constants.Constants.Camera.detect_color_min, constants.Constants.Camera.detect_color_max,"Left")
         opencv.center_of_mass(rgba_img2, constants.Constants.Camera.detect_color_min, constants.Constants.Camera.detect_color_max,"Right")
 
+        targets = [
+            np.array([1.2, -0.5, 0.5]),
+            np.array([0.8, -0.3, 1.0]),
+            np.array([1.5, -0.8, 0.8]),
+            np.array([0.5, -0.2, 0.3])
+        ]
 
+        for target in targets:
 
+            initial_q = np.zeros(7)
 
+            q_solution = kinematics.inverse_kinematics(
+                target,
+                initial_q
+            )
 
+            T, _, _, _ = kinematics.forward_kinematics(q_solution)
 
-        robot_controller.go_to_target(arm_id, [4, 0, 1])
-        if opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 255]) is not None:
-            target_last_info = opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 255])
-            if target_last_info[1] < 0.2:
-                robot_controller.approach(arm_id,target_last_info[0],viewMatrix1,viewMatrix2)
-                target_last_good_pose=target_last_info[0]
-        else:
-        # go_to.approach(arm_id,target_last_pose,viewMatrix1,viewMatrix2)
-            if target_last_info is not None:
-                robot_controller.approach(arm_id,target_last_good_pose,viewMatrix1,viewMatrix2)
-                print("target_last_pose good",target_last_good_pose)
-                print("target_last_posebad?",target_last_info[1])
+            final_position = T[:3, 3]
+            error = target - final_position
+
+            print("\n--------------------")
+            print("Target:", target)
+            print("Solution:", q_solution)
+            print("Final:", final_position)
+            print("Error:", error)
+            print("Error magnitude:", np.linalg.norm(error))
+
+        # if opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 255]) is not None:
+        #     target_last_info = opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 255])
+        #     if target_last_info[1] < 0.2:
+        #         robot_controller.approach(arm_id,target_last_info[0],viewMatrix1,viewMatrix2)
+        #         target_last_good_pose=target_last_info[0]
+        # else:
+        # # go_to.approach(arm_id,target_last_pose,viewMatrix1,viewMatrix2)
+        #     if target_last_info is not None:
+        #         robot_controller.approach(arm_id,target_last_good_pose,viewMatrix1,viewMatrix2)
+        #         print("target_last_pose good",target_last_good_pose)
+        #         print("target_last_posebad?",target_last_info[1])
 
 def get_joint_info(arm_id):
     """
