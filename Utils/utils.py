@@ -189,3 +189,22 @@ def calculate_jacobian(q):
         J[3:, i] = J_angular
 
     return J
+def damped_least_squares(J, error, damping=0.01):
+    """
+    Computes the change in joint angles using the Damped Least Squares method.
+    Args:
+        J (numpy.ndarray): The Jacobian matrix.
+        error (numpy.ndarray): The error vector.
+        damping (float): The damping factor.
+    Returns:
+        numpy.ndarray: The change in joint angles.
+    """
+    identity = np.eye(3)
+    j_damped_inverse = (
+        J.T @ np.linalg.inv(
+            J @ J.T + damping**2 * identity
+            )
+    )
+
+    delta_q = j_damped_inverse @ error
+    return delta_q

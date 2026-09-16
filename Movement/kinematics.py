@@ -39,7 +39,7 @@ def forward_kinematics(q):
 
     return T, joint_positions, joint_axes_world, transforms
 
-def inverse_kinematics(target_position,initial_q,max_iterations=1000, tolerance=1e-4,learning_rate=0.5):
+def inverse_kinematics(target_position,initial_q,max_iterations=1000, tolerance=1e-4,learning_rate=0.5, damping=0.05):
 
     q = np.asarray(initial_q, dtype=float).copy()
     target_position = np.asarray(target_position, dtype=float)
@@ -65,9 +65,14 @@ def inverse_kinematics(target_position,initial_q,max_iterations=1000, tolerance=
 
         J_position = J[:3, :]
 
-        j_pseudo_inverse = np.linalg.pinv(J_position)
+        delta_q = utils.damped_least_squares(J_position, error, damping)
 
-        delta_q = (learning_rate * j_pseudo_inverse @ error)
+        delta_q *= learning_rate
+
+        max_joint_step = 0.1
+        max_delta = np.max(np.abs(delta_q))
+        if max_delta > max_joint_step:
+            delta_q *= max_joint_step / max_delta
 
         q+= delta_q
 
