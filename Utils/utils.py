@@ -208,3 +208,49 @@ def damped_least_squares(J, error, damping=0.01):
 
     delta_q = j_damped_inverse @ error
     return delta_q
+def orientation_error(current_orientation, target_orientation):
+    """
+    Computes the orientation error between the current and target orientations.
+    Args:
+        current_orientation (numpy.ndarray): The current orientation as a 3x3 rotation matrix.
+        target_orientation (numpy.ndarray): The target orientation as a 3x3 rotation matrix.
+    Returns:
+        numpy.ndarray: The orientation error as a 3D vector.
+    """
+    R_error = target_orientation @ current_orientation.T
+
+    error = 0.5 * np.array([
+        R_error[2, 1] - R_error[1, 2],
+        R_error[0, 2] - R_error[2, 0],
+        R_error[1, 0] - R_error[0, 1]
+    ])
+    return error
+def pose_error(current_T, target_position, target_orientation):
+    """
+    Computes the pose error between the current and target poses.
+    Args:
+        current_T (numpy.ndarray): The current pose as a 4x4 transformation matrix.
+        target_position (numpy.ndarray): The target position as a 3D vector.
+        target_orientation (numpy.ndarray): The target orientation as a 3x3 rotation matrix.
+    Returns:
+        numpy.ndarray: The pose error as a 6D vector (3D position error + 3D orientation error).
+    """
+
+    current_position = current_T[:3, 3]
+    current_orientation = current_T[:3, :3]
+
+    position_error = (
+        target_position - current_position
+    )
+
+    rotation_error = orientation_error(
+        current_orientation,
+        target_orientation
+    )
+    
+    error = np.concatenate([
+        position_error,
+        rotation_error
+    ])
+
+    return error
