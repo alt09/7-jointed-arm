@@ -112,39 +112,6 @@ def translation(x,y,z):
 
     return T
 
-def rotation_about_axis(axis, angle):
-    #Rodrigues' rotation formula
-    axis = np.asarray(axis,dtype=float)
-    axis = axis / np.linalg.norm(axis)
-
-    x,y,z = axis
-
-    c = math.cos(angle)
-    s = math.sin(angle)
-    v = 1 - c
-    R = np.array([
-        [
-            c + x*x*v,
-            x*y*v -z*s,
-            x*z*v +y*s
-        ],
-        [
-            y*x*v +z*s,
-            c + y*y*v,
-            y*z*v - x*s
-        ],
-        [
-            z*x*v - y*s,
-            z*y*v + x*s,
-            c + z*z*v 
-        ]
-    ])
-
-    T = np.eye(4)
-
-    T[:3,:3] = R
-    return T
-
 def rotation_matrix(axis, angle):
 
     axis = np.asarray(axis, dtype=float)

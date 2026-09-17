@@ -3,19 +3,17 @@ import numpy as np
 
 class Constants:
     class Camera:
-        width = 320
-        height = 240
-        fov = 60
-        detect_color_max = [0, 0, 255]  # Green color for detection
-        detect_color_min = [0, 0, 55]   # Dark color for detection
+        WIDTH = 320
+        HEIGHT = 240
+        FOV = 60
+        DETECT_COLOR_MAX = [0, 0, 255]  # Green color for detection
+        DETECT_COLOR_MIN = [0, 0, 55]   # Dark color for detection
     class Robot:
-        arm_urdf_path = "URDF/arm.urdf"
-        r2d2_urdf_path = "r2d2.urdf"
-        arm_base_position = [0, 0, 0]
-        r2d2_base_position = [0, 4, 1]
-        end_effector_link_index = 6
+        ARM_BASE_POSITION = [0, 0, 0]
+        R2D2_BASE_POSITION = [0, 4, 1]
+        END_EFFECTOR_LINK_INDEX = 6
 
-        joint_origins = np.array([
+        JOINT_ORIGINS = np.array([
         [0.0,  0.0,  0.613788085],
         [0.0, -0.345, 0.0],
         [0.323, 0.0, 0.0],
@@ -25,7 +23,7 @@ class Constants:
         [0.0, 0.0, -0.613788085]
         ])
 
-        joint_axes = np.array([
+        JOINT_AXES = np.array([
         [0, 0, 1],
         [0, 1, 0],
         [1, 0, 0],

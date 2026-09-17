@@ -25,12 +25,12 @@ def go_to_target(arm_id,target_position, target_orientation):
     """
 
     # Calculate the inverse kinematics to find the joint angles for the target position
-    target_joint_positions = sim.p.calculateInverseKinematics(arm_id, constants.Constants.Robot.end_effector_link_index, target_position, target_orientation)  # 7 is the index of the end effector link
+    target_joint_positions = sim.p.calculateInverseKinematics(arm_id, constants.Constants.Robot.END_EFFECTOR_LINK_INDEX, target_position, target_orientation)  # 7 is the index of the end effector link
 
     # print(f"Target joint positions: {target_joint_positions}")
 
     # Move the arm to the target joint positions
-    for i in range(constants.Constants.Robot.end_effector_link_index):
+    for i in range(constants.Constants.Robot.END_EFFECTOR_LINK_INDEX):
         sim.set_joint_positions(i, target_joint_positions[i], arm_id)
 def where_is_endeffector(arm_id):
     """
@@ -40,11 +40,11 @@ def where_is_endeffector(arm_id):
     Returns:
         list: A list of 2 values [End_effector_position, End_effector_orientation] representing the current position and orientation of the end effector.
     """
-    quaternion = sim.p.getLinkState(arm_id, constants.Constants.Robot.end_effector_link_index)[5]  # Get the orientation of the end effector
+    quaternion = sim.p.getLinkState(arm_id, constants.Constants.Robot.END_EFFECTOR_LINK_INDEX)[5]  # Get the orientation of the end effector
 
     yaw, pitch, roll = utils.Yaw_pitch_roll_from_quaternion(quaternion)
     # Calculate the forward kinematics to find the position of the end effector
-    end_effector_state = sim.p.getLinkState(arm_id, constants.Constants.Robot.end_effector_link_index)
+    end_effector_state = sim.p.getLinkState(arm_id, constants.Constants.Robot.END_EFFECTOR_LINK_INDEX)
     end_effector_position = [end_effector_state[4],yaw,pitch,roll]  # Position is at index 4
 
     return end_effector_position

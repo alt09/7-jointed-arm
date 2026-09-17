@@ -31,11 +31,11 @@ def forward_kinematics(q):
 
     for i in range(7):
 
-        T[:3,3] += T[:3,:3] @ constants.Constants.Robot.joint_origins[i]
+        T[:3,3] += T[:3,:3] @ constants.Constants.Robot.JOINT_ORIGINS[i]
         joint_positions.append(T[:3,3].copy())
-        axis_world = T[:3,:3] @ constants.Constants.Robot.joint_axes[i]
+        axis_world = T[:3,:3] @ constants.Constants.Robot.JOINT_AXES[i]
         joint_axes_world.append(axis_world.copy())
-        R = utils.rotation_matrix(constants.Constants.Robot.joint_axes[i], q[i])
+        R = utils.rotation_matrix(constants.Constants.Robot.JOINT_AXES[i], q[i])
         T[:3,:3] = T[:3,:3] @ R
         transforms.append(T.copy())
         

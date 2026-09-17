@@ -6,7 +6,6 @@ import pybullet_data
 import math
 import Movement.kinematics as kinematics
 from Utils import utils
-from Utils.utils import orientation_error, pose_error, pose_error, rotation_about_axis, rotation_matrix
 import Vision.opencv as opencv
 import constants
 
@@ -25,8 +24,8 @@ def sim():
     
 
     #p.loadURDF("plane.urdf")  # load the plane
-    arm_id = p.loadURDF("URDF/arm.urdf", basePosition=constants.Constants.Robot.arm_base_position, useFixedBase=True)
-    r2d2_id = p.loadURDF("r2d2.urdf", basePosition=constants.Constants.Robot.r2d2_base_position, useFixedBase=True)
+    arm_id = p.loadURDF("URDF/arm.urdf", basePosition=constants.Constants.Robot.ARM_BASE_POSITION, useFixedBase=True)
+    r2d2_id = p.loadURDF("r2d2.urdf", basePosition=constants.Constants.Robot.R2D2_BASE_POSITION, useFixedBase=True)
    
     while p.isConnected(client):
         p.stepSimulation()
@@ -58,35 +57,35 @@ def sim():
    		)
         # print((go_to.where_is_endeffector(arm_id)))
         projectionMatrix = p.computeProjectionMatrixFOV(
-    	    fov = constants.Constants.Camera.fov,
-            aspect = constants.Constants.Camera.width/constants.Constants.Camera.height,
+    	    fov = constants.Constants.Camera.FOV,
+            aspect = constants.Constants.Camera.WIDTH/constants.Constants.Camera.HEIGHT,
             nearVal=0.1,
             farVal=100.0
     	)
         img_arr1 = p.getCameraImage(
-            constants.Constants.Camera.width,
-            constants.Constants.Camera.height,
+            constants.Constants.Camera.WIDTH,
+            constants.Constants.Camera.HEIGHT,
 			viewMatrix=viewMatrix1,
             projectionMatrix=projectionMatrix,
             renderer=p.ER_BULLET_HARDWARE_OPENGL
         )
         img_arr2 = p.getCameraImage(
-            constants.Constants.Camera.width, constants.Constants.Camera.height,
+            constants.Constants.Camera.WIDTH, constants.Constants.Camera.HEIGHT,
 			viewMatrix=viewMatrix2,
             projectionMatrix=projectionMatrix,
             renderer=p.ER_BULLET_HARDWARE_OPENGL
         )
         # Extract the RGBA image
-        rgba_img1 = np.reshape(img_arr1[2], (constants.Constants.Camera.height, constants.Constants.Camera.width, 4)).astype(np.uint8)
-        rgba_img2 = np.reshape(img_arr2[2], (constants.Constants.Camera.height, constants.Constants.Camera.width, 4)).astype(np.uint8)
+        rgba_img1 = np.reshape(img_arr1[2], (constants.Constants.Camera.HEIGHT, constants.Constants.Camera.WIDTH, 4)).astype(np.uint8)
+        rgba_img2 = np.reshape(img_arr2[2], (constants.Constants.Camera.HEIGHT, constants.Constants.Camera.WIDTH, 4)).astype(np.uint8)
 
 
 
-        opencv.center_of_mass(rgba_img1, constants.Constants.Camera.detect_color_min, constants.Constants.Camera.detect_color_max,"Left")
-        opencv.center_of_mass(rgba_img2, constants.Constants.Camera.detect_color_min, constants.Constants.Camera.detect_color_max,"Right")
+        opencv.center_of_mass(rgba_img1, constants.Constants.Camera.DETECT_COLOR_MIN, constants.Constants.Camera.DETECT_COLOR_MAX,"Left")
+        opencv.center_of_mass(rgba_img2, constants.Constants.Camera.DETECT_COLOR_MIN, constants.Constants.Camera.DETECT_COLOR_MAX,"Right")
         
-        if opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,constants.Constants.Camera.detect_color_min, constants.Constants.Camera.detect_color_max) is not None:
-            caminfo = opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,constants.Constants.Camera.detect_color_min, constants.Constants.Camera.detect_color_max)
+        if opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,constants.Constants.Camera.DETECT_COLOR_MIN, constants.Constants.Camera.DETECT_COLOR_MAX) is not None:
+            caminfo = opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,constants.Constants.Camera.DETECT_COLOR_MIN, constants.Constants.Camera.DETECT_COLOR_MAX)
             if caminfo[1] < 0.05:
                 pose = caminfo[0]
                 print("Target pose",pose)
@@ -96,12 +95,8 @@ def sim():
                 pitch = robot_controller.auto_aim(pose,viewMatrix1,viewMatrix2)[1]
                 roll = np.radians(0)
 
-                R_yaw = utils.rotation_matrix([0, 0, 1], yaw)
-                R_pitch = utils.rotation_matrix([0, 1, 0], pitch)
-                R_roll = utils.rotation_matrix([1, 0, 0], roll)
 
-                target_orientation = R_yaw @ R_pitch @ R_roll
-
+                target_orientation = utils.rpy_rotation(roll,pitch,yaw)
                 q_solution = kinematics.inverse_kinematics(
                     target_position = pose,
                     target_orientation = target_orientation,
@@ -111,10 +106,9 @@ def sim():
                 robot_controller.go_to(arm_id, len(q_solution), q_solution)
                 print("robot position:",robot_controller.where_is_endeffector(arm_id))
                 print("last known position:",kinematics.forward_kinematics(q_solution)[0][:3, 3])
-                print("Target orientation:",target_orientation)
 
             else:
-                print("\nTriangulation error too high, not moving the arm.**********************************")
+                print("\nTriangulation error too high, not moving the arm.")
         else:
             if last_q_solution is not None:
                 q_solution = last_q_solution
