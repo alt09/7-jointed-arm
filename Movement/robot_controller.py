@@ -63,8 +63,6 @@ def auto_aim(target_3Dposition,viewMatrix1,viewMatrix2):
     target_yaw = (target_yaw + math.pi) % (2 * math.pi) - math.pi
     target_pitch = (target_pitch + math.pi) % (2 * math.pi) - math.pi
 
-    print("Yaw:", math.degrees(target_yaw))
-    print("Pitch:", math.degrees(target_pitch))
     return target_yaw, target_pitch
 def cheats(arm_id,target_3Dposition,viewMatrix1,viewMatrix2):
     """

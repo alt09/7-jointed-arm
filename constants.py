@@ -6,12 +6,12 @@ class Constants:
         width = 320
         height = 240
         fov = 60
-        detect_color_max = [0, 255, 0]  # Green color for detection
+        detect_color_max = [0, 0, 255]  # Green color for detection
         detect_color_min = [0, 0, 55]   # Dark color for detection
     class Robot:
         arm_urdf_path = "URDF/arm.urdf"
         r2d2_urdf_path = "r2d2.urdf"
-        arm_base_position = [0, 0, 1]
+        arm_base_position = [0, 0, 0]
         r2d2_base_position = [0, 4, 1]
         end_effector_link_index = 6
 

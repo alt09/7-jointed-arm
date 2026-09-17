@@ -17,7 +17,8 @@ def sim():
     """
     Runs the PyBullet simulation.
     """
-    target_last_info = None
+    q_solution = None
+    last_q_solution = None
     client = p.connect(p.GUI)
     p.setAdditionalSearchPath(pybullet_data.getDataPath())
     p.setGravity(0, 0, 0)
@@ -83,31 +84,42 @@ def sim():
 
         opencv.center_of_mass(rgba_img1, constants.Constants.Camera.detect_color_min, constants.Constants.Camera.detect_color_max,"Left")
         opencv.center_of_mass(rgba_img2, constants.Constants.Camera.detect_color_min, constants.Constants.Camera.detect_color_max,"Right")
+        
+        if opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,constants.Constants.Camera.detect_color_min, constants.Constants.Camera.detect_color_max) is not None:
+            caminfo = opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,constants.Constants.Camera.detect_color_min, constants.Constants.Camera.detect_color_max)
+            if caminfo[1] < 0.05:
+                pose = caminfo[0]
+                angle = np.radians(0)
+                print("Target pose",pose)
 
-        if opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 255]) is not None:
-            target_last_info = opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 255])
-
-
-            if target_last_info[1] < 0.2:
-                target_yaw, target_pitch = robot_controller.auto_aim(target_last_info[0],viewMatrix1,viewMatrix2)
                 q_solution = kinematics.inverse_kinematics(
-                    target_position=opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,[0, 0, 55], [0, 0, 255])[0],
-                    target_orientation=utils.rpy_rotation(0, target_pitch, target_yaw),
-                )
-
+                    target_position = pose,
+                    target_orientation = utils.rotation_matrix([0, 0, 1], angle),
+                    initial_q = get_joint_angle(arm_id)
+                    )
+                last_q_solution = q_solution
                 robot_controller.go_to(arm_id, len(q_solution), q_solution)
-                print("target_last_pose good",target_last_info[0])
-                target_last_good_pose = target_last_info[0]
+                print("robot position:",robot_controller.where_is_endeffector(arm_id))
+                print("last known position:",kinematics.forward_kinematics(q_solution)[0][:3, 3])
 
+            else:
+                print("\nTriangulation error too high, not moving the arm.**********************************")
         else:
-            if target_last_info is not None:
-                target_yaw, target_pitch = robot_controller.auto_aim(target_last_good_pose,viewMatrix1,viewMatrix2)
-                q_solution = kinematics.inverse_kinematics(
-                    target_position=target_last_good_pose,
-                    target_orientation=utils.rpy_rotation(0, target_pitch, target_yaw),
-                )
-                robot_controller.go_to(arm_id, len(q_solution), q_solution)
-                print("target_last_pose good",target_last_good_pose)
+            if last_q_solution is not None:
+                q_solution = last_q_solution
+                print("No target detected, moving to last known position.")
+                robot_controller.go_to(arm_id, 7, q_solution)
+                print("robot position:",robot_controller.where_is_endeffector(arm_id))
+                print("last known position:",kinematics.forward_kinematics(q_solution)[0][:3, 3])
+
+            else:
+                print("No target detected and no last known position available.going to 0,0,0")
+
+                robot_controller.go_to_target(arm_id, [0, 0, 0], [0, 0, 0, 1])
+
+
+
+
 
 
 def get_joint_info(arm_id):
