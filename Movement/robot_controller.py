@@ -1,9 +1,11 @@
+from Movement import kinematics
 from Utils import utils
 from Vision import opencv
 import sim
 import math
 import constants
 import numpy as np
+
 def go_to(arm_id, num_joints, go_to):
     """
     Moves the robotic arm to the specified joint positions.
@@ -103,4 +105,46 @@ def approach(arm_id,target_3Dposition,viewMatrix1,viewMatrix2):
     pitch = -(wrist_pitch+diff_angle[1])
     go_to_target(arm_id, target_3Dposition, utils.quaternion_from_yaw_pitch_roll(yaw, pitch, 0))  # Move to a predefined approach position
     print("target_3Dposition",target_3Dposition)
+def go_to_target_with_IK(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,arm_id,last_q_solution):
+
+    if opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,constants.Constants.Camera.DETECT_COLOR_MIN, constants.Constants.Camera.DETECT_COLOR_MAX) is not None:
+        caminfo = opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,constants.Constants.Camera.DETECT_COLOR_MIN, constants.Constants.Camera.DETECT_COLOR_MAX)
+        if caminfo[1] < 0.05:
+            pose = caminfo[0]
+            print("Target pose",pose)
+            pose = caminfo[0]
+
+            yaw = auto_aim(pose,viewMatrix1,viewMatrix2)[0]
+            pitch = auto_aim(pose,viewMatrix1,viewMatrix2)[1]
+            roll = np.radians(0)
+
+
+            target_orientation = utils.rpy_rotation(roll,pitch,yaw)
+            q_solution = kinematics.inverse_kinematics(
+                target_position = pose,
+                target_orientation = target_orientation,
+                initial_q = sim.get_joint_angle(arm_id)
+                )
+            last_q_solution = q_solution
+            go_to(arm_id, len(q_solution), q_solution)
+            print("robot position:",where_is_endeffector(arm_id))
+            print("last known position:",kinematics.forward_kinematics(q_solution)[0][:3, 3])
+
+            return last_q_solution
+
+        else:
+            print("\nTriangulation error too high, not moving the arm.")
+    else:
+        if last_q_solution is not None:
+            q_solution = last_q_solution
+            print("No target detected, moving to last known position.")
+            go_to(arm_id, 7, q_solution)
+            print("robot position:",where_is_endeffector(arm_id))
+            print("last known position:",kinematics.forward_kinematics(q_solution)[0][:3, 3])
+
+        else:
+            print("No target detected and no last known position available.going to 0,0,0")
+
+            go_to_target(arm_id, [0, 0, 0], [0, 0, 0, 1])
+
 

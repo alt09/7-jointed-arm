@@ -83,44 +83,9 @@ def sim():
 
         opencv.center_of_mass(rgba_img1, constants.Constants.Camera.DETECT_COLOR_MIN, constants.Constants.Camera.DETECT_COLOR_MAX,"Left")
         opencv.center_of_mass(rgba_img2, constants.Constants.Camera.DETECT_COLOR_MIN, constants.Constants.Camera.DETECT_COLOR_MAX,"Right")
-        
-        if opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,constants.Constants.Camera.DETECT_COLOR_MIN, constants.Constants.Camera.DETECT_COLOR_MAX) is not None:
-            caminfo = opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,constants.Constants.Camera.DETECT_COLOR_MIN, constants.Constants.Camera.DETECT_COLOR_MAX)
-            if caminfo[1] < 0.05:
-                pose = caminfo[0]
-                print("Target pose",pose)
-                pose = caminfo[0]
 
-                yaw = robot_controller.auto_aim(pose,viewMatrix1,viewMatrix2)[0]
-                pitch = robot_controller.auto_aim(pose,viewMatrix1,viewMatrix2)[1]
-                roll = np.radians(0)
-
-
-                target_orientation = utils.rpy_rotation(roll,pitch,yaw)
-                q_solution = kinematics.inverse_kinematics(
-                    target_position = pose,
-                    target_orientation = target_orientation,
-                    initial_q = get_joint_angle(arm_id)
-                    )
-                last_q_solution = q_solution
-                robot_controller.go_to(arm_id, len(q_solution), q_solution)
-                print("robot position:",robot_controller.where_is_endeffector(arm_id))
-                print("last known position:",kinematics.forward_kinematics(q_solution)[0][:3, 3])
-
-            else:
-                print("\nTriangulation error too high, not moving the arm.")
-        else:
-            if last_q_solution is not None:
-                q_solution = last_q_solution
-                print("No target detected, moving to last known position.")
-                robot_controller.go_to(arm_id, 7, q_solution)
-                print("robot position:",robot_controller.where_is_endeffector(arm_id))
-                print("last known position:",kinematics.forward_kinematics(q_solution)[0][:3, 3])
-
-            else:
-                print("No target detected and no last known position available.going to 0,0,0")
-
-                robot_controller.go_to_target(arm_id, [0, 0, 0], [0, 0, 0, 1])
+        if(robot_controller.go_to_target_with_IK(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,arm_id,last_q_solution) is not None):
+            last_q_solution = robot_controller.go_to_target_with_IK(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,arm_id,last_q_solution)
 
 
 
