@@ -169,7 +169,7 @@ def set_joint_velocities(joint_index, target_velocity, arm_id):
         joint_index,
         p.VELOCITY_CONTROL,
         targetVelocity=target_velocity,
-        force=100
+        force=1000
     )
 def set_joint_torques(joint_index, target_torque, arm_id):
     """

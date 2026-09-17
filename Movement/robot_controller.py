@@ -125,7 +125,7 @@ def go_to_target_with_IK(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba
 
             go_to_target(arm_id, [0, 0, 0], [0, 0, 0, 1])
 
-def close_to_target(viewMatrix1, viewMatrix2, projectionMatrix, rgba_img1, rgba_img2, arm_id, last_q_solution, last_target_position, separation=1):
+def close_to_target(viewMatrix1, viewMatrix2, projectionMatrix, rgba_img1, rgba_img2, arm_id, last_q_solution, last_target_position, separation=2):
 
     caminfo = opencv.target_3d_pose(
         viewMatrix1,
@@ -204,4 +204,6 @@ def stay(arm_id):
     Args:
         arm_id (int): The ID of the robotic arm in the PyBullet simulation.
     """
-    go_to(arm_id, len(sim.get_joint_angle(arm_id)), sim.get_joint_angle(arm_id))
+
+    for i in range(constants.Constants.Robot.END_EFFECTOR_LINK_INDEX+1):
+        sim.set_joint_velocities(i, 0, arm_id)
