@@ -16,8 +16,8 @@ def sim():
     """
     Runs the PyBullet simulation.
     """
-    q_solution = None
     last_q_solution = None
+    last_target_position = None
     client = p.connect(p.GUI)
     p.setAdditionalSearchPath(pybullet_data.getDataPath())
     p.setGravity(0, 0, 0)
@@ -84,9 +84,16 @@ def sim():
         opencv.center_of_mass(rgba_img1, constants.Constants.Camera.DETECT_COLOR_MIN, constants.Constants.Camera.DETECT_COLOR_MAX,"Left")
         opencv.center_of_mass(rgba_img2, constants.Constants.Camera.DETECT_COLOR_MIN, constants.Constants.Camera.DETECT_COLOR_MAX,"Right")
 
-        if(robot_controller.go_to_target_with_IK(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,arm_id,last_q_solution) is not None):
-            last_q_solution = robot_controller.go_to_target_with_IK(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,arm_id,last_q_solution)
-
+        last_q_solution, last_target_position = robot_controller.close_to_target(
+            viewMatrix1,
+            viewMatrix2,
+            projectionMatrix,
+            rgba_img1,
+            rgba_img2,
+            arm_id,
+            last_q_solution,
+            last_target_position
+        )
 
 
 

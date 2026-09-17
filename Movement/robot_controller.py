@@ -83,28 +83,7 @@ def cheats(arm_id,target_3Dposition,viewMatrix1,viewMatrix2):
         sim.set_joint_positions(7,-(end_effector_yaw+angle[0]), arm_id) #  Move the arm to the calculated joint positions
         sim.set_joint_positions(6,-(wrist_pitch+angle[1]), arm_id) 
 
-def approach(arm_id,target_3Dposition,viewMatrix1,viewMatrix2):
-    """
-    Moves the robotic arm to a predefined approach position.
-    Args:
-        arm_id (int): The ID of the robotic arm in the PyBullet simulation.
-        target_3Dposition (list): A list of 3 coordinates [x, y, z] representing the target position in 3D space.
-        viewMatrix1 (list): The view matrix of the first camera.
-        viewMatrix2 (list): The view matrix of the second camera.
-    Returns:
-        None
-    """
-    target_approach_position = target_3Dposition - np.array([1, 1, 0])  
-    
-    end_effector_yaw = where_is_endeffector(arm_id)[1]  # Get the current position of the end effector
-    wrist_pitch = utils.Yaw_pitch_roll_from_quaternion(sim.p.getLinkState(arm_id, 6)[5])[1]  # Get the current position of the wrist
-    
 
-    diff_angle = auto_aim(target_approach_position,viewMatrix1,viewMatrix2)  # Get the final angle from auto_aim
-    yaw =  -(end_effector_yaw+diff_angle[0])
-    pitch = -(wrist_pitch+diff_angle[1])
-    go_to_target(arm_id, target_3Dposition, utils.quaternion_from_yaw_pitch_roll(yaw, pitch, 0))  # Move to a predefined approach position
-    print("target_3Dposition",target_3Dposition)
 def go_to_target_with_IK(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,arm_id,last_q_solution):
 
     if opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,constants.Constants.Camera.DETECT_COLOR_MIN, constants.Constants.Camera.DETECT_COLOR_MAX) is not None:
@@ -114,8 +93,7 @@ def go_to_target_with_IK(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba
             print("Target pose",pose)
             pose = caminfo[0]
 
-            yaw = auto_aim(pose,viewMatrix1,viewMatrix2)[0]
-            pitch = auto_aim(pose,viewMatrix1,viewMatrix2)[1]
+            yaw, pitch = auto_aim(pose,viewMatrix1,viewMatrix2)
             roll = np.radians(0)
 
 
@@ -147,4 +125,83 @@ def go_to_target_with_IK(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba
 
             go_to_target(arm_id, [0, 0, 0], [0, 0, 0, 1])
 
+def close_to_target(viewMatrix1, viewMatrix2, projectionMatrix, rgba_img1, rgba_img2, arm_id, last_q_solution, last_target_position, separation=1):
 
+    caminfo = opencv.target_3d_pose(
+        viewMatrix1,
+        viewMatrix2,
+        projectionMatrix,
+        rgba_img1,
+        rgba_img2,
+        constants.Constants.Camera.DETECT_COLOR_MIN,
+        constants.Constants.Camera.DETECT_COLOR_MAX
+    )
+
+    if caminfo is not None:
+        if caminfo[1] < 0.05:
+            pose = caminfo[0]
+
+            print("Target pose:", pose)
+            print("Triangulation error:", caminfo[1])
+
+            current_position = np.array(where_is_endeffector(arm_id)[0])
+            position_error = np.linalg.norm(current_position - np.array(pose))
+
+            print(f"Position error: {position_error:.4f} m")
+
+            if position_error < separation:
+                print("End effector is close to target.")
+                stay(arm_id)
+                return last_q_solution, pose
+
+            else:
+                print("End effector is not close to target.")
+
+                yaw, pitch = auto_aim(pose, viewMatrix1, viewMatrix2)
+                roll = np.radians(0)
+                target_orientation = utils.rpy_rotation(roll, pitch, yaw)
+                q_solution = kinematics.inverse_kinematics(pose,target_orientation,sim.get_joint_angle(arm_id))
+                last_q_solution = q_solution
+                last_target_position = pose
+
+                go_to(arm_id, len(q_solution), q_solution)
+
+                return last_q_solution, last_target_position
+
+        else:
+
+            print("Triangulation error too high.")
+
+            return last_q_solution, last_target_position
+    else:
+
+        if last_q_solution is not None and last_target_position is not None:
+
+            current_position = np.array(where_is_endeffector(arm_id)[0])
+
+            position_error = np.linalg.norm(current_position - np.array(last_target_position))
+
+            print(f"No target detected. "
+                  f"Distance from last target: {position_error:.4f} m")
+
+            if position_error < separation:
+                print("End effector is close to last known target.")
+                stay(arm_id)
+
+            else:
+                print("Moving toward last known target.")
+                go_to(arm_id, len(last_q_solution), last_q_solution)
+
+        else:
+            print("No target and no last known target.")
+            go_to_target(arm_id, [0, 0, 0], [0, 0, 0, 1])
+
+        return last_q_solution, last_target_position
+
+def stay(arm_id):
+    """
+    Keeps the robotic arm in its current position.
+    Args:
+        arm_id (int): The ID of the robotic arm in the PyBullet simulation.
+    """
+    go_to(arm_id, len(sim.get_joint_angle(arm_id)), sim.get_joint_angle(arm_id))
