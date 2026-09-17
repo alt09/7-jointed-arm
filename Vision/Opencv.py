@@ -113,23 +113,6 @@ def target_3d_pose(view_matrix_1,view_matrix_2,projectionMatrix,rgba_img1,rgba_i
 
         return target_position, triangulation_error
 
-def camera_to_world_coordinate(view_matrix1,view_matrix2, target_position):
-    """
-    Converts a target position from camera coordinates to world coordinates.
-    Args:
-        camera_position (numpy.ndarray): The position of the camera in world coordinates.
-        target_position (numpy.ndarray): The position of the target in camera coordinates.
-    Returns:
-        numpy.ndarray: The position of the target in world coordinates.
-    """
-    avg_camera_pose = np.divide(np.add(camera_pose_from_view_matrix(view_matrix1)[0], camera_pose_from_view_matrix(view_matrix2)[0]), 2)
-    world_position = np.add(avg_camera_pose, target_position)
-
-    print ("Camera Position:", avg_camera_pose)
-    print ("Target Position in Camera Coordinates:", target_position)
-    return  world_position
-
-
 def camera_pose_from_view_matrix(viewMatrix):
     """
     Computes the camera position and rotation matrix from the view matrix.

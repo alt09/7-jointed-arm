@@ -89,18 +89,29 @@ def sim():
             caminfo = opencv.target_3d_pose(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,constants.Constants.Camera.detect_color_min, constants.Constants.Camera.detect_color_max)
             if caminfo[1] < 0.05:
                 pose = caminfo[0]
-                angle = np.radians(0)
                 print("Target pose",pose)
+                pose = caminfo[0]
+
+                yaw = robot_controller.auto_aim(pose,viewMatrix1,viewMatrix2)[0]
+                pitch = robot_controller.auto_aim(pose,viewMatrix1,viewMatrix2)[1]
+                roll = np.radians(0)
+
+                R_yaw = utils.rotation_matrix([0, 0, 1], yaw)
+                R_pitch = utils.rotation_matrix([0, 1, 0], pitch)
+                R_roll = utils.rotation_matrix([1, 0, 0], roll)
+
+                target_orientation = R_yaw @ R_pitch @ R_roll
 
                 q_solution = kinematics.inverse_kinematics(
                     target_position = pose,
-                    target_orientation = utils.rotation_matrix([0, 0, 1], angle),
+                    target_orientation = target_orientation,
                     initial_q = get_joint_angle(arm_id)
                     )
                 last_q_solution = q_solution
                 robot_controller.go_to(arm_id, len(q_solution), q_solution)
                 print("robot position:",robot_controller.where_is_endeffector(arm_id))
                 print("last known position:",kinematics.forward_kinematics(q_solution)[0][:3, 3])
+                print("Target orientation:",target_orientation)
 
             else:
                 print("\nTriangulation error too high, not moving the arm.**********************************")
