@@ -11,8 +11,11 @@ def forward_kinematics(q):
         q (list): A list of joint angles for the robotic arm(in radians).
                 q = [q1, q2, q3, q4, q5, q6, q7]
     Returns:
-        list: 
-        list: A list of transformation of every joint frame.
+            - A list containing the following:
+            - T (numpy.ndarray): The transformation matrix representing the end effector's pose.
+            - joint_positions (list): A list of 7 joint positions in 3D space.
+            - joint_axes_world (list): A list of 7 joint axes in world coordinates.
+            - transforms (list): A list of 7 transformation matrices for each joint.
     """
     q = np.asarray(q, dtype=float)
 
@@ -40,6 +43,19 @@ def forward_kinematics(q):
     return T, joint_positions, joint_axes_world, transforms
 
 def inverse_kinematics(target_position,target_orientation,initial_q=None,max_iterations=1000, tolerance=1e-4,learning_rate=0.5, damping=0.05):
+    """
+    Computes the inverse kinematics for the robotic arm to reach a target position and orientation.
+    Args:
+        target_position (list): A list of 3 coordinates [x, y, z] representing the target position in 3D space.
+        target_orientation (list): Rotation matrix representing the target orientation in 3D space, yaw pitch and roll in radians.
+        initial_q (list, optional): A list of initial joint angles for the robotic arm(in radians). Defaults to None.
+        max_iterations (int, optional): The maximum number of iterations for the IK solver. Defaults to 1000.
+        tolerance (float, optional): The tolerance for convergence. Defaults to 1e-4.
+        learning_rate (float, optional): The learning rate for the IK solver. Defaults to 0.5.
+        damping (float, optional): The damping factor for the IK solver. Defaults to 0.05.
+    Returns:
+        list: A list of joint angles for the robotic arm(in radians) that achieve the target position and orientation.
+    """
     if initial_q is None:
         q = np.zeros(7)
     else:
