@@ -4,6 +4,7 @@ import numpy as np
 import pybullet as p
 import pybullet_data
 import math
+from Movement import dodge
 import Movement.kinematics as kinematics
 from Utils import utils
 import Vision.opencv as opencv
@@ -84,7 +85,7 @@ def sim():
         opencv.center_of_mass(rgba_img1, constants.Constants.Camera.DETECT_COLOR_MIN, constants.Constants.Camera.DETECT_COLOR_MAX,"Left")
         opencv.center_of_mass(rgba_img2, constants.Constants.Camera.DETECT_COLOR_MIN, constants.Constants.Camera.DETECT_COLOR_MAX,"Right")
 
-        last_q_solution, last_target_position = robot_controller.close_to_target(
+        last_q_solution, last_target_position = dodge.aproach(
             viewMatrix1,
             viewMatrix2,
             projectionMatrix,
@@ -92,7 +93,8 @@ def sim():
             rgba_img2,
             arm_id,
             last_q_solution,
-            last_target_position
+            last_target_position,
+            separation=constants.Constants.Robot.TARGET_SEPARATION
         )
 
 

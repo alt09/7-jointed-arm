@@ -52,3 +52,4 @@ class Constants:
             3.124,
             3.124
         ])
+        TARGET_SEPARATION = 2  
