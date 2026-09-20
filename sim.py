@@ -29,6 +29,14 @@ def sim():
     arm_id = p.loadURDF("URDF/arm.urdf", basePosition=constants.Constants.Robot.ARM_BASE_POSITION, useFixedBase=True)
     r2d2_id = p.loadURDF("r2d2.urdf", basePosition=constants.Constants.Robot.R2D2_BASE_POSITION, useFixedBase=True)
 
+    # Compute the projection matrix for both cameras
+    projectionMatrix = p.computeProjectionMatrixFOV(
+        fov = constants.Constants.Camera.FOV,
+        aspect = constants.Constants.Camera.WIDTH/constants.Constants.Camera.HEIGHT,
+        nearVal=0.1,
+        farVal=100.0
+    )
+
     while p.isConnected(client):
         p.stepSimulation()
         time.sleep(1.0 / 240.0)
@@ -61,13 +69,7 @@ def sim():
             upAxisIndex=2
    		)
 
-        # Compute the projection matrix for both cameras
-        projectionMatrix = p.computeProjectionMatrixFOV(
-    	    fov = constants.Constants.Camera.FOV,
-            aspect = constants.Constants.Camera.WIDTH/constants.Constants.Camera.HEIGHT,
-            nearVal=0.1,
-            farVal=100.0
-    	)
+
 
         # Get camera images from both cameras
         img_arr1 = p.getCameraImage(
@@ -104,7 +106,11 @@ def sim():
             arm_id,
             last_q_solution,
             last_target_position,
+
         )
+
+
+        p.removeBody(r2d2_id)
 
         # this is a debug line to visualize the distance between the end effector and the last known target position
         line_id = p.addUserDebugLine(

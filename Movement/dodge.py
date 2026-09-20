@@ -147,6 +147,7 @@ def approach(viewMatrix1, viewMatrix2, projectionMatrix, rgba_img1, rgba_img2, a
         last_target_position,
         separation=constants.Constants.Robot.TARGET_SEPARATION
     )
+    
     if is_close:
         print("End effector is close to target.")
         Movement.robot_controller.stay(arm_id)

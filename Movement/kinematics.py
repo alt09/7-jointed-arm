@@ -23,6 +23,7 @@ def forward_kinematics(q):
     if len(q) != 7:
 
         raise ValueError("Expected 7 joint angles, got {}".format(len(q)))
+    
     # Initialize the transformation matrix T as an identity matrix
     T = np.eye(4)
     joint_positions = []
@@ -30,6 +31,7 @@ def forward_kinematics(q):
     transforms = []
 
     transforms= []
+
     # Iterate through each joint angle to compute the forward kinematics
     for i in range(7):
 
@@ -82,12 +84,14 @@ def inverse_kinematics(target_position,target_orientation,initial_q=None,max_ite
         T, joint_positions, joint_axes_world, transforms = forward_kinematics(q)
 
         error = utils.pose_error(T,target_position,target_orientation)
+
         # If the error is within the specified tolerance, return the current joint angles
         if np.linalg.norm(error) < tolerance:
 
             print(f"IK converged in {i} iterations.")
 
             return q
+        
         # Compute the Jacobian matrix for the current joint angles
         J = utils.calculate_jacobian(q)
 
@@ -107,7 +111,7 @@ def inverse_kinematics(target_position,target_orientation,initial_q=None,max_ite
 
         q+= delta_q
 
-        # Clip the joint angles to their limits
+        # Clip the joint angles to their joint limits
         q = np.clip(q,
                     constants.Constants.Robot.JOINT_MIN,
                     constants.Constants.Robot.JOINT_MAX
