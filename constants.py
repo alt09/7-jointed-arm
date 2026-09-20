@@ -3,12 +3,14 @@ import numpy as np
 
 class Constants:
     class Camera:
-        WIDTH = 320
+        WIDTH = 320 
         HEIGHT = 240
         FOV = 60
-        DETECT_COLOR_MAX = [0, 0, 255]  # Green color for detection
+        DETECT_COLOR_MAX = [0, 0, 255]  # Bright color for detection
         DETECT_COLOR_MIN = [0, 0, 55]   # Dark color for detection
+
     class Robot:
+
         ARM_BASE_POSITION = [0, 0, 0]
         R2D2_BASE_POSITION = [0, 4, 1]
         END_EFFECTOR_LINK_INDEX = 6
@@ -52,4 +54,5 @@ class Constants:
             3.124,
             3.124
         ])
+        
         TARGET_SEPARATION = 2  

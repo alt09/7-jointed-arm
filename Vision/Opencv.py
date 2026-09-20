@@ -17,7 +17,9 @@ def moments(rgba_img,lower_color,upper_color):
     mask = cv2.inRange(hsv, np.array(lower_color), np.array(upper_color))    
 
     M = cv2.moments(mask)
+
     return M
+
 def center_of_mass(rgba_img, lower_color,upper_color, LoR):
     """
     Finds the center of mass of a red object in the image.
@@ -27,22 +29,30 @@ def center_of_mass(rgba_img, lower_color,upper_color, LoR):
         upper_color (list): The upper bound of the color range for object detection in HSV format.
         LoR (str): A string indicating whether the image is from the left or right camera.
     """
+
     bgr_img = cv2.cvtColor(rgba_img, cv2.COLOR_RGBA2BGR)
     hsv = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2HSV)
     mask = cv2.inRange(hsv, np.array(lower_color), np.array(upper_color))
 
     M = cv2.moments(mask)
+
     if M["m00"] != 0:
+
         cX = int(M["m10"] / M["m00"])
         cY = int(M["m01"] / M["m00"])
         #print(f"Detected red object at ({cX}, {cY})")
 
         cv2.circle(bgr_img, (cX, cY), 5, (0, 255, 0), -1)
     if LoR == "Left":
+
         cv2.imshow("Camera Feed 1", bgr_img)
+
     if LoR == "Right":
+
         cv2.imshow("Camera Feed 2", bgr_img)
+
     if cv2.waitKey(1) & 0xFF == ord('q'):
+
         return None
 
 def test_new_cameras(rgba_img):
@@ -51,9 +61,12 @@ def test_new_cameras(rgba_img):
     Args:
         rgba_img (numpy.ndarray): The RGBA image from the camera.
     """
+
     bgr_img = cv2.cvtColor(rgba_img, cv2.COLOR_RGBA2BGR)
     cv2.imshow("Camera Feed 2", bgr_img)
+
     if cv2.waitKey(1) & 0xFF == ord('q'):
+
         return None
 
 def target_3d_pose(view_matrix_1,view_matrix_2,projectionMatrix,rgba_img1,rgba_img2,lower_color,upper_color): 
@@ -78,7 +91,6 @@ def target_3d_pose(view_matrix_1,view_matrix_2,projectionMatrix,rgba_img1,rgba_i
 
     if M1["m00"] != 0 and M2["m00"] != 0:
 
-
         u1 = M1["m10"] / M1["m00"]
         v1 = M1["m01"] / M1["m00"]
         
@@ -100,8 +112,11 @@ def target_3d_pose(view_matrix_1,view_matrix_2,projectionMatrix,rgba_img1,rgba_i
         e = np.dot(D2, w0)
 
         denominator = a * c - b * b
+
         if abs(denominator) < 1e-8:
+
             return None
+        
         t = (b * e - c * d) / denominator
         s = (a * e - b * d) / denominator
 
@@ -130,6 +145,7 @@ def camera_pose_from_view_matrix(viewMatrix):
     R = camera_to_world[:3, :3]
 
     return C, R
+
 def pixel_to_world_ray(u,v,view_matrix,projection_matrix,width,height):
     """
     Computes the world ray direction from a pixel coordinate in the image.
@@ -143,6 +159,7 @@ def pixel_to_world_ray(u,v,view_matrix,projection_matrix,width,height):
     Returns:
         numpy.ndarray: A 3D unit vector representing the direction of the ray in world coordinates
     """
+    
     x_ndc = (2.0 * u) / width - 1.0
     y_ndc = 1.0 - (2.0 * v) / height
 
