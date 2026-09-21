@@ -6,7 +6,7 @@ import pybullet_data
 import math
 from Movement import dodge
 import Movement.kinematics as kinematics
-from Utils import utils
+from Utils import pid, utils
 import Vision.opencv as opencv
 import constants
 
@@ -36,6 +36,37 @@ def sim():
         nearVal=0.1,
         farVal=100.0
     )
+
+    natural_frequency = 5.0  # rad/s
+    damping_ratio = 1.0      # critical damping
+
+    current_joint_positions = [
+        p.getJointState(arm_id, i)[0]
+        for i in range(7)
+    ]
+
+    effective_inertias = calculate_effective_inertias(
+        arm_id,
+        current_joint_positions
+    )
+
+    print(f"Effective inertias: {effective_inertias}")
+
+
+    for joint_index, I_eff in enumerate(effective_inertias):
+
+        Kp, Kd = pid.calculate_PD_gain(
+            I_eff,
+            natural_frequency,
+            damping_ratio
+        )
+
+        print(
+            f"Joint {joint_index + 1}: "
+            f"I={I_eff:.4f}, "
+            f"Kp={Kp:.4f}, "
+            f"Kd={Kd:.4f}"
+        )
 
     while p.isConnected(client):
         p.stepSimulation()
@@ -122,6 +153,25 @@ def sim():
             physicsClientId=0
         )
 
+
+        base_mass = p.getDynamicsInfo(arm_id, -1)
+        print(f"link 1 mass: {base_mass}")
+
+        # Loop through all joints/links to get their masses
+        num_joints = p.getNumJoints(arm_id) #7
+
+        for link_index in range(num_joints):
+            # getDynamicsInfo returns a tuple where index 0 is the mass
+            dynamics_info = p.getDynamicsInfo(arm_id, link_index)
+            link_mass = dynamics_info[0]
+
+            # Optionally retrieve the link name from getJointInfo
+            link_name = p.getJointInfo(arm_id, link_index)[12].decode("utf-8")
+
+            print(f"Link {link_index+2} ({link_name}) mass: {link_mass}")
+
+
+
 def get_joint_info(arm_id):
     """
     Returns information about the joints of the robotic arm.
@@ -187,6 +237,32 @@ def set_joint_positions(joint_index, target_position, arm_id):
         targetPosition=target_position, 
         force=100
     )
+def set_joint_positions_PD(joint_index, target_position, arm_id, Kp, Kd):
+    """
+    Sets the position of a specific joint in the robotic arm using a PD controller.
+    Args:
+        joint_index (int): The index of the joint to be set.
+        target_position (float): The target position for the joint in radians.
+        arm_id (int): The ID of the robotic arm in the PyBullet simulation.
+        Kp (float): The proportional gain for the PD controller.
+        Kd (float): The derivative gain for the PD controller.
+
+    """
+    current_position, current_velocity,_ ,__ = p.getJointState(arm_id, joint_index)
+
+    position_error = target_position - current_position
+    velocity_error = -current_velocity  # Assuming the target velocity is zero e˙=0−q˙​=−q˙​
+
+    control_torque = Kp * position_error + Kd * velocity_error
+
+    control_torque = np.clip(control_torque, -100, 100)  # Limit the torque to a reasonable range
+
+    p.setJointMotorControl2(
+        arm_id,
+        joint_index,
+        p.TORQUE_CONTROL,
+        force=control_torque
+    )
 
 def set_joint_velocities(joint_index, target_velocity, arm_id):
     """
@@ -221,3 +297,17 @@ def set_joint_torques(joint_index, target_torque, arm_id):
         force=target_torque
     )
 
+def calculate_effective_inertias(arm_id, joint_positions):
+    """
+    Calculates the effective inertia of a specific joint in the robotic arm.
+    Args:
+        arm_id (int): The ID of the robotic arm in the PyBullet simulation.
+        joint_positions (list): A list of current joint angles for the robotic arm.
+        joint_index (int): The index of the joint for which to calculate the effective inertia.
+    Returns:
+        float: The effective inertia of the specified joint.
+    """
+    mass_matrix = np.array(
+        p.calculateMassMatrix(arm_id, joint_positions)
+    )
+    return np.diag(mass_matrix)
