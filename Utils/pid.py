@@ -19,8 +19,7 @@ def PID(arm_id, joint_index, joint_positions, natural_frequency, damping_ratio, 
     
     kP, kD = calculate_PD_gain(arm_id, joint_index, joint_positions, natural_frequency, damping_ratio)
 
-    tau = kP * (target_position - position) \
-        + kD * (target_velocity - velocity)
+    tau = kP * (target_position - position) + kD * (target_velocity - velocity)
 
     return tau
 

@@ -6,7 +6,7 @@ import pybullet_data
 import math
 from Movement import dodge
 import Movement.kinematics as kinematics
-from Utils import pid, utils
+from Utils import pid
 import Vision.opencv as opencv
 import constants
 
