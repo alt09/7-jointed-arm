@@ -29,6 +29,16 @@ def sim():
     arm_id = p.loadURDF("URDF/arm.urdf", basePosition=constants.Constants.Robot.ARM_BASE_POSITION, useFixedBase=True)
     r2d2_id = p.loadURDF("r2d2.urdf", basePosition=constants.Constants.Robot.R2D2_BASE_POSITION, useFixedBase=True)
 
+
+    for joint_index in range(7):
+        p.setJointMotorControl2(
+            arm_id,
+            joint_index,
+            p.VELOCITY_CONTROL,
+            targetVelocity=0,
+            force=0
+        )
+
     # Compute the projection matrix for both cameras
     projectionMatrix = p.computeProjectionMatrixFOV(
         fov = constants.Constants.Camera.FOV,
@@ -37,36 +47,13 @@ def sim():
         farVal=100.0
     )
 
-    natural_frequency = 5.0  # rad/s
-    damping_ratio = 1.0      # critical damping
+    desired_settling_time = 0.4
+    damping_ratio = 1.0
 
-    current_joint_positions = [
-        p.getJointState(arm_id, i)[0]
-        for i in range(7)
-    ]
-
-    effective_inertias = calculate_effective_inertias(
-        arm_id,
-        current_joint_positions
+    natural_frequency = 4.0 / (
+        damping_ratio * desired_settling_time
     )
 
-    print(f"Effective inertias: {effective_inertias}")
-
-
-    for joint_index, I_eff in enumerate(effective_inertias):
-
-        Kp, Kd = pid.calculate_PD_gain(
-            I_eff,
-            natural_frequency,
-            damping_ratio
-        )
-
-        print(
-            f"Joint {joint_index + 1}: "
-            f"I={I_eff:.4f}, "
-            f"Kp={Kp:.4f}, "
-            f"Kd={Kd:.4f}"
-        )
 
     while p.isConnected(client):
         p.stepSimulation()
@@ -127,8 +114,10 @@ def sim():
         opencv.center_of_mass(rgba_img1, constants.Constants.Camera.DETECT_COLOR_MIN, constants.Constants.Camera.DETECT_COLOR_MAX,"Left")
         opencv.center_of_mass(rgba_img2, constants.Constants.Camera.DETECT_COLOR_MIN, constants.Constants.Camera.DETECT_COLOR_MAX,"Right")
 
+
+    
         # Go near a target by 2 m
-        last_q_solution, last_target_position = dodge.approach(
+        last_q_solution, last_target_position,_,__ = dodge.close_to_target(
             viewMatrix1,
             viewMatrix2,
             projectionMatrix,
@@ -155,10 +144,24 @@ def sim():
 
 
         base_mass = p.getDynamicsInfo(arm_id, -1)
-        print(f"link 1 mass: {base_mass}")
+        # print(f"link 1 mass: {base_mass}")
 
         # Loop through all joints/links to get their masses
         num_joints = p.getNumJoints(arm_id) #7
+
+        current_joint_positions = [
+            p.getJointState(arm_id, i)[0]
+            for i in range(7)
+        ]
+        print(f"Current joint positions: {current_joint_positions}")
+        effective_inertias = calculate_effective_inertias(
+            arm_id,
+            current_joint_positions
+            
+        )
+
+        print(f"Effective inertias: {effective_inertias}")
+
 
         for link_index in range(num_joints):
             # getDynamicsInfo returns a tuple where index 0 is the mass
@@ -170,7 +173,18 @@ def sim():
 
             print(f"Link {link_index+2} ({link_name}) mass: {link_mass}")
 
+        if last_q_solution is not None:
+            for joint_index, I_eff in enumerate(effective_inertias):
+                Kp, Kd = pid.calculate_PD_gain(I_eff, natural_frequency, damping_ratio)
 
+                print(
+                    f"Joint {joint_index + 1}: "
+                    f"I={I_eff:.4f}, "
+                    f"Kp={Kp:.4f}, "
+                    f"Kd={Kd:.4f}"
+                )
+                print(f"Joint {joint_index }:last_q_solution: {last_q_solution[joint_index]:.4f}, last_target_position: {last_target_position}, I={I_eff:.4f}, Kp={Kp:.4f}, Kd={Kd:.4f}")
+                set_joint_positions_PD(joint_index, last_q_solution[joint_index], arm_id, Kp, Kd)
 
 def get_joint_info(arm_id):
     """
@@ -256,6 +270,18 @@ def set_joint_positions_PD(joint_index, target_position, arm_id, Kp, Kd):
     control_torque = Kp * position_error + Kd * velocity_error
 
     control_torque = np.clip(control_torque, -100, 100)  # Limit the torque to a reasonable range
+
+
+    print(
+        "SET JOINT POSITIONS PD: "
+        f"Joint {joint_index}: "
+        f"q={current_position:.4f}, "
+        f"target={target_position:.4f}, "
+        f"error={position_error:.4f}, "
+        f"Kp={Kp:.4f}, "
+        f"Kd={Kd:.4f}, "
+        f"torque={control_torque:.4f}"
+    )
 
     p.setJointMotorControl2(
         arm_id,
