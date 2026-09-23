@@ -4,13 +4,13 @@ import numpy as np
 import pybullet as p
 import pybullet_data
 import math
-from Movement import dodge
-import Movement.kinematics as kinematics
-from Utils import pid
-import Vision.opencv as opencv
 import constants
+from Movement import dodge
+from Movement import robot_controller
+from Movement import kinematics
+from Utils import pid
+from Vision import opencv
 
-import Movement.robot_controller as robot_controller
 
 print("Starting PyBullet simulation...")
 def sim():
@@ -29,7 +29,7 @@ def sim():
     arm_id = p.loadURDF("URDF/arm.urdf", basePosition=constants.Constants.Robot.ARM_BASE_POSITION, useFixedBase=True)
     r2d2_id = p.loadURDF("r2d2.urdf", basePosition=constants.Constants.Robot.R2D2_BASE_POSITION, useFixedBase=True)
 
-
+    # Disable default motor control for all joints
     for joint_index in range(7):
         p.setJointMotorControl2(
             arm_id,
@@ -47,15 +47,8 @@ def sim():
         farVal=100.0
     )
 
-    desired_settling_time = 0.4
-    damping_ratio = 1.0
-
-    natural_frequency = 4.0 / (
-        damping_ratio * desired_settling_time
-    )
-
-
     while p.isConnected(client):
+        
         p.stepSimulation()
         time.sleep(1.0 / 240.0)
 
@@ -65,7 +58,7 @@ def sim():
                 robot_controller.where_is_endeffector(arm_id)[0][0],
                 robot_controller.where_is_endeffector(arm_id)[0][1],
                 robot_controller.where_is_endeffector(arm_id)[0][2]-0.2
-            ],
+                ],
             distance=0.1,
             yaw=(180/math.pi)*robot_controller.where_is_endeffector(arm_id)[1], # RAD to DEG
             pitch=(180/math.pi)*robot_controller.where_is_endeffector(arm_id)[2],
@@ -79,7 +72,7 @@ def sim():
                 robot_controller.where_is_endeffector(arm_id)[0][0]+1,
                 robot_controller.where_is_endeffector(arm_id)[0][1],
                 robot_controller.where_is_endeffector(arm_id)[0][2]-0.2
-            ],
+                ],
             distance=0.1,
             yaw=(180/math.pi)*robot_controller.where_is_endeffector(arm_id)[1], # RAD to DEG
             pitch=(180/math.pi)*robot_controller.where_is_endeffector(arm_id)[2],
@@ -129,7 +122,6 @@ def sim():
 
         )
 
-
         p.removeBody(r2d2_id)
 
         # this is a debug line to visualize the distance between the end effector and the last known target position
@@ -141,50 +133,19 @@ def sim():
             lifeTime=0.2,
             physicsClientId=0
         )
+        
+        robot_controller.go_to_PD(arm_id, last_q_solution)
 
+def get_current_joint_positions(arm_id):
+    """
+    Returns the current joint positions of the robotic arm.
+    Args:
+        arm_id (int): The ID of the robotic arm in the PyBullet simulation.
+    Returns:
+        list: A list of current joint positions for the robotic arm.
+    """
 
-        base_mass = p.getDynamicsInfo(arm_id, -1)
-        # print(f"link 1 mass: {base_mass}")
-
-        # Loop through all joints/links to get their masses
-        num_joints = p.getNumJoints(arm_id) #7
-
-        current_joint_positions = [
-            p.getJointState(arm_id, i)[0]
-            for i in range(7)
-        ]
-        print(f"Current joint positions: {current_joint_positions}")
-        effective_inertias = calculate_effective_inertias(
-            arm_id,
-            current_joint_positions
-            
-        )
-
-        print(f"Effective inertias: {effective_inertias}")
-
-
-        for link_index in range(num_joints):
-            # getDynamicsInfo returns a tuple where index 0 is the mass
-            dynamics_info = p.getDynamicsInfo(arm_id, link_index)
-            link_mass = dynamics_info[0]
-
-            # Optionally retrieve the link name from getJointInfo
-            link_name = p.getJointInfo(arm_id, link_index)[12].decode("utf-8")
-
-            print(f"Link {link_index+2} ({link_name}) mass: {link_mass}")
-
-        if last_q_solution is not None:
-            for joint_index, I_eff in enumerate(effective_inertias):
-                Kp, Kd = pid.calculate_PD_gain(I_eff, natural_frequency, damping_ratio)
-
-                print(
-                    f"Joint {joint_index + 1}: "
-                    f"I={I_eff:.4f}, "
-                    f"Kp={Kp:.4f}, "
-                    f"Kd={Kd:.4f}"
-                )
-                print(f"Joint {joint_index }:last_q_solution: {last_q_solution[joint_index]:.4f}, last_target_position: {last_target_position}, I={I_eff:.4f}, Kp={Kp:.4f}, Kd={Kd:.4f}")
-                set_joint_positions_PD(joint_index, last_q_solution[joint_index], arm_id, Kp, Kd)
+    return [p.getJointState(arm_id, i)[0] for i in range(p.getNumJoints(arm_id))]
 
 def get_joint_info(arm_id):
     """
@@ -251,37 +212,18 @@ def set_joint_positions(joint_index, target_position, arm_id):
         targetPosition=target_position, 
         force=100
     )
-def set_joint_positions_PD(joint_index, target_position, arm_id, Kp, Kd):
+def set_joint_position_PD(joint_index, target_position, arm_id, I_eff):
     """
     Sets the position of a specific joint in the robotic arm using a PD controller.
     Args:
         joint_index (int): The index of the joint to be set.
         target_position (float): The target position for the joint in radians.
         arm_id (int): The ID of the robotic arm in the PyBullet simulation.
-        Kp (float): The proportional gain for the PD controller.
-        Kd (float): The derivative gain for the PD controller.
-
+        I_eff (float): The effective inertia of the joint.
     """
     current_position, current_velocity,_ ,__ = p.getJointState(arm_id, joint_index)
 
-    position_error = target_position - current_position
-    velocity_error = -current_velocity  # Assuming the target velocity is zero e˙=0−q˙​=−q˙​
-
-    control_torque = Kp * position_error + Kd * velocity_error
-
-    control_torque = np.clip(control_torque, -100, 100)  # Limit the torque to a reasonable range
-
-
-    print(
-        "SET JOINT POSITIONS PD: "
-        f"Joint {joint_index}: "
-        f"q={current_position:.4f}, "
-        f"target={target_position:.4f}, "
-        f"error={position_error:.4f}, "
-        f"Kp={Kp:.4f}, "
-        f"Kd={Kd:.4f}, "
-        f"torque={control_torque:.4f}"
-    )
+    control_torque = pid.calculate_torque(I_eff, target_position, 0.0, current_position, current_velocity)
 
     p.setJointMotorControl2(
         arm_id,

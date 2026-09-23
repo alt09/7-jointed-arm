@@ -55,4 +55,10 @@ class Constants:
             3.124
         ])
         
-        TARGET_SEPARATION = 0  
+        TARGET_SEPARATION = 2
+
+        DESIRED_SETTLING_TIME = 0.4
+
+        DAMPING_RATIO = 1
+
+        NATURAL_FREQUENCY = 4.0 / (DAMPING_RATIO * DESIRED_SETTLING_TIME)

@@ -180,3 +180,17 @@ def stay(arm_id):
     for i in range(constants.Constants.Robot.END_EFFECTOR_LINK_INDEX+1):
 
         sim.set_joint_velocities(i, 0, arm_id)
+def go_to_PD(arm_id, last_q_solution):
+    """
+    Moves the robotic arm to a target position using a PD controller.
+    Args:
+        arm_id (int): The ID of the robotic arm in the PyBullet simulation.
+        last_q_solution (list): The last known joint angles of the robotic arm.
+    """
+    current_joint_positions = sim.get_current_joint_positions(arm_id)
+    
+    effective_inertias = sim.calculate_effective_inertias(arm_id, current_joint_positions)
+
+    if last_q_solution is not None:
+        for joint_index, I_eff in enumerate(effective_inertias):
+            sim.set_joint_position_PD(joint_index, last_q_solution[joint_index], arm_id, I_eff)

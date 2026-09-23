@@ -1,25 +1,37 @@
-import sim
+import constants
+import numpy as np
 
-def calculate_PD_gain(I_eff ,natural_frequency, damping_ratio): 
+
+def calculate_PD_gain(I_eff): 
     """
     Calculates the proportional and derivative gains for a PID controller.
     Args:
         I_eff (float): The effective inertia of the joint.
-        natural_frequency (float): The natural frequency of the system.
-        damping_ratio (float): The damping ratio of the system.
     Returns:
         tuple: A tuple containing the proportional gain (kp) and the derivative gain (kD).
     """
-    kp = I_eff * natural_frequency**2
-    kD = 2 * damping_ratio * I_eff * natural_frequency
+    kp = I_eff * constants.Constants.Robot.NATURAL_FREQUENCY **2
+    kD = 2 * constants.Constants.Robot.DAMPING_RATIO * I_eff * constants.Constants.Robot.NATURAL_FREQUENCY
 
     return kp, kD
 
-def PID(arm_id, joint_index, joint_positions, natural_frequency, damping_ratio, target_position, target_velocity, position, velocity):
-    
-    kP, kD = calculate_PD_gain(arm_id, joint_index, joint_positions, natural_frequency, damping_ratio)
+def calculate_torque(I_eff, target_position, target_velocity, current_position, current_velocity):
+    """
+    Calculates the torque to be applied to a joint using a PD controller.
+    Args:
+        I_eff (float): The effective inertia of the joint.
+        target_position (float): The target position of the joint.
+        target_velocity (float): The target velocity of the joint.
+        current_position (float): The current position of the joint.
+        current_velocity (float): The current velocity of the joint.
+    Returns:
+        float: The torque to be applied to the joint.
+    """
+    Kp, Kd = calculate_PD_gain(I_eff)
 
-    tau = kP * (target_position - position) + kD * (target_velocity - velocity)
+    tau = Kp * (target_position - current_position) + Kd * (target_velocity - current_velocity)
+
+    tau = np.clip(tau, -100, 100)  # Limit the torque to a reasonable range
 
     return tau
 
