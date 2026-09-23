@@ -110,7 +110,7 @@ def sim():
 
     
         # Go near a target by 2 m
-        last_q_solution, last_target_position,_,__ = dodge.close_to_target(
+        last_q_solution, last_target_position = dodge.approach(
             viewMatrix1,
             viewMatrix2,
             projectionMatrix,
@@ -122,7 +122,6 @@ def sim():
 
         )
 
-        p.removeBody(r2d2_id)
 
         # this is a debug line to visualize the distance between the end effector and the last known target position
         line_id = p.addUserDebugLine(
@@ -134,7 +133,6 @@ def sim():
             physicsClientId=0
         )
         
-        robot_controller.go_to_PD(arm_id, last_q_solution)
 
 def get_current_joint_positions(arm_id):
     """
@@ -221,6 +219,7 @@ def set_joint_position_PD(joint_index, target_position, arm_id, I_eff):
         arm_id (int): The ID of the robotic arm in the PyBullet simulation.
         I_eff (float): The effective inertia of the joint.
     """
+
     current_position, current_velocity,_ ,__ = p.getJointState(arm_id, joint_index)
 
     control_torque = pid.calculate_torque(I_eff, target_position, 0.0, current_position, current_velocity)

@@ -159,11 +159,11 @@ def approach(viewMatrix1, viewMatrix2, projectionMatrix, rgba_img1, rgba_img2, a
         if is_seeing_target:
 
             print("end effector can see the target, moving toward it.")
-            Movement.robot_controller.go_to(arm_id, 7, n)
+            Movement.robot_controller.go_to_PD(arm_id, n)
             return n, a
         else:
 
             print("End effector cannot see the target, moving toward last known position.")
-            Movement.robot_controller.go_to(arm_id, 7, n)
+            Movement.robot_controller.go_to_PD(arm_id, n)
             
             return n, a

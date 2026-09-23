@@ -32,9 +32,7 @@ def go_to_target(arm_id,target_position, target_orientation):
     target_joint_positions = sim.p.calculateInverseKinematics(arm_id, constants.Constants.Robot.END_EFFECTOR_LINK_INDEX, target_position, target_orientation)  # 7 is the index of the end effector link
 
     # Move the arm to the target joint positions
-    for i in range(constants.Constants.Robot.END_EFFECTOR_LINK_INDEX):
-
-        sim.set_joint_positions(i, target_joint_positions[i], arm_id)
+    go_to_PD(arm_id, target_joint_positions)
 
 def where_is_endeffector(arm_id):
     """
@@ -146,7 +144,7 @@ def go_to_target_with_IK(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba
             )
             last_q_solution = q_solution
 
-            go_to(arm_id, len(q_solution), q_solution)
+            go_to_PD(arm_id, q_solution)
             print("robot position:",where_is_endeffector(arm_id))
             print("last known position:",kinematics.forward_kinematics(q_solution)[0][:3, 3])
 
@@ -161,7 +159,7 @@ def go_to_target_with_IK(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba
 
             q_solution = last_q_solution
             print("No target detected, moving to last known position.")
-            go_to(arm_id, 7, q_solution)
+            go_to_PD(arm_id, q_solution)
             print("robot position:",where_is_endeffector(arm_id))
             print("last known position:",kinematics.forward_kinematics(q_solution)[0][:3, 3])
 
