@@ -1,15 +1,11 @@
 from Utils import utils
-import Movement.robot_controller
-import Movement.kinematics as kinematics
-from Utils import utils
-import Vision.opencv as opencv
+from Movement import robot_controller, kinematics
+from Vision import opencv
 import constants
 import numpy as np
 
 
-import sim
-
-def close_to_target(viewMatrix1, viewMatrix2, projectionMatrix, rgba_img1, rgba_img2, arm_id, last_q_solution, last_target_position, separation=2):
+def close_to_target(viewMatrix1, viewMatrix2, projectionMatrix, rgba_img1, rgba_img2, arm_id, last_q_solution, last_target_position, endeffector_info, separation=2):
     """
     Determines if the end effector is close to the target.
     Args:
@@ -51,7 +47,7 @@ def close_to_target(viewMatrix1, viewMatrix2, projectionMatrix, rgba_img1, rgba_
             print("Target pose:", pose)
             print("Triangulation error:", caminfo[1])
 
-            current_position = np.array(Movement.robot_controller.where_is_endeffector(arm_id)[0])
+            current_position = np.array(endeffector_info[0])
             position_error = np.linalg.norm(current_position - np.array(pose))
 
             print(f"Position error: {position_error:.4f} m")
@@ -70,10 +66,10 @@ def close_to_target(viewMatrix1, viewMatrix2, projectionMatrix, rgba_img1, rgba_
                 # is not close to target, but can see it
                 print("End effector is not close to target.")
 
-                yaw, pitch = Movement.robot_controller.auto_aim(pose, viewMatrix1, viewMatrix2)
+                yaw, pitch = robot_controller.auto_aim(pose, viewMatrix1, viewMatrix2)
                 roll = np.radians(0)
                 target_orientation = utils.rpy_rotation(roll, pitch, yaw)
-                q_solution = kinematics.inverse_kinematics(pose,target_orientation,sim.get_joint_angle(arm_id))
+                q_solution = kinematics.inverse_kinematics(pose,target_orientation,robot_controller.get_current_joint_positions(arm_id))
                 last_q_solution = q_solution
                 last_target_position = pose
 
@@ -92,7 +88,7 @@ def close_to_target(viewMatrix1, viewMatrix2, projectionMatrix, rgba_img1, rgba_
 
         if last_q_solution is not None and last_target_position is not None:
 
-            current_position = np.array(Movement.robot_controller.where_is_endeffector(arm_id)[0])
+            current_position = np.array(endeffector_info[0])
 
             position_error = np.linalg.norm(current_position - np.array(last_target_position))
 
@@ -120,7 +116,7 @@ def close_to_target(viewMatrix1, viewMatrix2, projectionMatrix, rgba_img1, rgba_
 
         return last_q_solution, last_target_position, is_close, is_seeing_target
 
-def approach(viewMatrix1, viewMatrix2, projectionMatrix, rgba_img1, rgba_img2, arm_id, last_q_solution, last_target_position):
+def approach(viewMatrix1, viewMatrix2, projectionMatrix, rgba_img1, rgba_img2, arm_id, last_q_solution, last_target_position, endeffector_info):
 
     """
     Approaches the target based on the camera views and the current state of the robot arm.
@@ -145,12 +141,13 @@ def approach(viewMatrix1, viewMatrix2, projectionMatrix, rgba_img1, rgba_img2, a
         arm_id,
         last_q_solution,
         last_target_position,
+        endeffector_info,
         separation=constants.Constants.Robot.TARGET_SEPARATION
     )
     
     if is_close:
         print("End effector is close to target.")
-        Movement.robot_controller.stay(arm_id)
+        robot_controller.stay(arm_id)
 
         return n, a
     
@@ -159,11 +156,11 @@ def approach(viewMatrix1, viewMatrix2, projectionMatrix, rgba_img1, rgba_img2, a
         if is_seeing_target:
 
             print("end effector can see the target, moving toward it.")
-            Movement.robot_controller.go_to_PD(arm_id, n)
+            robot_controller.go_to_PD(arm_id, n)
             return n, a
         else:
 
             print("End effector cannot see the target, moving toward last known position.")
-            Movement.robot_controller.go_to_PD(arm_id, n)
+            robot_controller.go_to_PD(arm_id, n)
             
             return n, a

@@ -1,23 +1,40 @@
 from Movement import kinematics
-from Utils import utils
+from Utils import pid, utils
 from Vision import opencv
-import sim
+import pybullet as p
 import math
 import constants
 import numpy as np
 
-def go_to(arm_id, num_joints, go_to):
+def set_joint_positions(joint_index, target_position, arm_id):
+    """
+    Sets the position of a specific joint in the robotic arm.
+    Args:
+        joint_index (int): The index of the joint to be set.
+        target_position (float): The target position for the joint in radians.
+        arm_id (int): The ID of the robotic arm in the PyBullet simulation.
+    """
+
+    p.setJointMotorControl2(
+        arm_id,
+        joint_index,
+        p.POSITION_CONTROL,
+        targetPosition=target_position, 
+        force=100
+    )
+
+def go_to(arm_id, num_joints, target_joint_positions):
     """
     Moves the robotic arm to the specified joint positions.
     Args:
         arm_id (int): The ID of the robotic arm in the PyBullet simulation.
         num_joints (int): The number of joints in the robotic arm (7).
-        go_to (list): A list of 7 target joint positions for the robotic arm.
+        target_joint_positions (list): A list of 7 target joint positions for the robotic arm.
     """
 
     for i in range(num_joints):
 
-        sim.set_joint_positions(i, go_to[i], arm_id)
+        set_joint_positions(i, target_joint_positions[i], arm_id)
 
 def go_to_target(arm_id,target_position, target_orientation):
     """
@@ -29,12 +46,15 @@ def go_to_target(arm_id,target_position, target_orientation):
     """
 
     # Calculate the inverse kinematics to find the joint angles for the target position
-    target_joint_positions = sim.p.calculateInverseKinematics(arm_id, constants.Constants.Robot.END_EFFECTOR_LINK_INDEX, target_position, target_orientation)  # 7 is the index of the end effector link
-
+    target_joint_positions = kinematics.inverse_kinematics(
+        target_position = target_position,
+        target_orientation = target_orientation,
+        initial_q = get_current_joint_positions(arm_id)
+    )
     # Move the arm to the target joint positions
     go_to_PD(arm_id, target_joint_positions)
 
-def where_is_endeffector(arm_id):
+def get_end_effector_state(arm_id):
     """
     Returns the current position of the end effector of the robotic arm.
     Args:
@@ -43,14 +63,15 @@ def where_is_endeffector(arm_id):
         list: A list of 2 values [End_effector_position, End_effector_orientation] representing the current position and orientation of the end effector.
     """
 
-    quaternion = sim.p.getLinkState(arm_id, constants.Constants.Robot.END_EFFECTOR_LINK_INDEX)[5]  # Get the orientation of the end effector
+    end_effector_state = p.getLinkState(arm_id, constants.Constants.Robot.END_EFFECTOR_LINK_INDEX)
+    quaternion = end_effector_state[5]  # Get the orientation of the end effector
 
     yaw, pitch, roll = utils.Yaw_pitch_roll_from_quaternion(quaternion)
-    # Calculate the forward kinematics to find the position of the end effector
-    end_effector_state = sim.p.getLinkState(arm_id, constants.Constants.Robot.END_EFFECTOR_LINK_INDEX)
-    end_effector_position = [end_effector_state[4],yaw,pitch,roll]  # Position is at index 4
 
-    return end_effector_position
+    # Calculate the forward kinematics to find the position of the end effector
+    end_effector_info = [end_effector_state[4],yaw,pitch,roll]  # Position is at index 4
+
+    return end_effector_info
 
 def auto_aim(target_3Dposition,viewMatrix1,viewMatrix2):
     """
@@ -70,24 +91,24 @@ def auto_aim(target_3Dposition,viewMatrix1,viewMatrix2):
 
     return target_yaw, target_pitch
 
-def cheats(arm_id,target_3Dposition,viewMatrix1,viewMatrix2):
-    """
-    Aims the robotic arm at a target 3D position using the average camera pose.
-    Args:
-        arm_id (int): The ID of the robotic arm in the PyBullet simulation.
-        target_3Dposition (list): A list of 3 coordinates [x, y, z] representing the target position in 3D space.
-        viewMatrix1 (list): The view matrix of the first camera.
-        viewMatrix2 (list): The view matrix of the second camera.
-    """
+# def cheats(arm_id,target_3Dposition,viewMatrix1,viewMatrix2, endeffector_info):
+#     """
+#     Aims the robotic arm at a target 3D position using the average camera pose.
+#     Args:
+#         arm_id (int): The ID of the robotic arm in the PyBullet simulation.
+#         target_3Dposition (list): A list of 3 coordinates [x, y, z] representing the target position in 3D space.
+#         viewMatrix1 (list): The view matrix of the first camera.
+#         viewMatrix2 (list): The view matrix of the second camera.
+#     """
 
-    if target_3Dposition is not None:
+#     if target_3Dposition is not None:
 
-        angle = auto_aim(target_3Dposition,viewMatrix1,viewMatrix2)  # Get the final angle from auto_aim
-        print("target_3Dposition",target_3Dposition)
-        end_effector_yaw = where_is_endeffector(arm_id)[1]  # Get the current position of the end effector
-        wrist_pitch = utils.Yaw_pitch_roll_from_quaternion(sim.p.getLinkState(arm_id, 6)[5])[1]  # Get the current position of the wrist
-        sim.set_joint_positions(7,-(end_effector_yaw+angle[0]), arm_id) #  Move the arm to the calculated joint positions
-        sim.set_joint_positions(6,-(wrist_pitch+angle[1]), arm_id) 
+#         angle = auto_aim(target_3Dposition,viewMatrix1,viewMatrix2)  # Get the final angle from auto_aim
+#         print("target_3Dposition",target_3Dposition)
+#         end_effector_yaw = endeffector_info[1]  # Get the current position of the end effector
+#         wrist_pitch = utils.Yaw_pitch_roll_from_quaternion(p.getLinkState(arm_id, 6)[5])[1]  # Get the current position of the wrist
+#         set_joint_positions(7,-(end_effector_yaw+angle[0]), arm_id) #  Move the arm to the calculated joint positions
+#         set_joint_positions(6,-(wrist_pitch+angle[1]), arm_id) 
 
 
 def go_to_target_with_IK(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,arm_id,last_q_solution):
@@ -129,7 +150,6 @@ def go_to_target_with_IK(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba
 
             pose = caminfo[0]
             print("Target pose",pose)
-            pose = caminfo[0]
 
             yaw, pitch = auto_aim(pose,viewMatrix1,viewMatrix2)
             roll = np.radians(0)
@@ -140,12 +160,11 @@ def go_to_target_with_IK(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba
             q_solution = kinematics.inverse_kinematics(
                 target_position = pose,
                 target_orientation = target_orientation,
-                initial_q = sim.get_joint_angle(arm_id)
+                initial_q = get_current_joint_positions(arm_id)
             )
             last_q_solution = q_solution
 
             go_to_PD(arm_id, q_solution)
-            print("robot position:",where_is_endeffector(arm_id))
             print("last known position:",kinematics.forward_kinematics(q_solution)[0][:3, 3])
 
             return last_q_solution
@@ -160,7 +179,6 @@ def go_to_target_with_IK(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba
             q_solution = last_q_solution
             print("No target detected, moving to last known position.")
             go_to_PD(arm_id, q_solution)
-            print("robot position:",where_is_endeffector(arm_id))
             print("last known position:",kinematics.forward_kinematics(q_solution)[0][:3, 3])
 
         else:
@@ -177,7 +195,8 @@ def stay(arm_id):
 
     for i in range(constants.Constants.Robot.END_EFFECTOR_LINK_INDEX+1):
 
-        sim.set_joint_velocities(i, 0, arm_id)
+        set_joint_velocities(i, 0, arm_id)
+
 def go_to_PD(arm_id, last_q_solution):
     """
     Moves the robotic arm to a target position using a PD controller.
@@ -185,10 +204,120 @@ def go_to_PD(arm_id, last_q_solution):
         arm_id (int): The ID of the robotic arm in the PyBullet simulation.
         last_q_solution (list): The last known joint angles of the robotic arm.
     """
-    current_joint_positions = sim.get_current_joint_positions(arm_id)
+    current_joint_positions = get_current_joint_positions(arm_id)
     
-    effective_inertias = sim.calculate_effective_inertias(arm_id, current_joint_positions)
+    effective_inertias = calculate_effective_inertias(arm_id, current_joint_positions)
 
     if last_q_solution is not None:
         for joint_index, I_eff in enumerate(effective_inertias):
-            sim.set_joint_position_PD(joint_index, last_q_solution[joint_index], arm_id, I_eff)
+            set_joint_position_PD(joint_index, last_q_solution[joint_index], arm_id, I_eff)
+
+def get_current_joint_positions(arm_id):
+    """
+    Returns the current joint positions of the robotic arm.
+    Args:
+        arm_id (int): The ID of the robotic arm in the PyBullet simulation.
+    Returns:
+        list: A list of current joint positions for the robotic arm.
+    """
+
+    return [p.getJointState(arm_id, i)[0] for i in range(p.getNumJoints(arm_id))]
+
+def get_joint_info(arm_id):
+    """
+    Returns information about the joints of the robotic arm.
+    Args:
+        arm_id (int): The ID of the robotic arm in the PyBullet simulation.
+    Returns:
+        dict: A dictionary containing joint information, including joint names, indices, limits, and other properties.
+    """
+
+    joint_info = {}
+    num_joints = p.getNumJoints(arm_id)
+
+    for i in range(num_joints):
+
+        info = p.getJointInfo(arm_id, i)
+        joint_name = info[1].decode('utf-8')
+        joint_type = info[2]
+
+        if joint_type == p.JOINT_REVOLUTE:
+
+            joint_info[joint_name] = {
+                'index': i,
+                'lower_limit': info[8],
+                'upper_limit': info[9],
+                'max_force': info[10],
+                'max_velocity': info[11]
+            }
+
+    return joint_info
+
+def set_joint_position_PD(joint_index, target_position, arm_id, I_eff):
+    """
+    Sets the position of a specific joint in the robotic arm using a PD controller.
+    Args:
+        joint_index (int): The index of the joint to be set.
+        target_position (float): The target position for the joint in radians.
+        arm_id (int): The ID of the robotic arm in the PyBullet simulation.
+        I_eff (float): The effective inertia of the joint.
+    """
+
+    current_position, current_velocity,_ ,__ = p.getJointState(arm_id, joint_index)
+
+    control_torque = pid.calculate_torque(I_eff, target_position, 0.0, current_position, current_velocity)
+
+    p.setJointMotorControl2(
+        arm_id,
+        joint_index,
+        p.TORQUE_CONTROL,
+        force=control_torque
+    )
+
+def set_joint_velocities(joint_index, target_velocity, arm_id):
+    """
+    Sets the velocity of a specific joint in the robotic arm.
+    Args:
+        joint_index (int): The index of the joint to be set.
+        target_velocity (float): The target velocity for the joint in radians/second.
+        arm_id (int): The ID of the robotic arm in the PyBullet simulation.
+    """
+
+    p.setJointMotorControl2(
+        arm_id,
+        joint_index,
+        p.VELOCITY_CONTROL,
+        targetVelocity=target_velocity,
+        force=1000
+    )
+
+def set_joint_torques(joint_index, target_torque, arm_id):
+    """
+    Sets the torque of a specific joint in the robotic arm.
+    Args:
+        joint_index (int): The index of the joint to be set.
+        target_torque (float): The target torque for the joint.
+        arm_id (int): The ID of the robotic arm in the PyBullet simulation.
+    """
+    
+    p.setJointMotorControl2(
+        arm_id,
+        joint_index,
+        p.TORQUE_CONTROL,
+        force=target_torque
+    )
+
+def calculate_effective_inertias(arm_id, joint_positions):
+    """
+    Calculates the effective inertia of a specific joint in the robotic arm.
+    Args:
+        arm_id (int): The ID of the robotic arm in the PyBullet simulation.
+        joint_positions (list): A list of current joint angles for the robotic arm.
+        joint_index (int): The index of the joint for which to calculate the effective inertia.
+    Returns:
+        float: The effective inertia of the specified joint.
+    """
+    mass_matrix = np.array(
+        p.calculateMassMatrix(arm_id, joint_positions)
+    )
+    return np.diag(mass_matrix)

@@ -1,4 +1,4 @@
-import Utils.utils as utils
+from Utils import utils
 import numpy as np
 
 import constants
