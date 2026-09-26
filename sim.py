@@ -51,58 +51,13 @@ def sim():
 
         # Camera 1 Position and Orientation 
         endeffector_info = robot_controller.get_end_effector_state(arm_id)
-        viewMatrix1 = p.computeViewMatrixFromYawPitchRoll(
-            cameraTargetPosition = [
-                endeffector_info[0][0],
-                endeffector_info[0][1],
-                endeffector_info[0][2] - 0.2
-                ],
-            distance = 0.1,
-            yaw = (180 / math.pi) * endeffector_info[1], # RAD to DEG
-            pitch = (180 / math.pi) * endeffector_info[2],
-            roll = (180 / math.pi) * endeffector_info[3],
-            upAxisIndex = 2
-   		)
-        
-        # Camera 2 Position and Orientation
-        viewMatrix2 = p.computeViewMatrixFromYawPitchRoll(
-            cameraTargetPosition=[
-                endeffector_info[0][0]+1,
-                endeffector_info[0][1],
-                endeffector_info[0][2]-0.2
-                ],
-            distance = 0.1,
-            yaw = (180 / math.pi) * endeffector_info[1], # RAD to DEG
-            pitch = (180 / math.pi) * endeffector_info[2],
-            roll = (180 / math.pi) * endeffector_info[3],
-            upAxisIndex = 2
-   		)
 
-        # Get camera images from both cameras
-        img_arr1 = p.getCameraImage(
-            constants.Constants.Camera.WIDTH,
-            constants.Constants.Camera.HEIGHT,
-			viewMatrix=viewMatrix1,
-            projectionMatrix=projectionMatrix,
-            renderer=p.ER_BULLET_HARDWARE_OPENGL
-        )
+        viewMatrix1, viewMatrix2 = opencv.get_view_matrix(endeffector_info)
+        img_arr1, img_arr2 = opencv.get_camera_images(viewMatrix1, viewMatrix2, projectionMatrix)
+        rgba_img1 = opencv.extract_rgba_image(img_arr1)
+        rgba_img2 = opencv.extract_rgba_image(img_arr2)
 
-        img_arr2 = p.getCameraImage(
-            constants.Constants.Camera.WIDTH, constants.Constants.Camera.HEIGHT,
-			viewMatrix=viewMatrix2,
-            projectionMatrix=projectionMatrix,
-            renderer=p.ER_BULLET_HARDWARE_OPENGL
-        )
-
-        # Extract the RGBA image
-        rgba_img1 = np.reshape(img_arr1[2], (constants.Constants.Camera.HEIGHT, constants.Constants.Camera.WIDTH, 4)).astype(np.uint8)
-        rgba_img2 = np.reshape(img_arr2[2], (constants.Constants.Camera.HEIGHT, constants.Constants.Camera.WIDTH, 4)).astype(np.uint8)
-
-
-        # Shows the center of mass of the target object in both camera images in two different windows 
-        opencv.center_of_mass(rgba_img1, constants.Constants.Camera.DETECT_COLOR_MIN, constants.Constants.Camera.DETECT_COLOR_MAX,"Left")
-        opencv.center_of_mass(rgba_img2, constants.Constants.Camera.DETECT_COLOR_MIN, constants.Constants.Camera.DETECT_COLOR_MAX,"Right")
-
+        opencv.show_center_of_mass(endeffector_info, [0, 100, 100], [10, 255, 255])
         # Go near a target by 2 m
         last_q_solution, last_target_position = dodge.approach(
             viewMatrix1,

@@ -1,5 +1,129 @@
 import cv2
 import numpy as np
+import pybullet as p
+import math
+import constants
+
+def get_view_matrix(endeffector_info):
+    """
+    Computes the view matrices for two cameras based on the end effector's position and orientation.
+    Args:
+        endeffector_info (list): A list containing the end effector's position and orientation.
+    Returns:
+        tuple: A tuple containing the view matrices for the two cameras.
+    """
+    # Camera 1 Position and Orientation 
+    viewMatrix1 = p.computeViewMatrixFromYawPitchRoll(
+        cameraTargetPosition = [
+            endeffector_info[0][0],
+            endeffector_info[0][1],
+            endeffector_info[0][2] - 0.2
+            ],
+        distance = 0.1,
+        yaw = (180 / math.pi) * endeffector_info[1], # RAD to DEG
+        pitch = (180 / math.pi) * endeffector_info[2],
+        roll = (180 / math.pi) * endeffector_info[3],
+        upAxisIndex = 2
+    )
+
+    # Camera 2 Position and Orientation
+    viewMatrix2 = p.computeViewMatrixFromYawPitchRoll(
+        cameraTargetPosition=[
+            endeffector_info[0][0]+1,
+            endeffector_info[0][1],
+            endeffector_info[0][2]-0.2
+            ],
+        distance = 0.1,
+        yaw = (180 / math.pi) * endeffector_info[1], # RAD to DEG
+        pitch = (180 / math.pi) * endeffector_info[2],
+        roll = (180 / math.pi) * endeffector_info[3],
+        upAxisIndex = 2
+    )
+    return viewMatrix1, viewMatrix2
+
+def get_projection_matrix():
+    """
+    Computes the projection matrix for both cameras based on the camera's field of view and aspect ratio
+    Returns:
+        list: The projection matrix used for both cameras.
+    """
+
+    # Compute the projection matrix for both cameras
+    projectionMatrix = p.computeProjectionMatrixFOV(
+        fov = constants.Constants.Camera.FOV,
+        aspect = constants.Constants.Camera.WIDTH/constants.Constants.Camera.HEIGHT,
+        nearVal=0.1,
+        farVal=100.0
+    )
+
+    return projectionMatrix
+
+def get_camera_images(viewMatrix1, viewMatrix2, projectionMatrix, endeffector_info=None):
+    """
+    Captures images from two cameras based on their view matrices and the projection matrix.
+    Args:
+        viewMatrix1 (list): The view matrix of the first camera.
+        viewMatrix2 (list): The view matrix of the second camera.
+        projectionMatrix (list): The projection matrix used for both cameras.
+        endeffector_info (list, optional): A list containing the end effector's position and orientation. 
+            If provided, it will be used to compute the view matrices for both cameras. If not provided, the view matrices must be provided directly.
+    Returns:
+        tuple: A tuple containing the images captured from both cameras.
+    """
+    # If endeffector_info is provided, compute the view matrices for both cameras
+    if viewMatrix1 is None and viewMatrix2 is None:
+        viewMatrix1, viewMatrix2 = get_view_matrix(endeffector_info)
+    # Get camera images from both cameras
+    img_arr1 = p.getCameraImage(
+        constants.Constants.Camera.WIDTH,
+        constants.Constants.Camera.HEIGHT,
+        viewMatrix=viewMatrix1,
+        projectionMatrix=projectionMatrix,
+        renderer=p.ER_BULLET_HARDWARE_OPENGL
+    )
+
+    img_arr2 = p.getCameraImage(
+        constants.Constants.Camera.WIDTH, constants.Constants.Camera.HEIGHT,
+        viewMatrix=viewMatrix2,
+        projectionMatrix=projectionMatrix,
+        renderer=p.ER_BULLET_HARDWARE_OPENGL
+    )
+
+    return img_arr1, img_arr2
+
+def extract_rgba_image(img_arr):
+    """
+    Extracts the RGBA image from the camera image array.
+    Args:
+        img_arr (tuple): The camera image array returned by pybullet's getCameraImage function.
+    Returns:
+        numpy.ndarray: The extracted RGBA image as a NumPy array.
+    """
+    
+    rgba_img = np.reshape(img_arr[2], (constants.Constants.Camera.HEIGHT, constants.Constants.Camera.WIDTH, 4)).astype(np.uint8)
+    
+    return rgba_img
+
+def show_center_of_mass(endeffector_info, lower_color, upper_color):
+
+    rgba_img1 = extract_rgba_image(
+        get_camera_images(
+            viewMatrix1 = None,
+            viewMatrix2 = None,
+            projectionMatrix = get_projection_matrix(),
+            endeffector_info = endeffector_info
+            )[0]
+        )
+    rgba_img2 = extract_rgba_image(
+        get_camera_images(
+            viewMatrix1 = None,
+            viewMatrix2 = None,
+            projectionMatrix = get_projection_matrix(),
+            endeffector_info = endeffector_info
+            )[1]
+        )
+    center_of_mass(rgba_img1, lower_color, upper_color, "Left")
+    center_of_mass(rgba_img2, lower_color, upper_color, "Right")
 
 def moments(rgba_img,lower_color,upper_color):
     """
@@ -29,6 +153,8 @@ def center_of_mass(rgba_img, lower_color,upper_color, LoR):
         upper_color (list): The upper bound of the color range for object detection in HSV format.
         LoR (str): A string indicating whether the image is from the left or right camera.
     """
+
+
 
     bgr_img = cv2.cvtColor(rgba_img, cv2.COLOR_RGBA2BGR)
     hsv = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2HSV)
