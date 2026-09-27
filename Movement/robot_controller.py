@@ -25,6 +25,8 @@ def set_joint_positions(joint_index, target_position, arm_id):
 
 def go_to(arm_id, num_joints, target_joint_positions):
     """
+    NOTE: use go_to_PD instead of this function, it is more efficient and accurate
+
     Moves the robotic arm to the specified joint positions.
     Args:
         arm_id (int): The ID of the robotic arm in the PyBullet simulation.
@@ -91,24 +93,26 @@ def auto_aim(target_3Dposition,viewMatrix1,viewMatrix2):
 
     return target_yaw, target_pitch
 
-# def cheats(arm_id,target_3Dposition,viewMatrix1,viewMatrix2, endeffector_info):
-#     """
-#     Aims the robotic arm at a target 3D position using the average camera pose.
-#     Args:
-#         arm_id (int): The ID of the robotic arm in the PyBullet simulation.
-#         target_3Dposition (list): A list of 3 coordinates [x, y, z] representing the target position in 3D space.
-#         viewMatrix1 (list): The view matrix of the first camera.
-#         viewMatrix2 (list): The view matrix of the second camera.
-#     """
+def cheats(arm_id,target_3Dposition,viewMatrix1,viewMatrix2, endeffector_info):
+    """
+    FIXME: This function is a temporary solution and should be replaced with a more robust implementation.
+    
+    Aims the robotic arm at a target 3D position using the average camera pose.
+    Args:
+        arm_id (int): The ID of the robotic arm in the PyBullet simulation.
+        target_3Dposition (list): A list of 3 coordinates [x, y, z] representing the target position in 3D space.
+        viewMatrix1 (list): The view matrix of the first camera.
+        viewMatrix2 (list): The view matrix of the second camera.
+    """
 
-#     if target_3Dposition is not None:
+    if target_3Dposition is not None:
 
-#         angle = auto_aim(target_3Dposition,viewMatrix1,viewMatrix2)  # Get the final angle from auto_aim
-#         print("target_3Dposition",target_3Dposition)
-#         end_effector_yaw = endeffector_info[1]  # Get the current position of the end effector
-#         wrist_pitch = utils.Yaw_pitch_roll_from_quaternion(p.getLinkState(arm_id, 6)[5])[1]  # Get the current position of the wrist
-#         set_joint_positions(7,-(end_effector_yaw+angle[0]), arm_id) #  Move the arm to the calculated joint positions
-#         set_joint_positions(6,-(wrist_pitch+angle[1]), arm_id) 
+        angle = auto_aim(target_3Dposition,viewMatrix1,viewMatrix2)  # Get the final angle from auto_aim
+        print("target_3Dposition",target_3Dposition)
+        end_effector_yaw = endeffector_info[1]  # Get the current position of the end effector
+        wrist_pitch = utils.Yaw_pitch_roll_from_quaternion(p.getLinkState(arm_id, 6)[5])[1]  # Get the current position of the wrist
+        set_joint_positions(7,-(end_effector_yaw+angle[0]), arm_id) #  Move the arm to the calculated joint positions
+        set_joint_positions(6,-(wrist_pitch+angle[1]), arm_id) 
 
 
 def go_to_target_with_IK(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba_img2,arm_id,last_q_solution):

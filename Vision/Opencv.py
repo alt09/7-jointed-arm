@@ -4,6 +4,23 @@ import pybullet as p
 import math
 import constants
 
+def get_info_from_camera_image(endeffector_info):
+    """
+    Gets the view matrices, projection matrix, and RGBA images from two cameras based on the end effector's position and orientation.
+    Args:
+        endeffector_info (list): A list containing the end effector's position and orientation.
+    Returns:
+        tuple: A tuple containing the view matrices for both cameras, the projection matrix, and the RGBA images from both cameras.
+    """
+    viewMatrix1, viewMatrix2 = get_view_matrix(endeffector_info)
+    projectionMatrix = get_projection_matrix()
+    img_arr1, img_arr2 = get_camera_images(viewMatrix1, viewMatrix2, projectionMatrix)
+    rgba_img1 = extract_rgba_image(img_arr1)
+    rgba_img2 = extract_rgba_image(img_arr2)
+
+    return viewMatrix1, viewMatrix2, projectionMatrix, rgba_img1, rgba_img2
+
+
 def get_view_matrix(endeffector_info):
     """
     Computes the view matrices for two cameras based on the end effector's position and orientation.

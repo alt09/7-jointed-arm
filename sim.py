@@ -8,12 +8,11 @@ import constants
 from Movement import dodge, robot_controller
 from Vision import opencv
 
-
-print("Starting PyBullet simulation...")
 def sim():
     """
     Runs the PyBullet simulation.
     """
+    print("Starting PyBullet simulation...")
 
     last_q_solution = None
     last_target_position = None
@@ -37,12 +36,6 @@ def sim():
         )
 
     # Compute the projection matrix for both cameras
-    projectionMatrix = p.computeProjectionMatrixFOV(
-        fov = constants.Constants.Camera.FOV,
-        aspect = constants.Constants.Camera.WIDTH/constants.Constants.Camera.HEIGHT,
-        nearVal=0.1,
-        farVal=100.0
-    )
 
     while p.isConnected(client):
         
@@ -51,20 +44,17 @@ def sim():
 
         # Camera 1 Position and Orientation 
         endeffector_info = robot_controller.get_end_effector_state(arm_id)
+        cam_info = opencv.get_info_from_camera_image(endeffector_info)
 
-        viewMatrix1, viewMatrix2 = opencv.get_view_matrix(endeffector_info)
-        img_arr1, img_arr2 = opencv.get_camera_images(viewMatrix1, viewMatrix2, projectionMatrix)
-        rgba_img1 = opencv.extract_rgba_image(img_arr1)
-        rgba_img2 = opencv.extract_rgba_image(img_arr2)
 
         opencv.show_center_of_mass(endeffector_info, [0, 100, 100], [10, 255, 255])
         # Go near a target by 2 m
         last_q_solution, last_target_position = dodge.approach(
-            viewMatrix1,
-            viewMatrix2,
-            projectionMatrix,
-            rgba_img1,
-            rgba_img2,
+            cam_info[0],
+            cam_info[1],
+            cam_info[2],
+            cam_info[3],
+            cam_info[4],
             arm_id,
             last_q_solution,
             last_target_position,
