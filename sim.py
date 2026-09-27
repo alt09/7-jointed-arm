@@ -40,14 +40,12 @@ def sim():
     while p.isConnected(client):
         
         p.stepSimulation()
-        time.sleep(1.0 / 240.0)
 
         # Camera 1 Position and Orientation 
         endeffector_info = robot_controller.get_end_effector_state(arm_id)
         cam_info = opencv.get_info_from_camera_image(endeffector_info)
 
 
-        opencv.show_center_of_mass(endeffector_info, [0, 100, 100], [10, 255, 255])
         # Go near a target by 2 m
         last_q_solution, last_target_position = dodge.approach(
             cam_info[0],
