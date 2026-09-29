@@ -5,7 +5,7 @@ import pybullet as p
 import pybullet_data
 import math
 import constants
-from Movement import dodge, robot_controller
+from Movement import dodge, robot_controller, trajectory
 from Vision import opencv
 from Utils.logger import RobotLogger
 
@@ -99,6 +99,54 @@ def sim():
             # remove r2d2
             # p.removeBody(r2d2_id)
 
+            t = trajectory.generate_trajectory(
+                q_start=[
+                    0.0,    # Joint 1
+                    0.2,    # Joint 2
+                    -0.3,   # Joint 3
+                    0.0,    # Joint 4
+                    0.5,    # Joint 5
+                    -0.2,   # Joint 6
+                    0.0     # Joint 7
+                ],
+
+                q_goal=[
+                    1.0,    # Joint 1
+                    -0.5,   # Joint 2
+                    0.8,    # Joint 3
+                    0.3,    # Joint 4
+                    -0.4,   # Joint 5
+                    0.6,    # Joint 6
+                    -0.2    # Joint 7
+                ],
+
+                max_velocity=[
+                    0.5,    # Joint 1: rad/s
+                    0.4,    # Joint 2
+                    0.6,    # Joint 3
+                    0.5,    # Joint 4
+                    0.4,    # Joint 5
+                    0.6,    # Joint 6
+                    0.5     # Joint 7
+                ],
+
+                max_acceleration=[
+                    1.0,    # Joint 1: rad/s²
+                    0.8,    # Joint 2
+                    1.2,    # Joint 3
+                    1.0,    # Joint 4
+                    0.8,    # Joint 5
+                    1.2,    # Joint 6
+                    1.0     # Joint 7
+                ],
+
+                dt=0.02
+            )
+            for sample in t:
+                print(
+                    f"Time: {sample['time']}, Position: {sample['positions'][0]}, Velocity: {sample['velocities'][0]}, Acceleration: {sample['accelerations'][0]}"
+                )
+            break  # Remove this break to run the simulation continuously
     
-    finally:
+    finally:    
         logger.close()
