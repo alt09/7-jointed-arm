@@ -60,6 +60,6 @@ class Constants:
 
         DESIRED_SETTLING_TIME = 0.4 # Desired settling time in seconds for the end effector to reach the target position
 
-        DAMPING_RATIO = 1 # Damping ratio for the end effector's motion to the target position
+        DAMPING_RATIO = .5 # Damping ratio for the end effector's motion to the target position
 
         NATURAL_FREQUENCY = 4.0 / (DAMPING_RATIO * DESIRED_SETTLING_TIME) # Natural frequency for the end effector's motion to the target position

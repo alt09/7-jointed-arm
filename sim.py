@@ -22,7 +22,7 @@ def sim():
     p.setAdditionalSearchPath(pybullet_data.getDataPath())
     p.setGravity(0, 0, 0)
 
-    # logger = roborRobotLogger()
+    log = logger.RobotLogger()
     dt = 1.0 / 240.0  # Simulation time step
     sim_time = 0.0
     
@@ -45,28 +45,6 @@ def sim():
     try:
 
         while p.isConnected(client):
-            # logger
-            # for i in range(7):
-
-            #     state = robot_controller.get_joint_info(arm_id)
-
-            #     actual_position = 1
-            #     actual_velocity = 1
-
-            #     desired_position = 0 
-
-            #     # Replace with the actual torque
-            #     # calculated by your controller.
-            #     control_torque = 0
-
-                # logger.log_joint(
-                #     joint=i,
-                #     desired_position=desired_position,
-                #     actual_position=actual_position,
-                #     actual_velocity=actual_velocity,
-                #     control_torque=control_torque
-                # )
-            
 
             # Camera 1 Position and Orientation 
             endeffector_info = robot_controller.get_end_effector_state(arm_id)
@@ -106,6 +84,21 @@ def sim():
                 dt=dt
             )
 
+            #logger
+            for i in range(7):
+
+                actual_position = q_current[i]
+                actual_velocity = qdot_current[i]
+
+                desired_position = q_goal[i]
+
+                log.log_joint(
+                    joint=i,
+                    desired_position=desired_position,
+                    actual_position=actual_position,
+                    actual_velocity=actual_velocity,
+                )
+
             for sample in traj:
                 # print(sample)
                 q_desired = np.array(sample["positions"])
@@ -124,8 +117,6 @@ def sim():
 
                 robot_controller.go_to_PD(arm_id, q_desired, qdot_desired)
 
-                print("positions: ", q_desired)
-                print("velocities: ", qdot_desired)
                 p.removeBody(r2d2_id)
 
                 p.stepSimulation()
@@ -141,10 +132,13 @@ def sim():
                         physicsClientId = 0
                     )
 
-
-
+            
+                    
             # remove r2d2
+            # p.removeBody(r2d2_id)
     
     finally:    
-        # logger.close()
+        
+        log.close()
         print("Simulation ended.")
+        logger.plot_joint_data(log.file.name)
