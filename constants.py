@@ -58,7 +58,7 @@ class Constants:
         
         TARGET_SEPARATION = 0.01 # Separation in meters between the target and the end effector when the end effector is at the target position
 
-        DESIRED_SETTLING_TIME = 0.4 # Desired settling time in seconds for the end effector to reach the target position
+        DESIRED_SETTLING_TIME = 0.2 # Desired settling time in seconds for the end effector to reach the target position
 
         DAMPING_RATIO = 1 # Damping ratio for the end effector's motion to the target position
 

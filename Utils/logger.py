@@ -100,7 +100,7 @@ def plot_joint_data(log_file):
     plt.title('Average Position Error for Each Joint')
     plt.xlabel('Joint')
     plt.ylabel('Average Position Error (rad)')
-    plt.grid(axis='x')
+    plt.grid(axis='y')
     plt.savefig("Media/Average_Position_Error_for_Each_Joint.png")  # Save the figure as a PNG file
     plt.grid()
     plt.show()
@@ -171,6 +171,9 @@ class RobotLogger:
         elapsed = time.perf_counter() - self.start_time
         error = desired_position - actual_position
 
+        if elapsed > 30:
+            print("Logging stopped after 30 seconds.")
+            self.close()
         self.writer.writerow([
             elapsed,
             joint,
