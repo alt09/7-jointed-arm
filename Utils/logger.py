@@ -13,6 +13,57 @@ def plot_joint_data(log_file):
     final_errors=[]
     max_errors=[]
 
+
+    position_3d_data = data['additional_info']
+    target_position_data = data['target_position']
+
+    # Convert the stored 3D positions into separate X, Y, Z values
+    position_3d = position_3d_data.apply(eval)
+    target_position_3d = target_position_data.apply(eval)
+
+    x_position = position_3d.apply(lambda p: p[0])
+    y_position = position_3d.apply(lambda p: p[1])
+    z_position = position_3d.apply(lambda p: p[2])
+    target_x_position = target_position_3d.apply(lambda p: p[0])
+    target_y_position = target_position_3d.apply(lambda p: p[1])
+    target_z_position = target_position_3d.apply(lambda p: p[2])
+
+    
+
+    plt.figure(figsize=(10, 6))
+
+    plt.plot(data['time'], x_position, label='X Position')
+    plt.plot(data['time'], y_position, label='Y Position')
+    plt.plot(data['time'], z_position, label='Z Position')
+    plt.plot(data['time'], target_x_position, label='Target X Position', linestyle='--', color='blue')
+    plt.plot(data['time'], target_y_position, label='Target Y Position', linestyle='--', color='orange')
+    plt.plot(data['time'], target_z_position, label='Target Z Position', linestyle='--', color='green')
+
+    plt.title('3D Position vs Time')
+    plt.xlabel('Time (s)')
+    plt.ylabel('Position (m)')
+    plt.legend()
+    plt.grid()
+    plt.savefig("Media/3D_Position_vs_Time.png")  # Save the figure as a PNG file
+    plt.show()
+
+    plt.figure(figsize=(10, 6))
+    x_error = x_position - target_x_position
+    y_error = y_position - target_y_position
+    z_error = z_position - target_z_position
+
+    plt.plot(data['time'], x_error, label='X Error')
+    plt.plot(data['time'], y_error, label='Y Error')
+    plt.plot(data['time'], z_error, label='Z Error')
+
+    plt.title('3D Position Error vs Time')
+    plt.xlabel('Time (s)')
+    plt.ylabel('Error (m)')
+    plt.legend()
+    plt.grid()
+    plt.savefig("Media/3D_Position_Error_vs_Time.png")  # Save the figure as a PNG file
+    plt.show()
+
     for i in range(7):
         joint_data = data[data['joint'] == i]
 
@@ -24,6 +75,7 @@ def plot_joint_data(log_file):
         plt.ylabel('Position (rad)')
         plt.legend()
         plt.grid()
+        plt.savefig(f"Media/Joint_{i}_Position_Over_Time.png")  # Save the figure as a PNG file
         plt.show()
 
         average_error = joint_data["position_error"].abs().mean()
@@ -34,14 +86,8 @@ def plot_joint_data(log_file):
         final_error = final_data["position_error"].abs().mean()
         final_errors.append(final_error)
 
-        max_error = joint_data["position_error"].abs().max()
+        max_error = final_data["position_error"].abs().max()
         max_errors.append(max_error)
-
-        print(f"Joint {i + 1}:")
-        print(f"  Mean absolute error:  {average_error:.4f} rad")
-        print(f"  Final average error:  {final_error:.4f} rad")
-        print(f"  Maximum error:        {max_error:.4f} rad")
-        print()
 
 
 
@@ -54,6 +100,8 @@ def plot_joint_data(log_file):
     plt.title('Average Position Error for Each Joint')
     plt.xlabel('Joint')
     plt.ylabel('Average Position Error (rad)')
+    plt.grid(axis='x')
+    plt.savefig("Media/Average_Position_Error_for_Each_Joint.png")  # Save the figure as a PNG file
     plt.grid()
     plt.show()
 
@@ -65,6 +113,7 @@ def plot_joint_data(log_file):
     plt.ylabel('Final Average Position Error (rad)')
     plt.xticks(range(1, 8))
     plt.grid(axis='y')
+    plt.savefig("Media/Final_Average_Position_Error_for_Each_Joint.png")  # Save the figure as a PNG file
     plt.show()
 
     plt.figure(figsize=(10, 6))
@@ -74,7 +123,9 @@ def plot_joint_data(log_file):
     plt.ylabel('Maximum Position Error (rad)')
     plt.xticks(range(1, 8))
     plt.grid(axis='y')
+    plt.savefig("Media/Maximum_Position_Error_for_Each_Joint.png")  # Save the figure as a PNG file
     plt.show()
+
 
 class RobotLogger:
 
@@ -101,7 +152,9 @@ class RobotLogger:
             "desired_position",
             "actual_position",
             "position_error",
-            "actual_velocity"
+            "actual_velocity",
+            "additional_info",
+            "target_position"
         ])
 
         self.start_time = time.perf_counter()
@@ -111,7 +164,9 @@ class RobotLogger:
         joint,
         desired_position,
         actual_position,
-        actual_velocity
+        actual_velocity,
+        additional_info=None,
+        target_position=None
     ):
         elapsed = time.perf_counter() - self.start_time
         error = desired_position - actual_position
@@ -122,7 +177,9 @@ class RobotLogger:
             desired_position,
             actual_position,
             error,
-            actual_velocity
+            actual_velocity,
+            additional_info,
+            target_position
         ])
 
     def close(self):

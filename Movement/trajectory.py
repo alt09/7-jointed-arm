@@ -1,3 +1,6 @@
+from time import time
+
+import pybullet as p
 import numpy as np
 
 def generate_trajectory(q_start, q_goal, max_velocity, max_acceleration, dt=0.02):
@@ -18,7 +21,7 @@ def generate_trajectory(q_start, q_goal, max_velocity, max_acceleration, dt=0.02
 
         return [{
             "time": 0.0,
-            "position": q_goal.copy(),
+            "positions": q_goal.copy(),
             "velocities": np.zeros_like(q_goal),
             "accelerations": np.zeros_like(q_goal)
         }]
@@ -74,3 +77,11 @@ def generate_trajectory(q_start, q_goal, max_velocity, max_acceleration, dt=0.02
         })
     return trajectory
 
+def follow_trajectory(arm_id, trajectory, robot_controller, dt=0.02):
+    for sample in trajectory:
+        q_desired = np.array(sample["positions"])
+        qdot_desired = np.array(sample["velocities"])
+
+        robot_controller.go_to_PD(arm_id, q_desired, qdot_desired)
+        p.stepSimulation()
+        time.sleep(dt)

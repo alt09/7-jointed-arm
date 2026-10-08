@@ -7,7 +7,7 @@ import math
 import constants
 from Movement import kinematics, dodge, robot_controller, trajectory
 from Vision import opencv
-from Utils import logger, pid, utils
+from Utils import logger, utils
 
 
 def sim():
@@ -24,7 +24,6 @@ def sim():
 
     log = logger.RobotLogger()
     dt = 1.0 / 240.0  # Simulation time step
-    sim_time = 0.0
     
 
     #p.loadURDF("plane.urdf")  # load the plane
@@ -63,6 +62,7 @@ def sim():
                 last_target_position,
                 endeffector_info
             )
+
             yaw, pitch = robot_controller.auto_aim(last_target_position, cam_info[0], cam_info[1])
             roll = np.radians(0)
             target_orientation = utils.rpy_rotation(roll, pitch, yaw)
@@ -85,25 +85,11 @@ def sim():
             )
 
             #logger
-            for i in range(7):
-
-                actual_position = q_current[i]
-                actual_velocity = qdot_current[i]
-
-                desired_position = q_goal[i]
-
-                log.log_joint(
-                    joint=i,
-                    desired_position=desired_position,
-                    actual_position=actual_position,
-                    actual_velocity=actual_velocity,
-                )
 
             for sample in traj:
                 # print(sample)
                 q_desired = np.array(sample["positions"])
                 qdot_desired = np.array(sample["velocities"])
-
                 q_current = [] 
                 qdot_current = [] 
 
@@ -117,25 +103,44 @@ def sim():
 
                 robot_controller.go_to_PD(arm_id, q_desired, qdot_desired)
 
-                p.removeBody(r2d2_id)
-
+                if r2d2_id is not None:
+                    p.removeBody(r2d2_id)
+                    r2d2_id = None
                 p.stepSimulation()
 
 
-            # this is a debug line to visualize the distance between the end effector and the last known target position
+
+             # this is a debug line to visualize the distance between the end effector and the last known target position
                 if last_target_position is not None:
                     line_id = p.addUserDebugLine(
                         lineFromXYZ = endeffector_info[0],
                         lineToXYZ = last_target_position,
                         lineColorRGB = [1, 0, 0],
                         lineWidth = 1,
+                    
                         physicsClientId = 0
                     )
+                for i in range(7):
 
-            
-                    
-            # remove r2d2
-            # p.removeBody(r2d2_id)
+                    actual_position = q_current[i]
+                    actual_velocity = qdot_current[i]
+
+                    desired_position = q_goal[i]
+
+                    log.log_joint(
+                        joint=i,
+                        desired_position=desired_position,
+                        actual_position=actual_position,
+                        actual_velocity=actual_velocity,
+                        additional_info=robot_controller.get_end_effector_state(arm_id)[0],  # Log the end effector position as additional info
+                        target_position=last_target_position.tolist()
+                    )
+
+
+        
+                
+        # remove r2d2
+        # p.removeBody(r2d2_id)
     
     finally:    
         
