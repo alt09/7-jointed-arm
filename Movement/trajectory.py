@@ -31,7 +31,7 @@ def generate_trajectory(q_start, q_goal, max_velocity, max_acceleration, dt=0.02
     V = np.min(vmax[moving] / distance[moving])
     A = np.min(amax[moving] / distance[moving])
 
-    if V**2 / A < 1.0:
+    if V**2 / A >= 1.0:
 
         peak_velocity = np.sqrt(A)
         t_accel = peak_velocity / A
