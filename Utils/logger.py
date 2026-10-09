@@ -417,6 +417,79 @@ class RobotLogger:
             target_position
         ])
 
+    def log_tests(  
+        self,
+        any1=None,
+        any2=None,
+        any3=None,
+        any4=None,
+        any5=None,
+        any6=None,
+        any7=None,
+        end_time=None
+    ):
+        """
+        Logs the test data to the CSV file.
+        Args:
+            any (int): An integer value.
+            any (float): A float value.
+            any (float): Another float value.
+            any (float): Yet another float value.
+            any (any, optional): Additional information to log.
+            list (list, optional): A list of values.
+            end_time (float, optional): If specified, logging will stop after this time (in seconds).
+        """
+
+        elapsed = time.perf_counter() - self.start_time
+        if Constants.Simulation.KIND_OF_TEST is 'kinematics':
+            test_number = any1
+            pose_error = any2
+            orientation_error = any3
+            actual_velocity = any4
+            target_orientation = any5
+            target_position = any6
+            position_solution = any7
+
+            error = any2 -any3
+
+
+            self.writer.writerow([
+            elapsed,
+            test_number,
+            pose_error,
+            orientation_error,
+            error,
+            actual_velocity,
+            target_orientation,
+            target_position
+            ])
+        if Constants.Simulation.KIND_OF_TEST is 'vision':
+            
+
+            iterations = any1
+            target_position = any2
+            error = any3
+            distance = any4
+            can_see = any5
+            actual_target_position = any6
+
+            self.writer.writerow([
+            elapsed,
+            iterations,
+            target_position,
+            actual_target_position,
+            0,
+            distance,
+            can_see,
+            actual_target_position
+            ])
+
+        # If an end_time is specified and the elapsed time exceeds it, stop logging and close the file
+        if end_time is not None and elapsed > end_time:
+
+            print(f"Logging stopped after {end_time} seconds.")
+            self.close()
+
     def close(self):
         """
         Closes the CSV file.

@@ -5,7 +5,7 @@ class Constants:
 
     class Simulation:
 
-        ENABLE_SIMULATION = True # enable or disable the simulation, if set to False, the tests will run
+        ENABLE_SIMULATION = False # enable or disable the simulation, if set to False, the tests will run
         KIND_OF_TEST = 'vision' # 'kinematics' or 'vision' or 'all', if set to 'all', both tests will run
 
     class Camera:

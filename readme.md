@@ -165,7 +165,7 @@ The system integrates stereo vision, custom kinematics, trajectory generation, a
 
 ```mermaid
 flowchart TD
-    subgraph V["Stereo Vision — Vision/Opencv.py"]
+    subgraph V["Stereo Vision — Vision/opencv.py"]
         A["Left and Right Camera Images"]
         B["Target Detection"]
         C["Stereo Triangulation"]

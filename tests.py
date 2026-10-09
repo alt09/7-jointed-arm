@@ -55,13 +55,13 @@ def test_kinematics(number_of_tests=10):
         print("pose_error:", pose_error)
         print("orientation_error:", orientation_error)
 
-        log.log_joint(
-            joint=i, # instead of logging the joint index, we can log the test number
-            desired_position=pose_error,  # Log the pose error as the desired position
-            actual_position=orientation_error,  # Log the orientation error as the actual position
-            actual_velocity=[yaw, pitch, roll],  # Log the random orientation as the actual velocity
-            additional_info=position_solution.tolist(),  
-            target_position=random_3d_pose,
+        log.log_tests(
+            any1=i, # instead of logging the joint index, we can log the test number
+            any2=pose_error,  # Log the pose error as the desired position
+            any3=orientation_error,  # Log the orientation error as the actual position
+            any4=[yaw, pitch, roll],  # Log the random orientation as the actual velocity
+            any5=position_solution.tolist(),  
+            any6=random_3d_pose,
         )
 
         if pose_error < 1e-3 and orientation_error < 1e-3:
@@ -175,13 +175,13 @@ def test_vision(number_of_tests=8):
 
                 error = np.linalg.norm(np.array(last_target_position.tolist()) - np.array([j-size/2, i+7, k-size/2])) if last_target_position is not None else None
                 distance = np.linalg.norm(np.array([j-size/2, i+7, k-size/2]) - np.array([0.5,0.5,0]))
-                log.log_joint(
-                    joint=iterations, # instead of logging the joint index, we can log the test number
-                    desired_position = (last_target_position.tolist() if last_target_position is not None else [0,0,0]),  # Log the Vision position as the desired position
-                    actual_position=error,  # Log the error as the actual position
-                    actual_velocity=distance,  # Log the distance as the actual velocity
-                    additional_info=can_see if can_see else [False],  
-                    target_position=[j-size/2, i+7, k-size/2],
+                log.log_tests(
+                    any1=iterations, # instead of logging the joint index, we can log the test number
+                    any2 = (last_target_position.tolist() if last_target_position is not None else [0,0,0]),  # Log the Vision position as the desired position
+                    any3=error,  # Log the error as the actual position
+                    any4=distance,  # Log the distance as the actual velocity
+                    any5=can_see if can_see else [False],  
+                    any6=[j-size/2, i+7, k-size/2],
                 )
                 iterations += 1
                 if last_target_position is None:
