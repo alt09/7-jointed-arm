@@ -4,15 +4,18 @@ import pybullet as p
 import math
 import constants
 
-def get_info_from_camera_image(endeffector_info):
+def get_info_from_camera_image(endeffector_info, viewMatrix1=None, viewMatrix2=None):
     """
     Gets the view matrices, projection matrix, and RGBA images from two cameras based on the end effector's position and orientation.
     Args:
         endeffector_info (list): A list containing the end effector's position and orientation.
+        viewMatrix1 (list, optional): The view matrix of the first camera. If provided, it will be used directly. If not provided, it will be computed based on the end effector's position and orientation.
+        viewMatrix2 (list, optional): The view matrix of the second camera. If provided, it will be used directly. If not provided, it will be computed based on the end effector's position and orientation.
     Returns:
         tuple: A tuple containing the view matrices for both cameras, the projection matrix, and the RGBA images from both cameras.
     """
-    viewMatrix1, viewMatrix2 = get_view_matrix(endeffector_info)
+    if endeffector_info is not None:
+        viewMatrix1, viewMatrix2 = get_view_matrix(endeffector_info)
     projectionMatrix = get_projection_matrix()
     img_arr1, img_arr2 = get_camera_images(viewMatrix1, viewMatrix2, projectionMatrix)
     rgba_img1 = extract_rgba_image(img_arr1)
@@ -226,7 +229,7 @@ def target_3d_pose(view_matrix_1,view_matrix_2,projectionMatrix,rgba_img1,rgba_i
     Returns:
         tuple: A tuple containing the 3D position of the target object (in the Camera coordinate system) and the triangulation error.
         the triangulation error is the distance between the two rays from the cameras to the target object, which indicates the accuracy of the triangulation.
-        The third element of the tuple is the 3D position of the target object in the world coordinate system.
+        (The third element of the tuple is the 3D position of the target object in the world coordinate system.)
     """
 
     M1=moments(rgba_img1, lower_color, upper_color)
@@ -262,7 +265,6 @@ def target_3d_pose(view_matrix_1,view_matrix_2,projectionMatrix,rgba_img1,rgba_i
         
         t = (b * e - c * d) / denominator
         s = (a * e - b * d) / denominator
-
 
         point1 = C1 + t * D1
         point2 = C2 + s * D2

@@ -7,7 +7,9 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 
-def test_logger(log_file, succesful_tests=None):
+from constants import Constants
+
+def test_logger(log_file, succesful_tests=None, kind='all'):
     """
     Plots the joint data from the log file.
     and generates plots for position, error, and joint data.
@@ -17,100 +19,184 @@ def test_logger(log_file, succesful_tests=None):
     # Read the log file into a pandas DataFrame
     data = pd.read_csv(log_file)
 
-    # Extract the 3D position and target position data from the DataFrame
-    position_3d_data = data['additional_info']
-    target_position_data = data['target_position']
+    if kind is 'vision' or kind is 'all':
 
-    # Convert the stored 3D positions into separate X, Y, Z values
-    position_3d = position_3d_data.apply(eval)
-    target_position_3d = target_position_data.apply(eval)
+        position_vision = data['desired_position']
+        position_3d =position_vision.apply(eval)
+        # only use when position_vision is not None
+        target_position_3d = data['target_position'].apply(eval)
+        target_position_3d = target_position_3d[target_position_3d.notnull()]
 
-    # Extract X, Y, Z positions for both actual and target positions
-    x_position = position_3d.apply(lambda p: p[0])
-    y_position = position_3d.apply(lambda p: p[1])
-    z_position = position_3d.apply(lambda p: p[2])
-    target_x_position = target_position_3d.apply(lambda p: p[0])
-    target_y_position = target_position_3d.apply(lambda p: p[1])
-    target_z_position = target_position_3d.apply(lambda p: p[2])
 
-    # Create a 3D position error plot
-    x_error = x_position - target_x_position
-    y_error = y_position - target_y_position
-    z_error = z_position - target_z_position
+        x_position = position_3d.apply(lambda p: p[0])
+        y_position = position_3d.apply(lambda p: p[1])
+        z_position = position_3d.apply(lambda p: p[2])
 
-    # plot the 3D position error vs time
-    plt.figure(figsize=(10, 6))
-    plt.plot(data['time'], x_error, label='X Error')
-    plt.plot(data['time'], y_error, label='Y Error')
-    plt.plot(data['time'], z_error, label='Z Error')
+        plt.figure(figsize=(10, 6))
+        plt.plot(data['joint'], x_position, label='Vision X Position')
+        plt.plot(data['joint'], y_position, label='Vision Y Position')
+        plt.plot(data['joint'], z_position, label='Vision Z Position')
+        plt.plot(data['joint'], target_position_3d.apply(lambda p: p[0]), label='Target X Position', linestyle='--', color='blue')
+        plt.plot(data['joint'], target_position_3d.apply(lambda p: p[1]), label='Target Y Position', linestyle='--', color='orange')
+        plt.plot(data['joint'], target_position_3d.apply(lambda p: p[2]), label='Target Z Position', linestyle='--', color='green')
+        plt.title('Vision Position vs iteration')
+        plt.xlabel('iteration')
+        plt.ylabel('Vision Position (m)')
+        plt.legend()
+        plt.grid()
+        plt.savefig("Media/Test/Vision/Vision_Position_vs_iteration.png")  # Save the figure as a PNG file
+        plt.show()
 
-    plt.title('3D Position Error vs Time')
-    plt.xlabel('Time (s)')
-    plt.ylabel('Error (m)')
-    plt.legend()
-    plt.grid()
-    plt.savefig("Media/Test/3D_Position_Error_vs_Time.png")  # Save the figure as a PNG file
-    plt.show()
+        plt.figure(figsize=(10, 6))
+        plt.plot(data['joint'], data['actual_position'], label='Vision Position Error')
+        plt.title('Vision Position Error vs iteration')
+        plt.xlabel('iteration')
+        plt.ylabel('Position Error (m)')
+        plt.legend()
+        plt.grid()
+        plt.savefig("Media/Test/Vision/Vision_Position_Error_vs_iteration.png")  # Save the figure as a PNG file
+        plt.show()
 
-    # plot the position error vs joint index
-    plt.figure(figsize=(10, 6))
-    plt.plot(data['joint'], data['desired_position'], label='Error')
 
-    plt.title('Position Error vs iteration')
-    plt.xlabel('Joint')
-    plt.ylabel('Error (m)')
-    plt.legend()
-    plt.grid()
-    plt.savefig("Media/Test/Position_Error_vs_Joint.png")  # Save the figure as a PNG file
-    plt.show()
+        plt.figure(figsize=(10, 6))
+        plt.plot(data['actual_velocity'], data['actual_position'], label='Vision distance Error')
+        plt.title('distance away of the camera from the target vs Pose error')
+        plt.xlabel('Distance from target (m)')
+        plt.ylabel('Position Error (m)') 
+        plt.legend()
+        plt.grid()
+        plt.savefig("Media/Test/Vision/Vision_distance_Error_vs_iteration.png")  # Save the figure as a PNG file
+        plt.show()
 
-    # plot the orientation error vs iteration
-    plt.figure(figsize=(10, 6))
-    plt.plot(data['joint'], data['actual_position'], label='Orientation Error')
-    plt.title('Orientation Error vs iteration')
-    plt.xlabel('Iteration')
-    plt.ylabel('Orientation Error (rad)')
-    plt.legend()
-    plt.grid()
-    plt.savefig("Media/Test/Orientation_Error_vs_iteration.png")  # Save the figure as a PNG file
-    plt.show()
+        plt.figure(figsize=(10, 6))
+        average_vision_error = data["actual_position"].abs().mean()
+        max_vision_error = data["actual_position"].abs().max()
+        best_vision_error = data["actual_velocity"].abs().min()
 
-    # plot the number of successful simulations vs iteration
-    plt.figure(figsize=(10, 6))
-    plt.plot(data['joint'], [succesful_tests for _ in range(len(data['joint']))], label='successful simulations')
-    plt.title('successful simulations vs iteration')
-    plt.xlabel('iteration')
-    plt.ylabel('successful simulations')
-    plt.legend()
-    plt.grid()
-    plt.savefig("Media/Test/Successful_Simulations_vs_iteration.png")  # Save the figure as a PNG file
-    plt.show()
+        plt.bar(["Avrg Vision", "Max Vision"],
+                [average_vision_error, max_vision_error],
+                color=['blue', 'orange']
+                )
+        plt.title('Vision Position Error Statistics')
+        plt.xlabel('Error Type')
+        plt.ylabel('Position Error (m)')
+        plt.savefig("Media/Test/Vision/Vision_Position_Error_Statistics.png")  # Save the figure as a PNG file
+        plt.show()
+        print(f"Average Vision Error: {average_vision_error}")
+        print(f"Max Vision Error: {max_vision_error}")
+        print(f"Best Vision Error: {best_vision_error}")
+        print(f"number of successful tests: {succesful_tests}/{len(data)}")
+        
 
-    # Calculate average and maximum errors for pose and orientation
-    average_pose_error = data["desired_position"].abs().mean()
-    max_pose_error = data["desired_position"].abs().max()
-    average_orientation_error = data["actual_position"].abs().mean()
-    max_orientation_error = data["actual_position"].abs().max()
+        plt.figure(figsize=(10, 6))
 
-    print(f"Average Pose Error: {average_pose_error}")
-    print(f"Max Pose Error: {max_pose_error}")
-    print(f"Average Orientation Error: {average_orientation_error}")
-    print(f"Max Orientation Error: {max_orientation_error}")
+        plt.bar(["Best Vision"],
+                [best_vision_error],
+                color=['green']
+                )
+        plt.title('best distance away of the camera from the target')
+        plt.xlabel('best distance away of the camera from the target')
+        plt.ylabel('Position Error (m)')
+        plt.savefig("Media/Test/Vision/Best_Vision_Distance.png")  # Save the figure as a PNG file
+        plt.show()
 
-    # Generate a bar plot for average and maximum errors for pose and orientation
-    plt.figure(figsize=(10, 6))
-    plt.bar(["Avrg Pose", "Max Pose", "Avrg orientation", "Max Orientation"],
-            [average_pose_error, max_pose_error, average_orientation_error, max_orientation_error],
-            color=['blue', 'orange', 'green', 'red']
-            )
 
-    plt.title('Error Statistics')
-    plt.xlabel('Error Type')
-    plt.ylabel('Error (m)')
-    plt.legend()
-    plt.grid()
-    plt.savefig("Media/Test/Error_Statistics.png")  # Save the figure as a PNG file
-    plt.show()
+    if kind is 'kinematics' or kind is 'all':
+
+        # Extract the 3D position and target position data from the DataFrame
+        position_3d_data = data['additional_info']
+        target_position_data = data['target_position']
+
+        # Convert the stored 3D positions into separate X, Y, Z values
+        position_3d = position_3d_data.apply(eval)
+        target_position_3d = target_position_data.apply(eval)
+
+        # Extract X, Y, Z positions for both actual and target positions
+        x_position = position_3d.apply(lambda p: p[0])
+        y_position = position_3d.apply(lambda p: p[1])
+        z_position = position_3d.apply(lambda p: p[2])
+        target_x_position = target_position_3d.apply(lambda p: p[0])
+        target_y_position = target_position_3d.apply(lambda p: p[1])
+        target_z_position = target_position_3d.apply(lambda p: p[2])
+
+        # Create a 3D position error plot
+        x_error = x_position - target_x_position
+        y_error = y_position - target_y_position
+        z_error = z_position - target_z_position
+
+        # plot the 3D position error vs time
+        plt.figure(figsize=(10, 6))
+        plt.plot(data['time'], x_error, label='X Error')
+        plt.plot(data['time'], y_error, label='Y Error')
+        plt.plot(data['time'], z_error, label='Z Error')
+
+        plt.title('3D Position Error vs Time')
+        plt.xlabel('Time (s)')
+        plt.ylabel('Error (m)')
+        plt.legend()
+        plt.grid()
+        plt.savefig("Media/Test/Kinematics/3D_Position_Error_vs_Time.png")  # Save the figure as a PNG file
+        plt.show()
+
+        # plot the position error vs joint index
+        plt.figure(figsize=(10, 6))
+        plt.plot(data['joint'], data['desired_position'], label='Error')
+
+        plt.title('Position Error vs iteration')
+        plt.xlabel('Joint')
+        plt.ylabel('Error (m)')
+        plt.legend()
+        plt.grid()
+        plt.savefig("Media/Test/Kinematics/Position_Error_vs_Joint.png")  # Save the figure as a PNG file
+        plt.show()
+
+        # plot the orientation error vs iteration
+        plt.figure(figsize=(10, 6))
+        plt.plot(data['joint'], data['actual_position'], label='Orientation Error')
+        plt.title('Orientation Error vs iteration')
+        plt.xlabel('Iteration')
+        plt.ylabel('Orientation Error (rad)')
+        plt.legend()
+        plt.grid()
+        plt.savefig("Media/Test/Kinematics/Orientation_Error_vs_iteration.png")  # Save the figure as a PNG file
+        plt.show()
+
+        # plot the number of successful simulations vs iteration
+        plt.figure(figsize=(10, 6))
+        plt.plot(data['joint'], [succesful_tests for _ in range(len(data['joint']))], label='successful simulations')
+        plt.title('successful simulations vs iteration')
+        plt.xlabel('iteration')
+        plt.ylabel('successful simulations')
+        plt.legend()
+        plt.grid()
+        plt.savefig("Media/Test/Kinematics/Successful_Simulations_vs_iteration.png")  # Save the figure as a PNG file
+        plt.show()
+
+        # Calculate average and maximum errors for pose and orientation
+        average_pose_error = data["desired_position"].abs().mean()
+        max_pose_error = data["desired_position"].abs().max()
+        average_orientation_error = data["actual_position"].abs().mean()
+        max_orientation_error = data["actual_position"].abs().max()
+
+        print(f"Average Pose Error: {average_pose_error}")
+        print(f"Max Pose Error: {max_pose_error}")
+        print(f"Average Orientation Error: {average_orientation_error}")
+        print(f"Max Orientation Error: {max_orientation_error}")
+
+        # Generate a bar plot for average and maximum errors for pose and orientation
+        plt.figure(figsize=(10, 6))
+        plt.bar(["Avrg Pose", "Max Pose", "Avrg orientation", "Max Orientation"],
+                [average_pose_error, max_pose_error, average_orientation_error, max_orientation_error],
+                color=['blue', 'orange', 'green', 'red']
+                )
+
+        plt.title('Error Statistics')
+        plt.xlabel('Error Type')
+        plt.ylabel('Error (m)')
+        plt.legend()
+        plt.grid()
+        plt.savefig("Media/Test/Kinematics/Error_Statistics.png")  # Save the figure as a PNG file
+        plt.show()
 
 
 def plot_joint_data(log_file):
@@ -308,7 +394,10 @@ class RobotLogger:
             end_time (float, optional): If specified, logging will stop after this time (in seconds).
         """
         elapsed = time.perf_counter() - self.start_time
-        error = desired_position - actual_position
+        if Constants.Simulation.KIND_OF_TEST is not 'vision':
+            error = desired_position - actual_position
+        else:
+            error = 0
 
         # If an end_time is specified and the elapsed time exceeds it, stop logging and close the file
         if end_time is not None and elapsed > end_time:

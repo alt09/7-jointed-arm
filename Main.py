@@ -10,7 +10,8 @@ def main():
 
         print("Simulation is disabled. Running tests instead.")
         import tests
-        tests.test_kinematics(10000)
+        # tests.test_kinematics(10000)
+        tests.test_vision(1000) # number of tests must be a perfect cube (1, 8, 27, 64, 125, 216, 343, 512, 729, 1000)
 
 if __name__ == "__main__":
     main()

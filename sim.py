@@ -8,7 +8,6 @@ from Utils import logger, utils
 
 
 def sim():
-
     """
     Runs the PyBullet simulation.
     """
@@ -23,7 +22,6 @@ def sim():
     log = logger.RobotLogger()
     dt = 1.0 / 240.0  # Simulation time step
     
-
     #p.loadURDF("plane.urdf")  # load the plane
     arm_id = p.loadURDF("URDF/arm.urdf", basePosition=constants.Constants.Robot.ARM_BASE_POSITION, useFixedBase=True)
     r2d2_id = p.loadURDF("r2d2.urdf", basePosition=constants.Constants.Robot.R2D2_BASE_POSITION, useFixedBase=True)

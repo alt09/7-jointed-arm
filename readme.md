@@ -127,22 +127,25 @@ The dimensions and joint arrangements shown above are my estimates created only 
 ## Vision
 ### Set up
 
-- Number of tests: 180
-- Object: 0.1m radius sphere
-- best before 10.4037 m
+- Number of tests: 1000
+- Object: sphere2.urdf
+- change DETECT_COLOR_MIN Constant to [0, 0, 0] (to detect all colors)
 
-```The error can depend on the shape of the object and where the center is located. A circle and sphere are the best shapes to test the accuracy)```
+```The error can depend on the shape of the object and where the centeroid is located. A circle and sphere are the best shapes to test the accuracy)```
 
-### Filtered 
-- Mean error: 0.08363053329379369 m
-- Median error: 0.07358221298563601 m
-- Maximum error: 0.15566874517459925 m 
-- Acceptance rate: 98.33333333333333%
-- Number of acceptable tests: 177/180
-### Raw
-- Mean error: 0.08383519893634735 m
-- Median error: 0.07358224200916538 m
-- Maximum error: 0.15566874517459925 m
-- Number of acceptable tests: 180
+### Error mesurements  
+- Mean error: 0.09076341669262535 m
+- Maximum error: 8.911642841986879 m  
+``` only once happend, and it was the last value before stopping detecting targets ```
+- Detection rate: 66.5%
+- Number of accepted tests: 665/1000
+``` The error is caused by not being able to detect the object correctly (because it was too far)```
+- best before 6.519202405202649 m
 
-the filer and raw results are very similar, this proves that the triangular error filter rejects only a small number of measurements. 
+
+### Results 
+The mean position error across accepted detections was approximately 9.08 cm. The maximum error of 8.91 m occurred only once, in the final measurement before target detection stopped, this affects the mean error, so in a average scenario it should be less than the obtained results.
+
+The primary limitation is the detection range. As the target moves farther away, the vision system becomes less reliable, resulting in missed detections and occasional large position errors.
+
+The best tested distance was approximately 6.52 m.
