@@ -89,8 +89,10 @@ def inverse_kinematics(target_position,target_orientation,initial_q=None,max_ite
         if np.linalg.norm(error) < tolerance:
 
             print(f"IK converged in {i} iterations.")
-
-            return q
+            if max_iterations != 1000:
+                return q, i
+            else:
+                return q
         
         # Compute the Jacobian matrix for the current joint angles
         J = utils.calculate_jacobian(q)
@@ -119,5 +121,7 @@ def inverse_kinematics(target_position,target_orientation,initial_q=None,max_ite
         
     # If the maximum number of iterations is reached without convergence, print a message and return the current joint angles
     print(f"IK did not converge after {max_iterations} iterations. ")
-
-    return q
+    if max_iterations != 1000:
+        return q, max_iterations
+    else:
+        return q

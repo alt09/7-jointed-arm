@@ -109,18 +109,20 @@ The dimensions and joint arrangements shown above are my estimates created only 
 # accuracy  
 ## Inverse kinematics
 - Number of tests: 10,000
-- Reachable targets: 9,108/9,816
-- Reachable target success rate:  91.8%
-- Unreachable targets: 892/10,000 (8.9%)
+- Reachable targets: 9,335/10000
+- Reachable target success rate: 93.35%
+- Unreachable targets: 665/10,000 (6.65%)
+- Max iterations reached: 665/10000 (6.65%)
   
-```The unreachable targets are most likely caused by physically impossible positions, such as targets located inside the robotic arm or outside its reachable workspace.```
+```The unreachable targets are most likely caused by physically impossible positions, such as targets located inside the robotic arm or singularities```
 
-### Pose
-- Average Position Error: 0.000051 m
-- Max Position Error: 0.000099 m
+### Position
+- Average Position Error: 0.0000476238 m
+- Max Position Error: 0.0000989956 m
+
 ### Orientation
-- Average Orientation Error: 0.000067 rad (0.0038°)
-- Max Orientation Error: 0.000141 rad (0.0081°)
+- Average Orientation Error: 0.0000487156 rad (0.002791°)
+- Max Orientation Error: 0.0000999895 rad (0.005729°)
   
 ## Vision
 ### Set up

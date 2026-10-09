@@ -2,6 +2,11 @@ import numpy as np
 
 
 class Constants:
+
+    class Simulation:
+
+        ENABLE_SIMULATION = False # enable or disable the simulation, if set to False, the tests will run
+
     class Camera:
 
         WIDTH = 320 # width of the camera image

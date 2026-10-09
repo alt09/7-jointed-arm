@@ -1,9 +1,6 @@
-
-import time
 import numpy as np
 import pybullet as p
 import pybullet_data
-import math
 import constants
 from Movement import kinematics, dodge, robot_controller, trajectory
 from Vision import opencv
@@ -126,7 +123,7 @@ def sim():
                     actual_velocity=actual_velocity,
                     additional_info=robot_controller.get_end_effector_state(arm_id)[0],  # Log the end effector position as additional info
                     target_position=last_target_position.tolist(),
-                    end_time=10.0  # Stop logging after 10 seconds
+                    end_time=10.0  # Stop logging after 10 seconds 
                 )
     
     finally:  
