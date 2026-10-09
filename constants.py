@@ -5,7 +5,7 @@ class Constants:
 
     class Simulation:
 
-        ENABLE_SIMULATION = False # enable or disable the simulation, if set to False, the tests will run
+        ENABLE_SIMULATION = True # enable or disable the simulation, if set to False, the tests will run
         KIND_OF_TEST = 'vision' # 'kinematics' or 'vision' or 'all', if set to 'all', both tests will run
 
     class Camera:
@@ -14,7 +14,7 @@ class Constants:
         HEIGHT = 240 # height of the camera image
         FOV = 60 # Field of View in degrees
         DETECT_COLOR_MAX = [0, 0, 255]  # Bright color for detection
-        DETECT_COLOR_MIN = [0, 0, 0]   # Dark color for detection
+        DETECT_COLOR_MIN = [0, 0, 55]   # Dark color for detection
 
     class Robot:
 

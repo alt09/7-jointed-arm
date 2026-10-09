@@ -30,7 +30,8 @@ python Main.py
 - Position error checking
 - Last-known-target tracking when the target is temporarily out of sight
 
-
+## Demo 
+![](/Media/Demo/Video%20Project%202.gif)
 ## Reference Data:
 - source: https://www.asc-csa.gc.ca/eng/iss/canadarm2/canadarm-canadarm2-canadarm3-comparative-table.asp 
 - Length = 8.5m long arm 
@@ -123,7 +124,10 @@ The dimensions and joint arrangements shown above are my estimates created only 
 ### Orientation
 - Average Orientation Error: 0.0000487156 rad (0.002791°)
 - Max Orientation Error: 0.0000999895 rad (0.005729°)
-  
+
+### Media
+![image](/Media/Test/Kinematics/Error_Statistics.png)
+![image](/Media/Test/Kinematics/Successful_Simulations_vs_iteration.png)
 ## Vision
 ### Set up
 
@@ -142,10 +146,15 @@ The dimensions and joint arrangements shown above are my estimates created only 
 ``` The error is caused by not being able to detect the object correctly (because it was too far)```
 - best before 6.519202405202649 m
 
-
 ### Results 
 The mean position error across accepted detections was approximately 9.08 cm. The maximum error of 8.91 m occurred only once, in the final measurement before target detection stopped, this affects the mean error, so in a average scenario it should be less than the obtained results.
 
 The primary limitation is the detection range. As the target moves farther away, the vision system becomes less reliable, resulting in missed detections and occasional large position errors.
 
 The best tested distance was approximately 6.52 m.
+
+### Media
+
+![image](/Media/Test/Vision/Best_Vision_Distance.png)
+![image](/Media/Test/Vision/Vision_Position_Error_Statistics.png)
+![image](/Media/Test/Vision/Vision_Position_vs_iteration.png)
