@@ -2,6 +2,13 @@ import numpy as np
 
 
 class Constants:
+
+    class Simulation:
+
+        ENABLE_SIMULATION = False # enable or disable the simulation, if set to False, the tests will run
+        KIND_OF_TEST = 'vision' # 'kinematics' or 'vision' 
+        NUMBER_OF_TESTS = 10000 if KIND_OF_TEST != 'vision' else 27 # number of tests to run, if KIND_OF_TEST is 'kinematics', it can be any number, if KIND_OF_TEST is 'vision', it must be a perfect cube (1, 8, 27, 64, 125, 216, 343, 512, 729, 1000)
+    
     class Camera:
 
         WIDTH = 320 # width of the camera image
@@ -56,9 +63,9 @@ class Constants:
             3.124
         ]) # Maximum joint angles
         
-        TARGET_SEPARATION = 0 # Separation in meters between the target and the end effector when the end effector is at the target position
+        TARGET_SEPARATION = 0.01 # Separation in meters between the target and the end effector when the end effector is at the target position
 
-        DESIRED_SETTLING_TIME = 0.4 # Desired settling time in seconds for the end effector to reach the target position
+        DESIRED_SETTLING_TIME = 0.2 # Desired settling time in seconds for the end effector to reach the target position
 
         DAMPING_RATIO = 1 # Damping ratio for the end effector's motion to the target position
 

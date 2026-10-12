@@ -5,7 +5,7 @@ import constants
 import numpy as np
 
 
-def close_to_target(viewMatrix1, viewMatrix2, projectionMatrix, rgba_img1, rgba_img2, arm_id, last_q_solution, last_target_position, endeffector_info, separation=2):
+def close_to_target(viewMatrix1, viewMatrix2, projectionMatrix, rgba_img1, rgba_img2, arm_id, last_q_solution, last_target_position, endeffector_info, separation=2, test_pose=None):
     """
     Determines if the end effector is close to the target.
     Args:
@@ -28,6 +28,9 @@ def close_to_target(viewMatrix1, viewMatrix2, projectionMatrix, rgba_img1, rgba_
     is_close = False
     is_seeing_target = False
 
+    if test_pose is not None:
+        endeffector_info = test_pose
+
     caminfo = opencv.target_3d_pose(
         viewMatrix1,
         viewMatrix2,
@@ -41,7 +44,7 @@ def close_to_target(viewMatrix1, viewMatrix2, projectionMatrix, rgba_img1, rgba_
     if caminfo is not None:
 
         if caminfo[1] < 0.05: # 0.05 is the triangulation error threshold, if the error is less than this value, we consider the target to be detected
-
+            
             pose = caminfo[0]
 
             print("Target pose:", pose)
@@ -69,6 +72,10 @@ def close_to_target(viewMatrix1, viewMatrix2, projectionMatrix, rgba_img1, rgba_
                 yaw, pitch = robot_controller.auto_aim(pose, viewMatrix1, viewMatrix2)
                 roll = np.radians(0)
                 target_orientation = utils.rpy_rotation(roll, pitch, yaw)
+
+                if arm_id is None:
+                    print("Arm ID is None. Cannot compute inverse kinematics.")
+                    return last_q_solution, pose, is_close, is_seeing_target
                 q_solution = kinematics.inverse_kinematics(pose,target_orientation,robot_controller.get_current_joint_positions(arm_id))
                 last_q_solution = q_solution
                 last_target_position = pose

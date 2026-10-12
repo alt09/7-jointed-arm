@@ -201,7 +201,7 @@ def stay(arm_id):
 
         set_joint_velocities(i, 0, arm_id)
 
-def go_to_PD(arm_id, last_q_solution):
+def go_to_PD(arm_id, last_q_solution,target_velocity=0.0):
     """
     Moves the robotic arm to a target position using a PD controller.
     Args:
@@ -214,7 +214,7 @@ def go_to_PD(arm_id, last_q_solution):
 
     if last_q_solution is not None:
         for joint_index, I_eff in enumerate(effective_inertias):
-            set_joint_position_PD(joint_index, last_q_solution[joint_index], arm_id, I_eff)
+            set_joint_position_PD(joint_index, last_q_solution[joint_index], arm_id, I_eff, target_velocity[joint_index])
 
 def get_current_joint_positions(arm_id):
     """
@@ -257,7 +257,7 @@ def get_joint_info(arm_id):
 
     return joint_info
 
-def set_joint_position_PD(joint_index, target_position, arm_id, I_eff):
+def set_joint_position_PD(joint_index, target_position, arm_id, I_eff,target_velocity=0.0):
     """
     Sets the position of a specific joint in the robotic arm using a PD controller.
     Args:
@@ -269,7 +269,7 @@ def set_joint_position_PD(joint_index, target_position, arm_id, I_eff):
 
     current_position, current_velocity,_ ,__ = p.getJointState(arm_id, joint_index)
 
-    control_torque = pid.calculate_torque(I_eff, target_position, 0.0, current_position, current_velocity)
+    control_torque = pid.calculate_torque(I_eff, target_position, target_velocity, current_position, current_velocity)
 
     p.setJointMotorControl2(
         arm_id,
