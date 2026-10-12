@@ -6,8 +6,9 @@ class Constants:
     class Simulation:
 
         ENABLE_SIMULATION = False # enable or disable the simulation, if set to False, the tests will run
-        KIND_OF_TEST = 'vision' # 'kinematics' or 'vision' or 'all', if set to 'all', both tests will run
-
+        KIND_OF_TEST = 'vision' # 'kinematics' or 'vision' 
+        NUMBER_OF_TESTS = 10000 if KIND_OF_TEST != 'vision' else 27 # number of tests to run, if KIND_OF_TEST is 'kinematics', it can be any number, if KIND_OF_TEST is 'vision', it must be a perfect cube (1, 8, 27, 64, 125, 216, 343, 512, 729, 1000)
+    
     class Camera:
 
         WIDTH = 320 # width of the camera image

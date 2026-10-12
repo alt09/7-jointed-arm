@@ -9,9 +9,17 @@ def main():
     else:
 
         print("Simulation is disabled. Running tests instead.")
-        import tests
-        # tests.test_kinematics(100)
-        tests.test_vision(27) # number of tests must be a perfect cube (1, 8, 27, 64, 125, 216, 343, 512, 729, 1000)
+
+        from Tests import test_kinematics, test_vision
+
+        if Constants.Simulation.KIND_OF_TEST == 'kinematics':
+        
+            test_kinematics.test_kinematics(Constants.Simulation.NUMBER_OF_TESTS)
+        
+        if Constants.Simulation.KIND_OF_TEST == 'vision':
+        
+            test_vision.test_vision(Constants.Simulation.NUMBER_OF_TESTS)
+
 
 if __name__ == "__main__":
     main()

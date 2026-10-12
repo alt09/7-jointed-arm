@@ -395,8 +395,11 @@ class RobotLogger:
         """
         elapsed = time.perf_counter() - self.start_time
         if Constants.Simulation.KIND_OF_TEST is not 'vision':
+            
             error = desired_position - actual_position
+
         else:
+
             error = 0
 
         # If an end_time is specified and the elapsed time exceeds it, stop logging and close the file
@@ -441,16 +444,17 @@ class RobotLogger:
         """
 
         elapsed = time.perf_counter() - self.start_time
+        
         if Constants.Simulation.KIND_OF_TEST is 'kinematics':
+           
             test_number = any1
             pose_error = any2
             orientation_error = any3
             actual_velocity = any4
             target_orientation = any5
             target_position = any6
-            position_solution = any7
 
-            error = any2 -any3
+            error = pose_error + orientation_error
 
 
             self.writer.writerow([
@@ -463,8 +467,8 @@ class RobotLogger:
             target_orientation,
             target_position
             ])
+        
         if Constants.Simulation.KIND_OF_TEST is 'vision':
-            
 
             iterations = any1
             target_position = any2
@@ -483,6 +487,7 @@ class RobotLogger:
             can_see,
             actual_target_position
             ])
+        
 
         # If an end_time is specified and the elapsed time exceeds it, stop logging and close the file
         if end_time is not None and elapsed > end_time:
