@@ -29,6 +29,8 @@ python Main.py
 - Forward kinematics
 - Position error checking
 - Last-known-target tracking when the target is temporarily out of sight
+- Trajectory generation 
+- Feedback control using PD controller 
 
 ## Demo 
 ![](/Media/Demo/Video%20Project%202.gif)
@@ -106,6 +108,8 @@ The dimensions and joint arrangements shown above are my estimates created only 
 - Forward kinematics
 - Numpy
 - 3D triangulation
+- Motion and control
+- Validation
 
 # accuracy  
 ## Inverse kinematics
@@ -114,6 +118,7 @@ The dimensions and joint arrangements shown above are my estimates created only 
 - Reachable target success rate: 93.35%
 - Unreachable targets: 665/10,000 (6.65%)
 - Max iterations reached: 665/10000 (6.65%)
+
   
 ```The unreachable targets are most likely caused by physically impossible positions, such as targets located inside the robotic arm or singularities```
 
