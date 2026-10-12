@@ -1,9 +1,6 @@
-
-import time
 import numpy as np
 import pybullet as p
 import pybullet_data
-import math
 import constants
 from Movement import kinematics, dodge, robot_controller, trajectory
 from Vision import opencv
@@ -11,7 +8,6 @@ from Utils import logger, utils
 
 
 def sim():
-
     """
     Runs the PyBullet simulation.
     """
@@ -26,7 +22,6 @@ def sim():
     log = logger.RobotLogger()
     dt = 1.0 / 240.0  # Simulation time step
     
-
     #p.loadURDF("plane.urdf")  # load the plane
     arm_id = p.loadURDF("URDF/arm.urdf", basePosition=constants.Constants.Robot.ARM_BASE_POSITION, useFixedBase=True)
     r2d2_id = p.loadURDF("r2d2.urdf", basePosition=constants.Constants.Robot.R2D2_BASE_POSITION, useFixedBase=True)
@@ -126,7 +121,7 @@ def sim():
                     actual_velocity=actual_velocity,
                     additional_info=robot_controller.get_end_effector_state(arm_id)[0],  # Log the end effector position as additional info
                     target_position=last_target_position.tolist(),
-                    end_time=10.0  # Stop logging after 10 seconds
+                    end_time=10.0  # Stop logging after 10 seconds 
                 )
     
     finally:  

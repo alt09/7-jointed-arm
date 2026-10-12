@@ -1,3 +1,5 @@
 pybullet==3.2.7
 numpy==2.5.2
 pandas==3.0.6
+opencv-python== 5.0.0.93
+matplotlib==3.11.1
