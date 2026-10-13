@@ -13,8 +13,8 @@ def sim():
     """
     print("Starting PyBullet simulation...")
 
-    last_q_solution = None
-    last_target_position = None
+    last_q_solution = (0,0,0,0,0,0,0)  # Initialize last_q_solution with a default value
+    last_target_position = None  # Initialize last_target_position with a default value
     client = p.connect(p.GUI)
     p.setAdditionalSearchPath(pybullet_data.getDataPath())
     p.setGravity(0, 0, 0)
@@ -24,7 +24,7 @@ def sim():
     
     #p.loadURDF("plane.urdf")  # load the plane
     arm_id = p.loadURDF("URDF/arm.urdf", basePosition=constants.Constants.Robot.ARM_BASE_POSITION, useFixedBase=True)
-    r2d2_id = p.loadURDF("r2d2.urdf", basePosition=constants.Constants.Robot.R2D2_BASE_POSITION, useFixedBase=True)
+    # r2d2_id = p.loadURDF("r2d2.urdf", basePosition=constants.Constants.Robot.R2D2_BASE_POSITION, useFixedBase=True)
 
     # Disable default motor control for all joints
     for joint_index in range(7):
@@ -70,12 +70,14 @@ def sim():
             # get the current joint positions and velocities
             q_current = []
             qdot_current = []
+            
 
             for joint in range(7):
 
                 joint_state = p.getJointState(arm_id, joint)
                 qdot_current.append(joint_state[1])  # joint velocity
                 q_current.append(joint_state[0])  # joint position
+
 
             # generate a trajectory from the current joint positions to the goal joint positions
             traj = trajectory.generate_trajectory(
@@ -87,10 +89,10 @@ def sim():
             )
 
             # remove the previous R2D2 model if it exists
-            if r2d2_id is not None:
+            # if r2d2_id is not None:
 
-                p.removeBody(r2d2_id)
-                r2d2_id = None
+            #     p.removeBody(r2d2_id)
+            #     r2d2_id = None
             
             # follow the generated trajectory
             trajectory.follow_trajectory(arm_id, traj) 
@@ -120,7 +122,7 @@ def sim():
                     actual_position=actual_position,
                     actual_velocity=actual_velocity,
                     additional_info=robot_controller.get_end_effector_state(arm_id)[0],  # Log the end effector position as additional info
-                    target_position=last_target_position.tolist(),
+                    target_position=last_target_position.tolist() if last_target_position is None else robot_controller.get_end_effector_state(arm_id)[0],  # Log the last known target position or the end effector position if no target is known
                     end_time=10.0  # Stop logging after 10 seconds 
                 )
     
