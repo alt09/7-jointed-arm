@@ -19,7 +19,7 @@ def test_logger(log_file, succesful_tests=None, kind='all'):
     # Read the log file into a pandas DataFrame
     data = pd.read_csv(log_file)
 
-    if kind is 'vision' or kind is 'all':
+    if kind == 'vision' or kind == 'all':
 
         position_vision = data['desired_position']
         position_3d =position_vision.apply(eval)
@@ -101,7 +101,8 @@ def test_logger(log_file, succesful_tests=None, kind='all'):
         plt.show()
 
 
-    if kind is 'kinematics' or kind is 'all':
+
+    if kind == 'kinematics' or kind == 'all':
 
         # Extract the 3D position and target position data from the DataFrame
         position_3d_data = data['additional_info']
@@ -394,7 +395,7 @@ class RobotLogger:
             end_time (float, optional): If specified, logging will stop after this time (in seconds).
         """
         elapsed = time.perf_counter() - self.start_time
-        if Constants.Simulation.KIND_OF_TEST is not 'vision':
+        if Constants.Simulation.KIND_OF_TEST != 'vision':
             
             error = desired_position - actual_position
 
@@ -445,7 +446,7 @@ class RobotLogger:
 
         elapsed = time.perf_counter() - self.start_time
         
-        if Constants.Simulation.KIND_OF_TEST is 'kinematics':
+        if Constants.Simulation.KIND_OF_TEST == 'kinematics':
            
             test_number = any1
             pose_error = any2
@@ -468,7 +469,7 @@ class RobotLogger:
             target_position
             ])
         
-        if Constants.Simulation.KIND_OF_TEST is 'vision':
+        if Constants.Simulation.KIND_OF_TEST == 'vision':
 
             iterations = any1
             target_position = any2

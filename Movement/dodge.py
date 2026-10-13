@@ -30,7 +30,8 @@ def close_to_target(viewMatrix1, viewMatrix2, projectionMatrix, rgba_img1, rgba_
 
     if test_pose is not None:
         endeffector_info = test_pose
-
+    if last_target_position is None:
+        last_target_position = endeffector_info[0]  # Initialize last_target_position with the current end effector position
     caminfo = opencv.target_3d_pose(
         viewMatrix1,
         viewMatrix2,
