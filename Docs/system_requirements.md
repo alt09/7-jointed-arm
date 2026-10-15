@@ -3,7 +3,7 @@
 ## 7-Jointed Robotic Arm Simulation
 
 **Document ID:** SRS-001  
-**Version:** 1.0  
+**Version:** 1.1 
 **Status:** Approved   
 **Project:** 7 Jointed Arm  
 **System Type:** Robotic arm simulation and software verification
@@ -19,8 +19,8 @@ The purpose of this project is to develop a 7 jointed robotic arm simulation tha
 - 7 jointed arm model
 - Simulated environment using PyBullet.
 - Stereo vision and 3D target triangulation.
-- forward kinematics (FK).
-- inverse kinematics (IK).
+- Forward kinematics (FK).
+- Inverse kinematics (IK).
 - Joint trajectory generation.
 - Joint level motion control.
 - Target tracking.
@@ -120,5 +120,6 @@ Failed or incomplete tests shall be documented with their limitations and curren
 
 | Version | Description |
 |---|---|
-| 1 | First version of the system requirements specification. |
+| 1.0 | First of the system requirements specification. |
+| 1.1 | First review changes of the system requirements. |
 
