@@ -105,11 +105,11 @@ Simultaneously, it records measurements and errors to analyze them later.
 |---|---|---|---|
 | PERF-001 | FK accuracy | FK solutions should mantein a maximum error below 1cm | Analysis
 | PERF-002 | IK accuracy | IK solutions should mantein a maximum error below 1cm | Analysis
-| PERF-003 | Vision accuracy | the maximum target 3D pose error should be below 10 cm
-| PERF-004 | Settling time | the controller should settle within 0.2 seconds| Analysis
+| PERF-003 | Vision accuracy | the maximum target 3D pose error should be below 10 cm | Test
+| PERF-004 | Settling time | the controller should settle within 0.2 seconds | Analysis
 
 ## 8. Verification and Acceptance
-
+undetermined,
 Each system requirement is linked to one or more verification procedures and annotated in the requirements traceability.cvs file.
 
 A requirement shall be marked **Pass** only after its defined acceptance criteria have been evaluated
