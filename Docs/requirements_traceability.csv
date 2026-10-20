@@ -1,22 +1,22 @@
 ID,Code location,Test_ID,Acceptance criteria,Status,Version_tested,Notes
-NEED-001,Movement,Test-001,"The arm is with in 3cm of the target position.",Undetermined,IDK My laundry room doesn't have wifi LOL,N/A
-NEED-002,Vision,Test-002,"Target position should be within 10cm error .",Undetermined,IDK My laundry room doesn't have wifi LOL,N/A
-NEED-003,Trajectory,Test-003,"The arm follows each step of the trajectory.",Undetermined,IDK My laundry room doesn't have wifi LOL,N/A
-NEED-004,All,Test-004,"The system should not crash after receiving invalid measurements.",Undetermined,IDK My laundry room doesn't have wifi LOL,N/A
-NEED-005,Logger,Test-005,"The logger should show graphs showing the performance of the arm.",Undetermined,IDK My laundry room doesn't have wifi LOL,N/A
-SYS-001,URDF\arm.urdf,Test-006,"The robot model in the simulation should contain seven independent joints.",Undetermined,IDK My laundry room doesn't have wifi LOL,N/A
-SYS-002,All,Test-007,"The robot arm should reach the target position.",Undetermined,IDK My laundry room doesn't have wifi LOL,N/A
-KIN-001,Movement\kinematics.py,Test-008,"FK error should be less than the error limit.",Undetermined,IDK My laundry room doesn't have wifi LOL,N/A
-KIN-002,Movement\kinematics.py,Test-009,"IK error should be less than the error limit, and should respect joint limits and impossible.",Undetermined,IDK My laundry room doesn't have wifi LOL,N/A
-KIN-003,Movement\kinematics.py,Test-010,"The IK should report failure when it can not find a valid solution.",Undetermined,IDK My laundry room doesn't have wifi LOL,N/A
-VIS-001,Vision\opencv.py,Test-011,"The vision subsystem should estimate the 3D position of the target using the simulated cameras, satisfying the triangulation error and an error tolerance.",Undetermined,IDK My laundry room doesn't have wifi LOL,N/A
-VIS-002,Vision\opencv.py,Test-012,"The vision subsystem should reject measurements when a triangulation error exceeds 0.05.",Undetermined,IDK My laundry room doesn't have wifi LOL,N/A
-VIS-003,Vision\opencv.py,Test-013,"The vision should be able to retain the last valid target 3D pose when the target is undetectable.",Undetermined,IDK My laundry room doesn't have wifi LOL,N/A
-MOT-002,Movement\trajectory.py,Test-014,"The calculated joint velocities should not exceed the joint velocity limits.",Undetermined,IDK My laundry room doesn't have wifi LOL,N/A
-MOT-001,Movement\trajectory.py,Test-015,"The calculated joint acceleration should not exceed the joint acceleration limits.",Undetermined,IDK My laundry room doesn't have wifi LOL,N/A
-CTRL-001,Utils\pid.py,Test-016,"The controller should bring the end effector to the target position within the settling time.",Undetermined,IDK My laundry room doesn't have wifi LOL,N/A
-LOG-001,Utils\logger.py,Test-017,"The log file contains the 3D target position and the actual 3D position as well as the position and target position of each joint.",Undetermined,IDK My laundry room doesn't have wifi LOL,N/A
-PERF-001,Movement\kinematics.py,Test-018,"FK solutions should mantein a maximum error below 1cm.",Undetermined,IDK My laundry room doesn't have wifi LOL,N/A
-PERF-002,Movement\kinematics.py,Test-019,"IK solutions should mantein a maximum error below 1cm.",Undetermined,IDK My laundry room doesn't have wifi LOL,N/A
-PERF-003,Vision\opencv.py,Test-020,"the maximum target 3D pose error should be below 10 cm.",Undetermined,IDK My laundry room doesn't have wifi LOL,N/A
-PERF-004,Utils\pid.py,Test-021,"the controller should settle within 0.2 seconds.",Undetermined,IDK My laundry room doesn't have wifi LOL,N/A
+NEED-001,Movement,Test-kinematics-001,"The arm is with in 3cm of the target position.",Not run,IDK My laundry room doesn't have wifi LOL,N/A
+NEED-002,Vision,Test-vision-001,"Target position should be within 10cm error .",Not run,IDK My laundry room doesn't have wifi LOL,N/A
+NEED-003,Trajectory,Test-trajectory-001,"The arm follows each step of the trajectory.",Not run,IDK My laundry room doesn't have wifi LOL,N/A
+NEED-004,All,Test-general-001,"The system should not crash after receiving invalid measurements.",Not run,IDK My laundry room doesn't have wifi LOL,N/A
+NEED-005,Logger,Test-general-001,"The logger should show graphs showing the performance of the arm.",Not run,IDK My laundry room doesn't have wifi LOL,N/A
+SYS-001,URDF\arm.urdf,Test-general-001,"The robot model in the simulation should contain seven independent joints.",Not run,IDK My laundry room doesn't have wifi LOL,N/A
+SYS-002,All,Test-general-001,"The robot arm should reach the target position.",Not run,IDK My laundry room doesn't have wifi LOL,N/A
+KIN-001,Movement\kinematics.py,Test-kinematics-001,"FK error should be less than the error limit.",Not run,IDK My laundry room doesn't have wifi LOL,N/A
+KIN-002,Movement\kinematics.py,Test-kinematics-001,"IK error should be less than the error limit, and should respect joint limits and impossible.",Not run,IDK My laundry room doesn't have wifi LOL,N/A
+KIN-003,Movement\kinematics.py,Test-kinematics-001,"The IK should report failure when it can not find a valid solution.",Not run,IDK My laundry room doesn't have wifi LOL,N/A
+VIS-001,Vision\opencv.py,Test-vision-001,"The vision subsystem should estimate the 3D position of the target using the simulated cameras, satisfying the triangulation error and an error tolerance.",Not run,IDK My laundry room doesn't have wifi LOL,N/A
+VIS-002,Vision\opencv.py,Test-vision-001,"The vision subsystem should reject measurements when a triangulation error exceeds 0.05.",Not run,IDK My laundry room doesn't have wifi LOL,N/A
+VIS-003,Vision\opencv.py,Test-general-001,"The vision should be able to retain the last valid target 3D pose when the target is undetectable.",Not run,IDK My laundry room doesn't have wifi LOL,N/A
+MOT-001,Movement\trajectory.py,Test-trajectory-001,"The calculated joint acceleration should not exceed the joint acceleration limits.",Not run,IDK My laundry room doesn't have wifi LOL,N/A
+MOT-002,Movement\trajectory.py,Test-trajectory-001,"The calculated joint velocities should not exceed the joint velocity limits.",Not run,IDK My laundry room doesn't have wifi LOL,N/A
+CTRL-001,Utils\pid.py,Test-trajectory-001,"The controller should bring the end effector to the target position within the settling time.",Not run,IDK My laundry room doesn't have wifi LOL,N/A
+LOG-001,Utils\logger.py,Test-general-001,"The log file contains the 3D target position and the actual 3D position as well as the position and target position of each joint.",Not run,IDK My laundry room doesn't have wifi LOL,N/A
+PERF-001,Movement\kinematics.py,Test-kinematics-001,"FK solutions should mantein a maximum error below 1cm.",Not run,IDK My laundry room doesn't have wifi LOL,N/A
+PERF-002,Movement\kinematics.py,Test-kinematics-001,"IK solutions should mantein a maximum error below 1cm.",Not run,IDK My laundry room doesn't have wifi LOL,N/A
+PERF-003,Vision\opencv.py,Test-vision-001,"the maximum target 3D pose error should be below 10 cm.",Not run,IDK My laundry room doesn't have wifi LOL,N/A
+PERF-004,Utils\pid.py,Test-trajectory-001,"the controller should settle within 0.2 seconds.",Not run,IDK My laundry room doesn't have wifi LOL,N/A

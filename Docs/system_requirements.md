@@ -51,13 +51,13 @@ Simultaneously, it records measurements and errors to analyze them later.
 
 ## 5. Stakeholder Needs
 
-| ID | Stakeholder need | Acceptance criteria
-|---|---|---|
-| NEED-001 | The arm should reach valid target poses. | The arm is within 3cm of the target position
-| NEED-002 | The system should estimate target positions using stereo vision. | Target position should be within 10cm error  
-| NEED-003 | The arm should follow trajectories within defined motion limits. | The arm follows each step of the trajectory
-| NEED-004 | The system should handle invalid measurements and failed solutions. | The system should not crash after receiving invalid measurements
-| NEED-005 | The developer should be able to reproduce and evaluate system performance. | The logger should show graphs showing the performance of the arm
+| ID | Stakeholder need | Acceptance criteria | Verification method
+|---|---|---|---|
+| NEED-001 | The arm should reach valid target poses. | The arm is within 3cm of the target position | Test
+| NEED-002 | The system should estimate target positions using stereo vision. | Target position should be within 10cm error | Test  
+| NEED-003 | The arm should follow trajectories within defined motion limits. | The arm follows each step of the trajectory | Test
+| NEED-004 | The system should handle invalid measurements and failed solutions. | The system should not crash after receiving invalid measurements | Demonstration
+| NEED-005 | The developer should be able to reproduce and evaluate system performance. | The logger should show graphs showing the performance of the arm  | Inspection/Demonstration
 
 ## 6. System Requirements
 
@@ -65,15 +65,15 @@ Simultaneously, it records measurements and errors to analyze them later.
 
 | ID | Name | Acceptance criteria | Verification method
 |---|---|---|---|
-| SYS-001 | Robot Configuration | The robot model in the simulation should contain seven independent joints. | Inspection/Test.
-| SYS-002 | Target to motion pipeline | The robot arm should reach the target position | Test
+| SYS-001 | Robot Configuration | The robot model in the simulation should contain seven independent joints. | Inspection
+| SYS-002 | Target to motion pipeline | The robot arm should reach the target position | Demonstration
 
 
 ### 6.2 Kinematics
 
 | ID | Name | Acceptance criteria | Verification method
 |---|---|---|---|
-| KIN-001 | Forward kinematics | FK error should be less than the error limit | Test\Inspection
+| KIN-001 | Forward kinematics | FK error should be less than the error limit | Analysis/Test
 | KIN-002 | Inverse kinematics | IK error should be less than the error limit, and should respect joint limits and impossible solutions | Test
 | KIN-003 | Unreachable target | The IK should report failure when it can not find a valid solution | Test
 
@@ -83,7 +83,7 @@ Simultaneously, it records measurements and errors to analyze them later.
 |---|---|---|---|
 | VIS-001 | Stereo target position | The vision subsystem should estimate the 3D position of the target using the simulated cameras, satisfying the triangulation error and an error tolerance | Test
 | VIS-002 | Measurement validation | The vision subsystem should reject measurements when a triangulation error exceeds 0.05| Test
-| VIS-003 | Target loss handling | The vision should be able to retain the last valid target 3D pose when the target is undetectable | Test
+| VIS-003 | Target loss handling | The vision should be able to retain the last valid target 3D pose when the target is undetectable | Inspection
 
 ### 6.4 Trajectory generation and control
 
@@ -115,6 +115,10 @@ Each system requirement is linked to one or more verification procedures and ann
 A requirement shall be marked **Pass** only after its defined acceptance criteria have been evaluated
 
 Failed or incomplete tests shall be documented with their limitations and current status in the notes and marked as **Failed**.
+
+**Not Run** Verification has not been executed
+
+**Blocked**	Verification cannot proceed because of an unresolved dependency or setup issue
 
 ## 9. Document Change History
 

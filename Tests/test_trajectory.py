@@ -1,0 +1,1 @@
+# aqui va a estar el test de la trayectoria, que va a ser un test de integración, que va a probar que el brazo puede seguir una trayectoria dada.

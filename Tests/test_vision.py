@@ -100,10 +100,10 @@ def test_vision(number_of_tests=8):
                 error = np.linalg.norm(np.array(last_target_position.tolist()) - np.array([j-size/2, i+7, k-size/2])) if last_target_position is not None else None
                 distance = np.linalg.norm(np.array([j-size/2, i+7, k-size/2]) - np.array([0.5,0.5,0]))
                 log.log_tests(
-                    any1=iterations, # instead of logging the joint index, we can log the test number
-                    any2 = (last_target_position.tolist() if last_target_position is not None else [0,0,0]),  # Log the Vision position as the desired position
-                    any3=error,  # Log the error as the actual position
-                    any4=distance,  # Log the distance as the actual velocity
+                    any1=iterations, #  we can log the test number
+                    any2 = (last_target_position.tolist() if last_target_position is not None else [0,0,0]),  # Log the Vision position 
+                    any3=error,  # Log the error 
+                    any4=distance,  # Log the distance 
                     any5=can_see if can_see else [False],  
                     any6=[j-size/2, i+7, k-size/2],
                 )
