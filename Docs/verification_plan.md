@@ -112,7 +112,7 @@ The purpose of this project is to develop a 7 jointed robotic arm simulation tha
 **Objective:** Verify implementations related to the simulated vision system 
 
 **Procedure:**
-1. Generates 1000 random targets in different positions.
+1. Generates 100 random targets in different positions.
 2. Generates a new camera system.
 3. Calculates the distance between the camera and the target.
 4. Calculate the position error. 

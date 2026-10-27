@@ -96,6 +96,7 @@ def test_vision(number_of_tests=8):
                 can_see.append(True)
 
                 error = np.linalg.norm(np.array(last_target_position.tolist()) - np.array([j-size/2, i+7, k-size/2])) if last_target_position is not None else None
+                print(f"Error: {error:.4f}" if error is not None else "Error: None")
                 distance = np.linalg.norm(np.array([j-size/2, i+7, k-size/2]) - np.array([0.5,0.5,0]))
                 log.log_tests(
                     any1=iterations, #  we can log the test number

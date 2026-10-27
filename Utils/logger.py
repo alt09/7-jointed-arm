@@ -23,7 +23,7 @@ def test_logger(log_file, succesful_tests=None, kind='all'):
     if kind == 'vision' or kind == 'all':
 
         position_vision = data['desired_position']
-        position_3d =position_vision.apply(eval)
+        position_3d = position_vision.apply(eval)
         # only use when position_vision is not None
         target_position_3d = data['target_position'].apply(eval)
         target_position_3d = target_position_3d[target_position_3d.notnull()]
@@ -49,7 +49,7 @@ def test_logger(log_file, succesful_tests=None, kind='all'):
         plt.show()
 
         plt.figure(figsize=(10, 6))
-        plt.plot(data['joint'], data['actual_position'], label='Vision Position Error')
+        plt.plot(data['joint'], data['position_error'], label='Vision Position Error')
         plt.title('Vision Position Error vs iteration')
         plt.xlabel('iteration')
         plt.ylabel('Position Error (m)')
@@ -60,7 +60,7 @@ def test_logger(log_file, succesful_tests=None, kind='all'):
 
 
         plt.figure(figsize=(10, 6))
-        plt.plot(data['actual_velocity'], data['actual_position'], label='Vision distance Error')
+        plt.plot(data['actual_velocity'], data['position_error'], label='Vision distance Error')
         plt.title('distance away of the camera from the target vs Pose error')
         plt.xlabel('Distance from target (m)')
         plt.ylabel('Position Error (m)') 
@@ -70,8 +70,8 @@ def test_logger(log_file, succesful_tests=None, kind='all'):
         plt.show()
 
         plt.figure(figsize=(10, 6))
-        average_vision_error = data["actual_position"].abs().mean()
-        max_vision_error = data["actual_position"].abs().max()
+        average_vision_error = data["position_error"].abs().mean()
+        max_vision_error = data["position_error"].abs().max()
         best_vision_error = data["actual_velocity"].abs().min()
 
         plt.bar(["Avrg Vision", "Max Vision"],
@@ -460,13 +460,8 @@ class RobotLogger:
             end_time (float, optional): If specified, logging will stop after this time (in seconds).
         """
         elapsed = time.perf_counter() - self.start_time
-        if Constants.Simulation.KIND_OF_TEST != 'vision':
-            
-            error = desired_position - actual_position
 
-        else:
-
-            error = 0
+        error = desired_position - actual_position
 
         # If an end_time is specified and the elapsed time exceeds it, stop logging and close the file
         if end_time is not None and elapsed > end_time:
@@ -568,7 +563,7 @@ class RobotLogger:
             iterations,
             target_position,
             actual_target_position,
-            0,
+            error,
             distance,
             can_see,
             actual_target_position

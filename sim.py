@@ -24,7 +24,7 @@ def sim():
     
     #p.loadURDF("plane.urdf")  # load the plane
     arm_id = p.loadURDF("URDF/arm.urdf", basePosition=constants.Constants.Robot.ARM_BASE_POSITION, useFixedBase=True)
-    # r2d2_id = p.loadURDF("r2d2.urdf", basePosition=constants.Constants.Robot.R2D2_BASE_POSITION, useFixedBase=True)
+    r2d2_id = p.loadURDF("r2d2.urdf", basePosition=constants.Constants.Robot.R2D2_BASE_POSITION, useFixedBase=True)
 
     # Disable default motor control for all joints
     for joint_index in range(7):
@@ -89,10 +89,10 @@ def sim():
             )
 
             # remove the previous R2D2 model if it exists
-            # if r2d2_id is not None:
+            if r2d2_id is not None:
 
-            #     p.removeBody(r2d2_id)
-            #     r2d2_id = None
+                p.removeBody(r2d2_id)
+                r2d2_id = None
             
             # follow the generated trajectory
             trajectory.follow_trajectory(arm_id, traj) 
