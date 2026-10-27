@@ -13,10 +13,10 @@ VIS-001,Vision\opencv.py,Test-vision-001,"The vision subsystem should estimate t
 VIS-002,Vision\opencv.py,Test-vision-001,"The vision subsystem should reject measurements when a triangulation error exceeds 0.05.",Not run,IDK My laundry room doesn't have wifi LOL,N/A
 VIS-003,Vision\opencv.py,Test-general-001,"The vision should be able to retain the last valid target 3D pose when the target is undetectable.",Not run,IDK My laundry room doesn't have wifi LOL,N/A
 MOT-001,Movement\trajectory.py,Test-trajectory-001,"The calculated joint acceleration should not exceed the joint acceleration limits.",Not run,IDK My laundry room doesn't have wifi LOL,N/A
-MOT-002,Movement\trajectory.py,Test-trajectory-001,"The calculated joint velocities should not exceed the joint velocity limits.",Not run,IDK My laundry room doesn't have wifi LOL,N/A
-CTRL-001,Utils\pid.py,Test-trajectory-001,"The controller should bring the end effector to the target position within the settling time.",Not run,IDK My laundry room doesn't have wifi LOL,N/A
+MOT-002,Movement\trajectory.py,Test-trajectory-001,"The calculated joint velocities should not exceed the joint velocity limits of 1 rad/second.",Not run,IDK My laundry room doesn't have wifi LOL,N/A
+CTRL-001,Utils\pid.py,Test-trajectory-001,"The controller should bring the end effector to the target position within the settling time of 1 rad/second.",Not run,IDK My laundry room doesn't have wifi LOL,N/A
 LOG-001,Utils\logger.py,Test-general-001,"The log file contains the 3D target position and the actual 3D position as well as the position and target position of each joint.",Not run,IDK My laundry room doesn't have wifi LOL,N/A
 PERF-001,Movement\kinematics.py,Test-kinematics-001,"FK solutions should mantein a maximum error below 1cm.",Not run,IDK My laundry room doesn't have wifi LOL,N/A
 PERF-002,Movement\kinematics.py,Test-kinematics-001,"IK solutions should mantein a maximum error below 1cm.",Not run,IDK My laundry room doesn't have wifi LOL,N/A
 PERF-003,Vision\opencv.py,Test-vision-001,"the maximum target 3D pose error should be below 10 cm.",Not run,IDK My laundry room doesn't have wifi LOL,N/A
-PERF-004,Utils\pid.py,Test-trajectory-001,"the controller should settle within 0.2 seconds.",Not run,IDK My laundry room doesn't have wifi LOL,N/A
+PERF-004,Utils\pid.py,Test-kinematics-001;Test-general-001,"the controller should settle within 0.2 seconds.",Not run,IDK My laundry room doesn't have wifi LOL,N/A

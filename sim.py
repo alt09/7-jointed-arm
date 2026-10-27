@@ -83,8 +83,8 @@ def sim():
             traj = trajectory.generate_trajectory(
                 q_start=np.array(q_current),
                 q_goal=np.array(q_goal),
-                max_velocity=np.array([1.0] * 7),  # max velocity for each joint
-                max_acceleration=np.array([1.0] * 7),  # max acceleration for each joint
+                max_velocity=constants.Constants.Robot.JOINT_MAX_VELOCITY,  # max velocity for each joint
+                max_acceleration=constants.Constants.Robot.JOINT_MAX_ACCELERATION,  # max acceleration for each joint
                 dt=dt
             )
 

@@ -90,7 +90,7 @@ Simultaneously, it records measurements and errors to analyze them later.
 | ID | Name | Acceptance criteria | Verification method
 |---|---|---|---|
 | MOT-001 | Joint velocity limit | The calculated joint velocities should not exceed the joint velocity limits | Analysis
-| MOT-002 | Joint acceleration limit | The calculated joint acceleration should not exceed the joint acceleration limits | Analysis
+| MOT-002 | Joint acceleration limit of 1 rad/second | The calculated joint acceleration should not exceed the joint acceleration limits of 1 rad/second | Analysis
 | CTRL-001| End effector settling | The controller should bring the end effector to the target position within the settling time. | Test
 
 ### 6.5 Logging and reliability

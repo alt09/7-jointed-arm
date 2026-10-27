@@ -19,6 +19,10 @@ def main():
         if Constants.Simulation.KIND_OF_TEST == 'vision':
         
             test_vision.test_vision(Constants.Simulation.NUMBER_OF_TESTS)
+        if Constants.Simulation.KIND_OF_TEST == 'trajectory':
+        
+            from Tests import test_trajectory
+            test_trajectory.test_trajectory(Constants.Simulation.NUMBER_OF_TESTS)
 
 
 if __name__ == "__main__":

@@ -5,8 +5,6 @@ from Movement import dodge
 from Vision import opencv
 from Utils import logger
 
-
-
 def test_vision(number_of_tests=8):
     """
     Test the vision functions.
