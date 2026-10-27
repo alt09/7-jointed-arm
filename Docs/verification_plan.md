@@ -135,7 +135,7 @@ The purpose of this project is to develop a 7 jointed robotic arm simulation tha
 ### 6.3 Trajectory generation 
 
 **Test ID:** Test-trajectory-001   
-**Requirements linked:** NEED-003, MOT-001, MOT-002, CTRL-001   
+**Requirements linked:** NEED-003, MOT-001, MOT-002       
 **Method:** Test and Analysis    
 
 **Objective:** Verify implementations related to the trajectory generation, including PID controller
