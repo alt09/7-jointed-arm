@@ -216,8 +216,6 @@ Each implementation must be defined by using coordinate frames used by the camer
 | Orientation error | Radians, where applicable |
 ## 6. Dependencies
 
-### 6.1 External dependencies
-
 | Dependency | Purpose |
 |---|---|
 | Python | Application and simulation logic |

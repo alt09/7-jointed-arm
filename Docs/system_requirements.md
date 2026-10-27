@@ -82,16 +82,16 @@ Simultaneously, it records measurements and errors to analyze them later.
 | ID | Name | Acceptance criteria | Verification method
 |---|---|---|---|
 | VIS-001 | Stereo target position | The vision subsystem should estimate the 3D position of the target using the simulated cameras, satisfying the triangulation error and an error tolerance | Test
-| VIS-002 | Measurement validation | The vision subsystem should reject measurements when a triangulation error exceeds 0.05| Test
+| VIS-002 | Measurement validation | The vision subsystem should reject measurements when a triangulation error exceeds 0.05 | Test
 | VIS-003 | Target loss handling | The vision should be able to retain the last valid target 3D pose when the target is undetectable | Inspection
 
 ### 6.4 Trajectory generation and control
 
 | ID | Name | Acceptance criteria | Verification method
 |---|---|---|---|
-| MOT-001 | Joint velocity limit1 rad/second | The calculated joint velocities should not exceed the joint velocity limits 1 rad/second | Analysis
-| MOT-002 | Joint acceleration limit of 1 rad/second^2 | The calculated joint acceleration should not exceed the joint acceleration limits of 1 rad/second^2 | Analysis
-| CTRL-001| End effector settling | The controller should bring the end effector to the target position within the settling time. | Test
+| MOT-001 | Joint velocity limit | The calculated joint velocities should not exceed the joint velocity limits 1 rad/second | Analysis
+| MOT-002 | Joint acceleration limit | The calculated joint acceleration should not exceed the joint acceleration limits of 1 rad/second^2 | Analysis
+| CTRL-001 | End effector settling | The controller should bring the end effector to the target position within the settling time. | Test
 
 ### 6.5 Logging and reliability
 

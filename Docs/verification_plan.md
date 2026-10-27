@@ -59,7 +59,7 @@ The purpose of this project is to develop a 7 jointed robotic arm simulation tha
 | Configuration | Version |
 |---|---|
 | Python | 3.14.0 |
-| Git commit hash and branch | a4f21efb7623a6645f80af2ccc28ee695c9ea4e4 : Feat#4-systems-engineering | 
+| Git commit number and branch | Feat#4-systems-engineering : commit #108 | 
 | OS | Windows 11 Home | 25H2 |
 
 ## 5. General Verification procedure 
