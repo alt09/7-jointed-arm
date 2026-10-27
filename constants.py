@@ -7,7 +7,12 @@ class Constants:
 
         ENABLE_SIMULATION = False # enable or disable the simulation, if set to False, the tests will run
         KIND_OF_TEST = 'trajectory' # 'kinematics' or 'vision' or 'trajectory'
-        NUMBER_OF_TESTS = 10 if KIND_OF_TEST != 'vision' else 27 # number of tests to run, if KIND_OF_TEST is 'kinematics', it can be any number, if KIND_OF_TEST is 'vision', it must be a perfect cube (1, 8, 27, 64, 125, 216, 343, 512, 729, 1000)
+        if KIND_OF_TEST == 'kinematics':
+            NUMBER_OF_TESTS = 10000
+        elif KIND_OF_TEST == 'vision':
+            NUMBER_OF_TESTS = 1000
+        else:
+            NUMBER_OF_TESTS = 100 # default to 10 tests if the kind of test is not recognized
 
     class Camera:
 
