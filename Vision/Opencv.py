@@ -15,7 +15,9 @@ def get_info_from_camera_image(endeffector_info, viewMatrix1=None, viewMatrix2=N
         tuple: A tuple containing the view matrices for both cameras, the projection matrix, and the RGBA images from both cameras.
     """
     if endeffector_info is not None:
+
         viewMatrix1, viewMatrix2 = get_view_matrix(endeffector_info)
+
     projectionMatrix = get_projection_matrix()
     img_arr1, img_arr2 = get_camera_images(viewMatrix1, viewMatrix2, projectionMatrix)
     rgba_img1 = extract_rgba_image(img_arr1)
@@ -59,6 +61,7 @@ def get_view_matrix(endeffector_info):
         roll = (180 / math.pi) * endeffector_info[3],
         upAxisIndex = 2
     )
+    
     return viewMatrix1, viewMatrix2
 
 def get_projection_matrix():
@@ -92,7 +95,9 @@ def get_camera_images(viewMatrix1, viewMatrix2, projectionMatrix, endeffector_in
     """
     # If endeffector_info is provided, compute the view matrices for both cameras
     if viewMatrix1 is None and viewMatrix2 is None:
+       
         viewMatrix1, viewMatrix2 = get_view_matrix(endeffector_info)
+   
     # Get camera images from both cameras
     img_arr1 = p.getCameraImage(
         constants.Constants.Camera.WIDTH,
@@ -119,7 +124,7 @@ def extract_rgba_image(img_arr):
     Returns:
         numpy.ndarray: The extracted RGBA image as a NumPy array.
     """
-    
+
     rgba_img = np.reshape(img_arr[2], (constants.Constants.Camera.HEIGHT, constants.Constants.Camera.WIDTH, 4)).astype(np.uint8)
     
     return rgba_img
@@ -134,6 +139,7 @@ def show_center_of_mass(endeffector_info, lower_color, upper_color):
             endeffector_info = endeffector_info
             )[0]
         )
+    
     rgba_img2 = extract_rgba_image(
         get_camera_images(
             viewMatrix1 = None,
@@ -142,6 +148,7 @@ def show_center_of_mass(endeffector_info, lower_color, upper_color):
             endeffector_info = endeffector_info
             )[1]
         )
+    
     center_of_mass(rgba_img1, lower_color, upper_color, "Left")
     center_of_mass(rgba_img2, lower_color, upper_color, "Right")
 

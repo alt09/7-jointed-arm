@@ -52,12 +52,12 @@ def test_kinematics(number_of_tests=10):
         print("orientation_error:", orientation_error)
 
         log.log_tests(
-            any1=i, # instead of logging the joint index, we can log the test number
-            any2=pose_error,  # Log the pose error as the desired position
-            any3=orientation_error,  # Log the orientation error as the actual position
-            any4=[yaw, pitch, roll],  # Log the random orientation as the actual velocity
-            any5=position_solution.tolist(),  
-            any6=random_3d_pose,
+            any1=i, # Log the test number
+            any2=pose_error,  # Log the pose error 
+            any3=orientation_error,  # Log the orientation error 
+            any4=[yaw, pitch, roll],  # Log the random orientation 
+            any5=position_solution.tolist(), # Log the position solution
+            any6=random_3d_pose, # Log the random 3D pose
         )
 
         if pose_error < 1e-3 and orientation_error < 1e-3:
