@@ -142,7 +142,7 @@ The dimensions and joint arrangements shown above are my estimates created only 
 
 ```The error can depend on the shape of the object and where the centeroid is located. A circle and sphere are the best shapes to test the accuracy)```
 
-### Error mesurements  
+### Error measurements  
 - Mean error: 0.09076341669262535 m
 - Maximum error: 8.911642841986879 m  
 ``` only once happend, and it was the last value before stopping detecting targets ```
