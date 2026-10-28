@@ -6,13 +6,18 @@ class Constants:
     class Simulation:
 
         ENABLE_SIMULATION = True # enable or disable the simulation, if set to False, the tests will run
-        KIND_OF_TEST = 'vision' # 'kinematics' or 'vision' 
-        NUMBER_OF_TESTS = 10000 if KIND_OF_TEST != 'vision' else 27 # number of tests to run, if KIND_OF_TEST is 'kinematics', it can be any number, if KIND_OF_TEST is 'vision', it must be a perfect cube (1, 8, 27, 64, 125, 216, 343, 512, 729, 1000)
-    
+        KIND_OF_TEST = 'vision' # 'kinematics' or 'vision' or 'trajectory'
+        if KIND_OF_TEST == 'kinematics':
+            NUMBER_OF_TESTS = 10000
+        elif KIND_OF_TEST == 'vision':
+            NUMBER_OF_TESTS = 100
+        else:
+            NUMBER_OF_TESTS = 100 # default to 10 tests if the kind of test is not recognized
+
     class Camera:
 
-        WIDTH = 320 # width of the camera image
-        HEIGHT = 240 # height of the camera image
+        WIDTH = 640 # width of the camera image
+        HEIGHT = 480 # height of the camera image
         FOV = 60 # Field of View in degrees
         DETECT_COLOR_MAX = [0, 0, 255]  # Bright color for detection
         DETECT_COLOR_MIN = [0, 0, 55]   # Dark color for detection
@@ -62,6 +67,26 @@ class Constants:
             3.124,
             3.124
         ]) # Maximum joint angles
+
+        JOINT_MAX_VELOCITY = np.array([
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+        ]) # Maximum joint velocities
+
+        JOINT_MAX_ACCELERATION = np.array([
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+        ]) # Maximum joint accelerations
         
         TARGET_SEPARATION = 0.01 # Separation in meters between the target and the end effector when the end effector is at the target position
 
@@ -70,3 +95,5 @@ class Constants:
         DAMPING_RATIO = 1 # Damping ratio for the end effector's motion to the target position
 
         NATURAL_FREQUENCY = 4.0 / (DAMPING_RATIO * DESIRED_SETTLING_TIME) # Natural frequency for the end effector's motion to the target position
+
+        DT = 1.0 / 240.0  # Simulation time step

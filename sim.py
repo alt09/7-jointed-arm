@@ -20,11 +20,11 @@ def sim():
     p.setGravity(0, 0, 0)
 
     log = logger.RobotLogger()
-    dt = 1.0 / 240.0  # Simulation time step
+    dt = constants.Constants.Robot.DT  # Simulation time step
     
     #p.loadURDF("plane.urdf")  # load the plane
     arm_id = p.loadURDF("URDF/arm.urdf", basePosition=constants.Constants.Robot.ARM_BASE_POSITION, useFixedBase=True)
-    # r2d2_id = p.loadURDF("r2d2.urdf", basePosition=constants.Constants.Robot.R2D2_BASE_POSITION, useFixedBase=True)
+    r2d2_id = p.loadURDF("r2d2.urdf", basePosition=constants.Constants.Robot.R2D2_BASE_POSITION, useFixedBase=False)
 
     # Disable default motor control for all joints
     for joint_index in range(7):
@@ -80,52 +80,58 @@ def sim():
 
 
             # generate a trajectory from the current joint positions to the goal joint positions
-            traj = trajectory.generate_trajectory(
-                q_start=np.array(q_current),
-                q_goal=np.array(q_goal),
-                max_velocity=np.array([1.0] * 7),  # max velocity for each joint
-                max_acceleration=np.array([1.0] * 7),  # max acceleration for each joint
-                dt=dt
-            )
 
-            # remove the previous R2D2 model if it exists
-            # if r2d2_id is not None:
+            if q_current is None or q_goal is None:
+                print("Current or goal joint positions are None. Skipping trajectory generation.")
+                robot_controller.stay(arm_id)
+                    
+            else: 
+                
+                traj = trajectory.generate_trajectory(
+                    q_start=np.array(q_current),
+                    q_goal=np.array(q_goal),
+                    max_velocity=constants.Constants.Robot.JOINT_MAX_VELOCITY,  # max velocity for each joint
+                    max_acceleration=constants.Constants.Robot.JOINT_MAX_ACCELERATION,  # max acceleration for each joint
+                    dt=dt
+                )
+                # remove the previous R2D2 model if it exists
+                if r2d2_id is not None:
 
-            #     p.removeBody(r2d2_id)
-            #     r2d2_id = None
-            
-            # follow the generated trajectory
-            trajectory.follow_trajectory(arm_id, traj) 
+                    p.removeBody(r2d2_id)
+                    r2d2_id = None
+                
+                # follow the generated trajectory
+                trajectory.follow_trajectory(arm_id, traj)                 
 
             # this is a debug line to visualize the distance between the end effector and the last known target position
-            if last_target_position is not None:
+                if last_target_position is not None:
 
-                line_id = p.addUserDebugLine(
-                    lineFromXYZ = endeffector_info[0],
-                    lineToXYZ = last_target_position,
-                    lineColorRGB = [1, 0, 0],
-                    lineWidth = 1,
-                    # lifeTime = 0.1,  # line will be visible for 0.1 seconds                
-                    physicsClientId = 0
-                )
+                    line_id = p.addUserDebugLine(
+                        lineFromXYZ = endeffector_info[0],
+                        lineToXYZ = last_target_position,
+                        lineColorRGB = [1, 0, 0],
+                        lineWidth = 1,
+                        lifeTime = 0.2,  # line will be visible for 0.1 seconds                
+                        physicsClientId = 0
+                    )
 
-            for i in range(7):
+                for i in range(7):
 
-                actual_position = q_current[i]
-                actual_velocity = qdot_current[i]
+                    actual_position = q_current[i]
+                    actual_velocity = qdot_current[i]
 
-                desired_position = q_goal[i]
+                    desired_position = q_goal[i]
 
-                log.log_joint(
-                    joint=i,
-                    desired_position=desired_position,
-                    actual_position=actual_position,
-                    actual_velocity=actual_velocity,
-                    additional_info=robot_controller.get_end_effector_state(arm_id)[0],  # Log the end effector position as additional info
-                    target_position=last_target_position.tolist() if last_target_position is None else robot_controller.get_end_effector_state(arm_id)[0],  # Log the last known target position or the end effector position if no target is known
-                    end_time=10.0  # Stop logging after 10 seconds 
-                )
-    
+                    log.log_joint(
+                        joint=i,
+                        desired_position=desired_position,
+                        actual_position=actual_position,
+                        actual_velocity=actual_velocity,
+                        additional_info=robot_controller.get_end_effector_state(arm_id)[0],  # Log the end effector position as additional info
+                        target_position=last_target_position.tolist() if last_target_position is None else robot_controller.get_end_effector_state(arm_id)[0],  # Log the last known target position or the end effector position if no target is known
+                        end_time=10000.0  # Stop logging after 10 seconds 
+                    )
+
     finally:  
 
         # Close the logger and plot the joint data

@@ -54,7 +54,8 @@ def go_to_target(arm_id,target_position, target_orientation):
         initial_q = get_current_joint_positions(arm_id)
     )
     # Move the arm to the target joint positions
-    go_to_PD(arm_id, target_joint_positions)
+    if target_joint_positions is not None:
+        go_to_PD(arm_id, target_joint_positions)
 
 def get_end_effector_state(arm_id):
     """
@@ -166,10 +167,12 @@ def go_to_target_with_IK(viewMatrix1,viewMatrix2,projectionMatrix,rgba_img1,rgba
                 target_orientation = target_orientation,
                 initial_q = get_current_joint_positions(arm_id)
             )
+
             last_q_solution = q_solution
 
-            go_to_PD(arm_id, q_solution)
-            print("last known position:",kinematics.forward_kinematics(q_solution)[0][:3, 3])
+            if q_solution is not None:
+                go_to_PD(arm_id, q_solution)
+                print("last known position:",kinematics.forward_kinematics(q_solution)[0][:3, 3])
 
             return last_q_solution
 
@@ -200,6 +203,8 @@ def stay(arm_id):
     for i in range(constants.Constants.Robot.END_EFFECTOR_LINK_INDEX+1):
 
         set_joint_velocities(i, 0, arm_id)
+        p.stepSimulation()
+
 
 def go_to_PD(arm_id, last_q_solution,target_velocity=0.0):
     """

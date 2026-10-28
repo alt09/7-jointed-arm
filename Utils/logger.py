@@ -1,3 +1,4 @@
+import ast
 import csv
 import os
 import time
@@ -22,7 +23,7 @@ def test_logger(log_file, succesful_tests=None, kind='all'):
     if kind == 'vision' or kind == 'all':
 
         position_vision = data['desired_position']
-        position_3d =position_vision.apply(eval)
+        position_3d = position_vision.apply(eval)
         # only use when position_vision is not None
         target_position_3d = data['target_position'].apply(eval)
         target_position_3d = target_position_3d[target_position_3d.notnull()]
@@ -48,7 +49,7 @@ def test_logger(log_file, succesful_tests=None, kind='all'):
         plt.show()
 
         plt.figure(figsize=(10, 6))
-        plt.plot(data['joint'], data['actual_position'], label='Vision Position Error')
+        plt.plot(data['joint'], data['position_error'], label='Vision Position Error')
         plt.title('Vision Position Error vs iteration')
         plt.xlabel('iteration')
         plt.ylabel('Position Error (m)')
@@ -59,7 +60,7 @@ def test_logger(log_file, succesful_tests=None, kind='all'):
 
 
         plt.figure(figsize=(10, 6))
-        plt.plot(data['actual_velocity'], data['actual_position'], label='Vision distance Error')
+        plt.plot(data['actual_velocity'], data['position_error'], label='Vision distance Error')
         plt.title('distance away of the camera from the target vs Pose error')
         plt.xlabel('Distance from target (m)')
         plt.ylabel('Position Error (m)') 
@@ -69,8 +70,8 @@ def test_logger(log_file, succesful_tests=None, kind='all'):
         plt.show()
 
         plt.figure(figsize=(10, 6))
-        average_vision_error = data["actual_position"].abs().mean()
-        max_vision_error = data["actual_position"].abs().max()
+        average_vision_error = data["position_error"].abs().mean()
+        max_vision_error = data["position_error"].abs().max()
         best_vision_error = data["actual_velocity"].abs().min()
 
         plt.bar(["Avrg Vision", "Max Vision"],
@@ -100,7 +101,7 @@ def test_logger(log_file, succesful_tests=None, kind='all'):
         plt.savefig("Media/Test/Vision/Best_Vision_Distance.png")  # Save the figure as a PNG file
         plt.show()
 
-
+        print(f"time taken for the tests: {data['time'].iloc[-1]} seconds")
 
     if kind == 'kinematics' or kind == 'all':
 
@@ -199,6 +200,72 @@ def test_logger(log_file, succesful_tests=None, kind='all'):
         plt.savefig("Media/Test/Kinematics/Error_Statistics.png")  # Save the figure as a PNG file
         plt.show()
 
+    if kind == 'trajectory' or kind == 'all':
+
+        q_current = np.stack(data['desired_position'].apply(ast.literal_eval).to_numpy())
+        q_goal = np.stack(data['actual_position'].apply(ast.literal_eval).to_numpy())
+
+        test_number = np.arange(len(data))
+
+        # Plot the desired and actual joint positions for each joint over the tests
+        plt.figure(figsize=(12, 6))
+
+        for joint in range(q_current.shape[1]):
+
+            plt.plot(
+                test_number,
+                q_current[:, joint],
+                label = f"Joint {joint + 1} Desired",
+                color = plt.cm.tab10(joint)  # Use a colormap for different joints
+            )
+            plt.plot(
+                test_number,
+                q_goal[:, joint],
+                linestyle = "--",
+                label = f"Joint {joint + 1} Actual",
+                color = plt.cm.tab10(joint)  # Use the same colormap for consistency
+            )
+
+        plt.title('Start and goal joint positions for each joint over the tests')
+        plt.xlabel('test')
+        plt.ylabel('Joint Position (rad)')
+        plt.legend(ncol=2)
+        plt.grid()
+        plt.savefig("Media/Test/Trajectory/Trajectory_Test_Positions.png")
+        plt.show()
+
+        # Extract maximum velocities and accelerations for each joint from the log data
+        max_velocities = data['actual_velocity'].apply(ast.literal_eval).apply(lambda x: np.max(np.abs(x)) if isinstance(x, list) and len(x) > 0 else 0)
+        max_accelerations = data["additional_info"].apply(ast.literal_eval).apply(lambda x: np.max(np.abs(x)) if isinstance(x, list) and len(x) > 0 else 0)
+        
+        # Generate bar plots for maximum velocity and acceleration across all joints
+        plt.figure(figsize=(12, 6))
+        plt.bar(["Max velocity", "Max acceleration"],
+                [np.max(max_velocities.max()), np.max(max_accelerations.max())],
+                color=['blue', 'orange']
+                )
+        plt.title('Trajectory Maximum Statistics')
+        plt.xlabel('Statistic Type')
+        plt.ylabel('Value')
+        plt.grid()
+        plt.savefig("Media/Test/Trajectory/Trajectory_Max.png")
+        plt.show()
+
+
+        # Generate bar plots for each joint's maximum velocity and acceleration
+        for i in range(7):
+
+            plt.figure(figsize=(12, 6))
+            plt.bar([f"Joint {i + 1} Max Velocity", f"Joint {i + 1} Max Acceleration"],
+                    [np.max(max_velocities[ i]), np.max(max_accelerations[ i])],
+                    color=['blue', 'orange']
+                    )
+            plt.title(f'Joint {i + 1} Maximum Statistics')
+            plt.xlabel('Statistic Type')
+            plt.ylabel('Value')
+            plt.grid()
+            plt.savefig(f"Media/Test/Trajectory/Joint_{i + 1}_Max.png")
+            plt.show()
 
 def plot_joint_data(log_file):
     """
@@ -211,9 +278,9 @@ def plot_joint_data(log_file):
     data = pd.read_csv(log_file)
 
     # Initialize lists to store average, final, and maximum errors for each joint
-    average_errors=[]
-    final_errors=[]
-    max_errors=[]
+    average_errors = []
+    final_errors = []
+    max_errors = []
 
     # Extract the 3D position and target position data from the DataFrame
     position_3d_data = data['additional_info']
@@ -395,13 +462,8 @@ class RobotLogger:
             end_time (float, optional): If specified, logging will stop after this time (in seconds).
         """
         elapsed = time.perf_counter() - self.start_time
-        if Constants.Simulation.KIND_OF_TEST != 'vision':
-            
-            error = desired_position - actual_position
 
-        else:
-
-            error = 0
+        error = desired_position - actual_position
 
         # If an end_time is specified and the elapsed time exceeds it, stop logging and close the file
         if end_time is not None and elapsed > end_time:
@@ -445,6 +507,26 @@ class RobotLogger:
         """
 
         elapsed = time.perf_counter() - self.start_time
+
+        if Constants.Simulation.KIND_OF_TEST == 'trajectory':
+            
+            test_number = any1
+            q_current = any2
+            q_goal = any3
+            time_passed = any4
+            velocities = any5
+            accelerations = any6
+
+            self.writer.writerow([
+                elapsed,
+                test_number,
+                q_current.tolist() if isinstance(q_current, np.ndarray) else q_current,
+                q_goal.tolist() if isinstance(q_goal, np.ndarray) else q_goal,
+                time_passed,  
+                velocities,  
+                accelerations,
+                None   
+            ])
         
         if Constants.Simulation.KIND_OF_TEST == 'kinematics':
            
@@ -483,7 +565,7 @@ class RobotLogger:
             iterations,
             target_position,
             actual_target_position,
-            0,
+            error,
             distance,
             can_see,
             actual_target_position
