@@ -5,7 +5,7 @@ class Constants:
 
     class Simulation:
 
-        ENABLE_SIMULATION = False # enable or disable the simulation, if set to False, the tests will run
+        ENABLE_SIMULATION = True # enable or disable the simulation, if set to False, the tests will run
         KIND_OF_TEST = 'vision' # 'kinematics' or 'vision' or 'trajectory'
         if KIND_OF_TEST == 'kinematics':
             NUMBER_OF_TESTS = 10000

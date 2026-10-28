@@ -203,7 +203,7 @@ def stay(arm_id):
     for i in range(constants.Constants.Robot.END_EFFECTOR_LINK_INDEX+1):
 
         set_joint_velocities(i, 0, arm_id)
-    p.stepSimulation()
+        p.stepSimulation()
 
 
 def go_to_PD(arm_id, last_q_solution,target_velocity=0.0):

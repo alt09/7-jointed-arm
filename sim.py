@@ -20,7 +20,7 @@ def sim():
     p.setGravity(0, 0, 0)
 
     log = logger.RobotLogger()
-    dt = 1.0 / 240.0  # Simulation time step
+    dt = constants.Constants.Robot.DT  # Simulation time step
     
     #p.loadURDF("plane.urdf")  # load the plane
     arm_id = p.loadURDF("URDF/arm.urdf", basePosition=constants.Constants.Robot.ARM_BASE_POSITION, useFixedBase=True)
@@ -86,6 +86,7 @@ def sim():
                 robot_controller.stay(arm_id)
                     
             else: 
+                
                 traj = trajectory.generate_trajectory(
                     q_start=np.array(q_current),
                     q_goal=np.array(q_goal),
@@ -93,7 +94,6 @@ def sim():
                     max_acceleration=constants.Constants.Robot.JOINT_MAX_ACCELERATION,  # max acceleration for each joint
                     dt=dt
                 )
-
                 # remove the previous R2D2 model if it exists
                 if r2d2_id is not None:
 
@@ -111,7 +111,7 @@ def sim():
                         lineToXYZ = last_target_position,
                         lineColorRGB = [1, 0, 0],
                         lineWidth = 1,
-                        lifeTime = 0.1,  # line will be visible for 0.1 seconds                
+                        lifeTime = 0.2,  # line will be visible for 0.1 seconds                
                         physicsClientId = 0
                     )
 
@@ -129,9 +129,9 @@ def sim():
                         actual_velocity=actual_velocity,
                         additional_info=robot_controller.get_end_effector_state(arm_id)[0],  # Log the end effector position as additional info
                         target_position=last_target_position.tolist() if last_target_position is None else robot_controller.get_end_effector_state(arm_id)[0],  # Log the last known target position or the end effector position if no target is known
-                        end_time=10.0  # Stop logging after 10 seconds 
+                        end_time=10000.0  # Stop logging after 10 seconds 
                     )
-    
+
     finally:  
 
         # Close the logger and plot the joint data
