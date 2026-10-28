@@ -1,6 +1,6 @@
 ID,Code location,Test_ID,Acceptance criteria,Status,Version_tested,Notes
 NEED-001,Movement,Test-kinematics-001,The arm is with in 3cm of the target position.,Pass,Feat #4: commit #108,N/A
-NEED-002,Vision,Test-vision-001,Target position should be within 10cm error.,Fail,Feat #4: commit #108,satisfy the triangulation error but has a max distance error of 15.5cm but a average distance error of 5.5cm
+NEED-002,Vision,Test-vision-001,Target position should be within 10cm error.,Pass,Dev: commit#113,satisfy the triangulation error but has a max distance error of 9.88cm but a average distance error of 5.5cm
 NEED-003,Trajectory,Test-trajectory-001,The arm follows each step of the trajectory.,Pass,Feat #4: commit #108,N/A
 NEED-004,All,Test-general-001,The system should not crash after receiving invalid measurements.,Pass,Feat #4: commit #108,N/A
 NEED-005,Logger,Test-general-001,The logger should show graphs showing the performance of the arm.,Pass,Feat #4: commit #108,N/A
@@ -9,7 +9,7 @@ SYS-002,All,Test-general-001,The robot arm should reach the target position.,Pas
 KIN-001,Movement\kinematics.py,Test-kinematics-001,FK error should be less than the error limit.,Pass,Feat #4: commit #108,N/A
 KIN-002,Movement\kinematics.py,Test-kinematics-001,"IK error should be less than the error limit, and should respect joint limits and impossible.",Pass,Feat #4: commit #108,N/A
 KIN-003,Movement\kinematics.py,Test-kinematics-001,The IK should report failure when it can not find a valid solution.,Pass,Feat #4: commit #108,N/A
-VIS-001,Vision\opencv.py,Test-vision-001,"The vision subsystem should estimate the 3D position of the target using the simulated cameras, satisfying the triangulation error and an error tolerance.",Fail,Feat #4: commit #108,satisfy the triangulation error but has a max distance error of 15.5cm but a average distance error of 5.5cm
+VIS-001,Vision\opencv.py,Test-vision-001,"The vision subsystem should estimate the 3D position of the target using the simulated cameras, satisfying the triangulation error and an error tolerance.",Pass,Dev: commit#113,satisfy the triangulation error but has a max distance error of 9.88cm but a average distance error of 5.5cm
 VIS-002,Vision\opencv.py,Test-vision-001,The vision subsystem should reject measurements when a triangulation error exceeds 0.05.,Pass,Feat #4: commit #108,N/A
 VIS-003,Vision\opencv.py,Test-general-001,The vision should be able to retain the last valid target 3D pose when the target is undetectable.,Pass,Feat #4: commit #108,N/A
 MOT-001,Movement\trajectory.py,Test-trajectory-001,The calculated joint acceleration should not exceed the joint acceleration limits of 1 rad/second^2.,Pass,Feat #4: commit #108,N/A
@@ -18,5 +18,5 @@ CTRL-001,Utils\pid.py,Test-general-001,The controller should bring the end effec
 LOG-001,Utils\logger.py,Test-general-001,The log file contains the 3D target position and the actual 3D position as well as the position and target position of each joint.,Pass,Feat #4: commit #108,N/A
 PERF-001,Movement\kinematics.py,Test-kinematics-001,FK solutions should mantein a maximum error below 1cm.,Pass,Feat #4: commit #108,N/A
 PERF-002,Movement\kinematics.py,Test-kinematics-001,IK solutions should mantein a maximum error below 1cm.,Pass,Feat #4: commit #108,N/A
-PERF-003,Vision\opencv.py,Test-vision-001,the maximum target 3D pose error should be below 10 cm.,Fail,Feat #4: commit #108,Max error of 15.5cm but a average error of 5.5cm
+PERF-003,Vision\opencv.py,Test-vision-001,the maximum target 3D pose error should be below 10 cm.,Pass,Dev: commit#113,Max error of 9.88cm but a average error of 5.5cm
 PERF-004,Utils\pid.py,Test-kinematics-001;Test-general-001,the controller should settle within 0.2 seconds.,Pass,Feat #4: commit #108,N/A

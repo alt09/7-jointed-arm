@@ -59,8 +59,8 @@ The purpose of this project is to develop a 7 jointed robotic arm simulation tha
 |---|---|
 | Total planned test cases | [10201] |
 | Tests executed | [10201] |
-| Tests passed | [10134] |
-| Tests failed | [4] |
+| Tests passed | [10138] |
+| Tests failed | [0] |
 | Tests blocked | [63] |
 | Requirements verified | [21] |
 | Requirements not verified | [0] |
@@ -82,10 +82,10 @@ The purpose of this project is to develop a 7 jointed robotic arm simulation tha
 ### 5.2 Vision 
 | ID | Name | Acceptance criteria | Actual result | Status
 |---|---|---|---|---|
-| NEED-002 | Vision need | Target position should be within 10cm error | Max error of 0.15m | Failed
-| VIS-001 | Stereo target position | The vision subsystem should estimate the 3D position of the target using the simulated cameras, satisfying the triangulation error and an error tolerance | Satisfied the triangulation error, but a max position error of 0.15m | Failed
+| NEED-002 | Vision need | Target position should be within 10cm error | Max error of 9.88cm | Pass
+| VIS-001 | Stereo target position | The vision subsystem should estimate the 3D position of the target using the simulated cameras, satisfying the triangulation error and an error tolerance | Satisfied the triangulation error, but a max position error of 9.88cm | Pass
 | VIS-002 | Measurement validation | The vision subsystem should reject measurements when a triangulation error exceeds 0.05 | The system rejected measurements with high triangulation error| Pass
-| PERF-003 | Vision accuracy | the maximum target 3D pose error should be below 10 cm | max position error of 0.15m | Failed
+| PERF-003 | Vision accuracy | the maximum target 3D pose error should be below 10 cm | max position error of 9.88cm | Pass
 
 ### 5.3 Trajectory 
 
@@ -112,9 +112,9 @@ The purpose of this project is to develop a 7 jointed robotic arm simulation tha
 
 | Defect ID | Test ID | Description | Severity | Resolution | Retest status |
 |---|---|---|---|---|---|
-| DEF-001 | Need-002 | The average vision error is below 10 cm, but it reaches at a max error of 15.5 cm or higher | medium | Vision tuning and complementation with other way to detect the target | Open 
-| DEF-002 | VIS-001 | The triangulation error is satisfied but the position error is not | medium | Vision tuning and complementation with other way to detect the target | Open 
-| DEF-003 | PERF-003 |  max error of 15.5 cm or higher | medium | Vision tuning and complementation with other way to detect the target | Open 
+| DEF-001 | Need-002 | The average vision error is below 10 cm, but it reaches at a max error of 15.5 cm or higher | medium | Vision tuning and complementation with other way to detect the target | Closed 
+| DEF-002 | VIS-001 | The triangulation error is satisfied, but the position error is not | medium | Vision tuning and complementation with other way to detect the target | Closed
+| DEF-003 | PERF-003 |  max error of 15.5 cm or higher | medium | Vision tuning and complementation with other way to detect the target | Closed 
 
 ## 7. Conclusions 
 

@@ -130,7 +130,13 @@ def extract_rgba_image(img_arr):
     return rgba_img
 
 def show_center_of_mass(endeffector_info, lower_color, upper_color):
-
+    """
+    Displays the center of mass of a red object in the images captured from two cameras based on the end effector's position and orientation.
+    Args:
+        endeffector_info (list): A list containing the end effector's position and orientation.
+        lower_color (list): The lower bound of the color range for object detection in HSV format.
+        upper_color (list): The upper bound of the color range for object detection in HSV format.
+    """
     rgba_img1 = extract_rgba_image(
         get_camera_images(
             viewMatrix1 = None,
@@ -253,8 +259,8 @@ def target_3d_pose(view_matrix_1,view_matrix_2,projectionMatrix,rgba_img1,rgba_i
         u2 = M2["m10"] / M2["m00"]
         v2 = M2["m01"] / M2["m00"]
 
-        D1 = pixel_to_world_ray(u1, v1, view_matrix_1, projectionMatrix, 320, 240)
-        D2 = pixel_to_world_ray(u2, v2, view_matrix_2, projectionMatrix, 320, 240)
+        D1 = pixel_to_world_ray(u1, v1, view_matrix_1, projectionMatrix, constants.Constants.Camera.WIDTH, constants.Constants.Camera.HEIGHT)
+        D2 = pixel_to_world_ray(u2, v2, view_matrix_2, projectionMatrix, constants.Constants.Camera.WIDTH, constants.Constants.Camera.HEIGHT)
 
         w0 = C1 - C2
 

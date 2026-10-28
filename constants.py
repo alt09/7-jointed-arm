@@ -5,8 +5,8 @@ class Constants:
 
     class Simulation:
 
-        ENABLE_SIMULATION = True # enable or disable the simulation, if set to False, the tests will run
-        KIND_OF_TEST = 'kinematics' # 'kinematics' or 'vision' or 'trajectory'
+        ENABLE_SIMULATION = False # enable or disable the simulation, if set to False, the tests will run
+        KIND_OF_TEST = 'vision' # 'kinematics' or 'vision' or 'trajectory'
         if KIND_OF_TEST == 'kinematics':
             NUMBER_OF_TESTS = 10000
         elif KIND_OF_TEST == 'vision':
@@ -16,8 +16,8 @@ class Constants:
 
     class Camera:
 
-        WIDTH = 320 # width of the camera image
-        HEIGHT = 240 # height of the camera image
+        WIDTH = 640 # width of the camera image
+        HEIGHT = 480 # height of the camera image
         FOV = 60 # Field of View in degrees
         DETECT_COLOR_MAX = [0, 0, 255]  # Bright color for detection
         DETECT_COLOR_MIN = [0, 0, 55]   # Dark color for detection

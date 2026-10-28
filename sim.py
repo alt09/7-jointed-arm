@@ -129,7 +129,7 @@ def sim():
                         actual_velocity=actual_velocity,
                         additional_info=robot_controller.get_end_effector_state(arm_id)[0],  # Log the end effector position as additional info
                         target_position=last_target_position.tolist() if last_target_position is None else robot_controller.get_end_effector_state(arm_id)[0],  # Log the last known target position or the end effector position if no target is known
-                        end_time=10000000.0  # Stop logging after 10 seconds 
+                        end_time=10.0  # Stop logging after 10 seconds 
                     )
     
     finally:  

@@ -136,23 +136,24 @@ The dimensions and joint arrangements shown above are my estimates created only 
 ## Vision
 ### Set up
 
-- Number of tests: 1000
+- Number of tests: 100
 - Object: sphere2.urdf
 - change DETECT_COLOR_MIN Constant to [0, 0, 0] (to detect all colors)
+- Test that can be seen: 64
+- Successful test: 64/64
 
 ```The error can depend on the shape of the object and where the centeroid is located. A circle and sphere are the best shapes to test the accuracy)```
 
 ### Error measurements  
-- Mean error: 0.09076341669262535 m
-- Maximum error: 8.911642841986879 m  
-``` only once happend, and it was the last value before stopping detecting targets ```
-- Detection rate: 66.5%
-- Number of accepted tests: 665/1000
-``` The error is caused by not being able to detect the object correctly (because it was too far)```
+- Mean error: 0.03796173044847929 m
+- Maximum error: 0.0988306821930961 m  
 - best before 6.519202405202649 m
 
 ### Results 
-The mean position error across accepted detections was approximately 9.08 cm. The maximum error of 8.91 m occurred only once, in the final measurement before target detection stopped, this affects the mean error, so in a average scenario it should be less than the obtained results.
+The mean position error across accepted detections was approximately 3.79 cm. The maximum error of 9.88 cm.
+
+Increasing the resolution of the camera increased the accuracy of the measurements, but it also made the simulation slower. 
+Increasing more the resolution will only make the simulation slower and the accuracy will remain almost the same.
 
 The primary limitation is the detection range. As the target moves farther away, the vision system becomes less reliable, resulting in missed detections and occasional large position errors.
 

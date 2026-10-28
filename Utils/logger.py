@@ -101,6 +101,8 @@ def test_logger(log_file, succesful_tests=None, kind='all'):
         plt.savefig("Media/Test/Vision/Best_Vision_Distance.png")  # Save the figure as a PNG file
         plt.show()
 
+        print(f"time taken for the tests: {data['time'].iloc[-1]} seconds")
+
     if kind == 'kinematics' or kind == 'all':
 
         # Extract the 3D position and target position data from the DataFrame
