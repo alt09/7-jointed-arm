@@ -95,3 +95,5 @@ class Constants:
         DAMPING_RATIO = 1 # Damping ratio for the end effector's motion to the target position
 
         NATURAL_FREQUENCY = 4.0 / (DAMPING_RATIO * DESIRED_SETTLING_TIME) # Natural frequency for the end effector's motion to the target position
+
+        DT = 1.0 / 240.0  # Simulation time step

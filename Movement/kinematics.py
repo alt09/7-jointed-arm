@@ -77,6 +77,9 @@ def inverse_kinematics(target_position,target_orientation,initial_q=None,max_ite
     else:
 
         q = np.asarray(initial_q, dtype=float)
+    if utils.is_reachable(target_position) is False:
+        print("Target position is not reachable.")
+        return None
 
     # Iterate to find the joint angles that achieve the target position and orientation    
     for i in range(max_iterations):
@@ -89,9 +92,13 @@ def inverse_kinematics(target_position,target_orientation,initial_q=None,max_ite
         if np.linalg.norm(error) < tolerance:
 
             print(f"IK converged in {i} iterations.")
+
             if max_iterations != 1000:
+
                 return q, i
+            
             else:
+
                 return q
         
         # Compute the Jacobian matrix for the current joint angles
@@ -122,6 +129,9 @@ def inverse_kinematics(target_position,target_orientation,initial_q=None,max_ite
     # If the maximum number of iterations is reached without convergence, print a message and return the current joint angles
     print(f"IK did not converge after {max_iterations} iterations. ")
     if max_iterations != 1000:
+
         return q, max_iterations
+    
     else:
+
         return q

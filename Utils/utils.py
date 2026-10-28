@@ -219,6 +219,7 @@ def orientation_error(current_orientation, target_orientation):
     ])
     
     return error
+
 def pose_error(current_T, target_position, target_orientation):
     """
     Computes the pose error between the current and target poses.
@@ -248,3 +249,20 @@ def pose_error(current_T, target_position, target_orientation):
     ])
 
     return error
+
+def is_reachable(target_position):
+    """
+    Checks if the target position is reachable by the robotic arm.
+    Args:
+        target_position (list): A list of 3 coordinates [x, y, z] representing the target position in 3D space.
+    Returns:
+        bool: True if the target position is reachable, False otherwise.
+    """
+
+    distance = np.linalg.norm(target_position)
+
+    # Check if the distance to the target position is within the robot's reach
+    if distance > 7.0: 
+        return False
+
+    return True
